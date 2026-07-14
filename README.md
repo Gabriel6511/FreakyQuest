@@ -24,7 +24,8 @@ Requer Playwright: `pip install playwright && playwright install chromium`
 
 ## Deploy
 
-Projeto configurado para Vercel (pasta estática).
+Deploy automático via Vercel a partir do GitHub (Gabriel6511/FreakyQuest, branch `main`).
+A cada `git push` para `main`, a Vercel publica em produção automaticamente. Não é mais necessário rodar `vercel --prod` manualmente.
 
 ## Funcionalidades principais
 
