@@ -1,0 +1,3507 @@
+--- 
++++ 
+@@ -56,14 +56,37 @@
+ 
+ // 2. OFFICIAL MENTORS DATABASE — ALL FREE FROM LEVEL 1!
++// ─────────────────────────────────────────────────────────────
++// GUIA PARA ADICIONAR NOVO MENTOR (ex: mentor #9, #20, #50...):
++//   1. Copie um objeto abaixo e ajuste todos os campos
++//   2. Adicione o tema CSS em styles.css (body.theme-<id>)
++//   3. Adicione as quotes em MENTOR_DASHBOARD_QUOTES
++//   4. Adicione uma entrada em MENTOR_REWARD_CONFIGS (ver linha ~405)
++//      — NÃO escreva o array de recompensas à mão. O gerador
++//      generateMentorRewards() monta as 23 etapas automaticamente
++//      a partir desse config, garantindo que todo mentor novo nasça
++//      com a MESMA profundidade de progressão que os outros.
++//   5. Coloque a imagem na pasta do projeto (nome = avatar field)
++//   6. filterCSS: filtro para imagem — 'anime' | 'real' | 'minimal'
++//   7. universe: agrupa na aba de mentores (ex: 'Dragon Ball', 'Naruto', 'Fisiculturistas')
++//      Para um universo novo (ex: 'Attack on Titan'), basta usar o nome aqui
++//      e adicioná-lo em UNIVERSE_ORDER / UNIVERSE_META (ver função MENTORS_LIST_FULL)
++// ─────────────────────────────────────────────────────────────
+ const OFFICIAL_MENTORS = [
++  // ══════════════ DRAGON BALL ══════════════
+   {
+-    id: 'bebezinho',
+-    name: 'Gabriel Ganley "Bebezinho"',
++    id: 'goku',
++    name: 'Son Goku',
++    universe: 'Dragon Ball',
++    category: 'anime',
++    archetype: 'effort',       // effort | genetics | wisdom | beast | legend
++    primaryStat: 'for',
+     levelReq: 1,
+-    theme: 'theme-bebezinho',
+-    avatar: 'bebezinho_tribute.png',
+-    quote: '"Wake wake! Abre o olho big! Fica Freaky! Hoje é All Day!"',
+-    buff: '+15% Força & +15% Foco (Tributo Especial)',
+-    colorHex: '#9b5de5',
++    theme: 'theme-goku',
++    avatar: 'goku.png',
++    filterCSS: 'contrast(1.5) saturate(2.0) brightness(0.88)',
++    quote: '"Oi, eu sou o Goku! Treinar na gravidade 100x vai te deixar insano. Vamos superar nossos limites hoje?"',
++    buff: '+15% Força & +5% Foco',
++    colorHex: '#f77f00',
++    particleType: 'ki',
+     isCustom: false
+   },
+@@ -71,21 +94,70 @@
+     id: 'brolyz',
+     name: 'Broly (Saga Z)',
++    universe: 'Dragon Ball',
++    category: 'anime',
++    archetype: 'beast',
++    primaryStat: 'for',
+     levelReq: 1,
+     theme: 'theme-brolyz',
+     avatar: 'brolyz.png',
++    filterCSS: 'contrast(1.6) saturate(1.8) brightness(0.85) hue-rotate(5deg)',
+     quote: '"O meu poder é máximo! Kakarotooooo!"',
+     buff: '+25% Força & +10% Resistência (Poder Supremo)',
+     colorHex: '#adff2f',
++    particleType: 'ki',
+     isCustom: false
+   },
++  // ══════════════ NARUTO ══════════════
+   {
+     id: 'rocklee',
+     name: 'Rock Lee',
++    universe: 'Naruto',
++    category: 'anime',
++    archetype: 'effort',
++    primaryStat: 'agi',
+     levelReq: 1,
+     theme: 'theme-rocklee',
+     avatar: 'rocklee.png',
++    filterCSS: 'contrast(1.4) saturate(1.9) brightness(0.9)',
+     quote: '"O trabalho duro vence o talento natural quando o talento natural não trabalha duro!"',
+     buff: '+10% Agilidade & +10% Vigor',
+     colorHex: '#38b000',
++    particleType: 'leaves',
++    isCustom: false
++  },
++  // ══════════════ ONE PUNCH MAN ══════════════
++  {
++    id: 'saitama',
++    name: 'Saitama',
++    universe: 'One Punch Man',
++    category: 'anime',
++    archetype: 'legend',
++    primaryStat: 'res',
++    levelReq: 1,
++    theme: 'theme-saitama',
++    avatar: 'saitama.png',
++    filterCSS: 'contrast(1.45) saturate(1.7) brightness(0.92)',
++    quote: '"100 flexões, 100 agachamentos, 100 abdominais e 10 km de corrida todos os dias! Isso é tudo."',
++    buff: '+30% Resistência & +30% Agilidade',
++    colorHex: '#e63946',
++    particleType: 'stars',
++    isCustom: false
++  },
++  // ══════════════ FISICULTURISTAS ══════════════
++  {
++    id: 'bebezinho',
++    name: 'Gabriel Ganley "Bebezinho"',
++    universe: 'Fisiculturistas',
++    category: 'real',
++    archetype: 'legend',
++    primaryStat: 'foc',
++    levelReq: 1,
++    theme: 'theme-bebezinho',
++    avatar: 'bebezinho_tribute.png',
++    filterCSS: 'contrast(1.3) saturate(0.15) sepia(0.5) brightness(0.95)',
++    quote: '"Wake wake! Abre o olho big! Fica Freaky! Hoje é All Day!"',
++    buff: '+15% Força & +15% Foco (Tributo Especial)',
++    colorHex: '#9b5de5',
++    particleType: 'embers',
+     isCustom: false
+   },
+@@ -93,21 +165,16 @@
+     id: 'ramondino',
+     name: 'Ramon Dino',
++    universe: 'Fisiculturistas',
++    category: 'real',
++    archetype: 'genetics',
++    primaryStat: 'vig',
+     levelReq: 1,
+     theme: 'theme-ramondino',
+     avatar: 'ramondino.png',
++    filterCSS: 'contrast(1.35) saturate(0.2) sepia(0.4) brightness(0.92)',
+     quote: '"Não tem segredo, irmão. É bater o peso certinho, treinar braço pesado e comer limpo! Acorda pro treino!"',
+     buff: '+12% Vigor & +8% Força',
+     colorHex: '#0077b6',
+-    isCustom: false
+-  },
+-  {
+-    id: 'goku',
+-    name: 'Son Goku',
+-    levelReq: 1,
+-    theme: 'theme-goku',
+-    avatar: 'goku.png',
+-    quote: '"Oi, eu sou o Goku! Treinar na gravidade 100x vai te deixar insano. Vamos superar nossos limites hoje?"',
+-    buff: '+15% Força & +5% Foco',
+-    colorHex: '#f77f00',
++    particleType: 'embers',
+     isCustom: false
+   },
+@@ -115,21 +182,16 @@
+     id: 'arnold',
+     name: 'Arnold S.',
++    universe: 'Fisiculturistas',
++    category: 'real',
++    archetype: 'legend',
++    primaryStat: 'for',
+     levelReq: 1,
+     theme: 'theme-arnold',
+     avatar: 'arnold.png',
++    filterCSS: 'contrast(1.3) saturate(0.1) sepia(0.55) brightness(0.9)',
+     quote: '"Se você quer crescer, tem que passar pela dor. Sinta o pump e venha comigo se quiser ficar gigantesco!"',
+     buff: '+20% Força e Hipertrofia Estética',
+     colorHex: '#d4af37',
+-    isCustom: false
+-  },
+-  {
+-    id: 'saitama',
+-    name: 'Saitama',
+-    levelReq: 1,
+-    theme: 'theme-saitama',
+-    avatar: 'saitama.png',
+-    quote: '"100 flexões, 100 agachamentos, 100 abdominais e 10 km de corrida todos os dias! Isso é tudo."',
+-    buff: '+30% Resistência & +30% Agilidade',
+-    colorHex: '#e63946',
++    particleType: 'embers',
+     isCustom: false
+   },
+@@ -137,10 +199,16 @@
+     id: 'nickwalker',
+     name: 'Nick Walker "The Mutant"',
++    universe: 'Fisiculturistas',
++    category: 'real',
++    archetype: 'genetics',
++    primaryStat: 'for',
+     levelReq: 1,
+     theme: 'theme-nickwalker',
+     avatar: 'nickwalker.png',
++    filterCSS: 'contrast(1.35) saturate(0.18) sepia(0.45) brightness(0.88)',
+     quote: '"Foque em progredir a carga, treine com intensidade bizarra de verdade e seja um Mutante no ginásio!"',
+     buff: '+25% Força & +10% Vigor (Hipertrofia Extrema)',
+     colorHex: '#ff5e00',
++    particleType: 'embers',
+     isCustom: false
+   }
+@@ -208,5 +276,32 @@
+ // 2b. MENTOR REWARDS — Sistema de progressão de Nível 1 ao 30
+ // ─────────────────────────────────────────────────────────────
++// TIER SYSTEM:
++//   Nv 1-5   → APRENDIZ  (hook rápido, recompensas visuais básicas)
++//   Nv 6-10  → DISCÍPULO (funcionalidades, áudio, protocolo de dieta)
++//   Nv 11-15 → GUERREIRO (buffs de atributo, missão exclusiva)
++//   Nv 16-20 → VETERANO  (transformações visuais avançadas)
++//   Nv 21-25 → ELITE     (raros, title + aura especial)
++//   Nv 26-30 → LENDA     (masterização, conteúdo eterno)
++// ─────────────────────────────────────────────────────────────
++// ─────────────────────────────────────────────────────────────
+ // SISTEMA DE TEMPLATE DE RECOMPENSAS — escala para infinitos mentores
++// ─────────────────────────────────────────────────────────────
++// Os mentores de hoje são uma "beta". O plano é adicionar MUITOS mais,
++// filtrados por anime/universo. Para que todo mentor novo nasça com a
++// MESMA estrutura de progressão (23 marcos, do nível 2 ao 30), em vez
++// de escrever na mão um array de 20+ linhas por mentor, preenchemos
++// um pequeno objeto de "config" e o gerador monta o resto.
++//
++// COMO ADICIONAR UM MENTOR #9 (ou #50):
++//   1. Adicione o mentor em OFFICIAL_MENTORS (id, name, universe, etc.)
++//   2. Adicione uma entrada em MENTOR_REWARD_CONFIGS com o mesmo id,
++//      preenchendo só as 8 partes realmente exclusivas dele:
++//      colorLabel, particleLabel, primaryStat, secondaryStat,
++//      tier1 (item nv5), tier2 (efeito nv10), mission (nv13),
++//      tier4 (efeito nv20), leaderboardTitle (nv22), finalTitle (nv25),
++//      easterDesc (nv29). Tudo o resto (nv 2,3,4,7,8,9,12,14,15,17,
++//      18,19,23,27,28,30) é gerado automaticamente com o nome e a cor
++//      do mentor — ninguém fica com progressão mais curta que outro.
++//   3. generateMentorRewards() roda para todos e popula MENTOR_REWARDS.
+ // ─────────────────────────────────────────────────────────────
+ const ATTR_LABELS = { for: 'Força', res: 'Resistência', agi: 'Agilidade', vig: 'Vigor', foc: 'Foco' };
+@@ -226,4 +321,5 @@
+ 
+   return [
++    // ── APRENDIZ (nv 1-5) ──
+     { lvl: 2, id: `m_${sc}_2`, type: 'css_class', value: `has-men-${sc}2`, icon: '🎨',
+       name: `Tema ${cfg.colorLabel} Ativado`,
+@@ -238,4 +334,6 @@
+       name: `⭐ DISCÍPULO — ${cfg.tier1.name}`,
+       desc: `Milestone! ${cfg.tier1.desc}` },
++
++    // ── DISCÍPULO (nv 6-10) ──
+     { lvl: 7, id: `m_${sc}_7`, type: 'xpbonus', value: 'xp+5', icon: '⚡',
+       name: '+5% XP global',
+@@ -250,4 +348,6 @@
+       name: `⭐ GUERREIRO — ${cfg.tier2.name}`,
+       desc: `Milestone! ${cfg.tier2.desc}` },
++
++    // ── GUERREIRO (nv 11-15) ──
+     { lvl: 12, id: `m_${sc}_12`, type: 'buff', value: `${p}+3`, icon: '💪',
+       name: `+3 ${pC} Permanente`,
+@@ -262,4 +362,6 @@
+       name: `⭐ VETERANO — +5 ${pC} + Fundo Especial`,
+       desc: `Milestone! +5 ${pL} acumulado e fundo animado especial de ${name}.` },
++
++    // ── VETERANO (nv 16-20) ──
+     { lvl: 17, id: `m_${sc}_17`, type: 'buff', value: `${p}+5|${s}+3`, icon: '🌀',
+       name: `+5 ${pC} + +3 ${sC} Permanentes`,
+@@ -274,4 +376,6 @@
+       name: `⭐ ELITE — ${cfg.tier4.name}`,
+       desc: `Milestone! ${cfg.tier4.desc}` },
++
++    // ── ELITE (nv 21-25) ──
+     { lvl: 22, id: `m_${sc}_22`, type: 'css_class', value: `has-men-${sc}22`, icon: '🏆',
+       name: 'Título no Leaderboard Global',
+@@ -283,4 +387,6 @@
+       name: `⭐ LENDA — "${cfg.finalTitle}"`,
+       desc: `Milestone Lendário! Aura máxima de ${name}. Título ${cfg.finalTitle} desbloqueado para sempre.` },
++
++    // ── LENDA (nv 26-30) ──
+     { lvl: 27, id: `m_${sc}_27`, type: 'content', value: `quotes_${sc}_pers`, icon: '💬',
+       name: 'Frases que referenciam seu progresso',
+@@ -298,4 +404,9 @@
+ }
+ 
++// ─────────────────────────────────────────────────────────────
++// CONFIGS POR MENTOR — só as partes exclusivas de cada um.
++// Todo o resto da progressão é gerado por generateMentorRewards().
++// PARA ADICIONAR UM MENTOR NOVO: copie um bloco e troque os valores.
++// ─────────────────────────────────────────────────────────────
+ const MENTOR_REWARD_CONFIGS = {
+   rocklee: {
+@@ -407,4 +518,7 @@
+ };
+ 
++// MENTOR_REWARDS é construído automaticamente a partir dos configs acima.
++// Mentores novos só precisam de uma entrada em MENTOR_REWARD_CONFIGS —
++// nenhuma linha extra de array precisa ser escrita à mão.
+ const MENTOR_REWARDS = {};
+ Object.keys(MENTOR_REWARD_CONFIGS).forEach(mentorId => {
+@@ -412,4 +526,98 @@
+ });
+ 
++// 2c. EQUIPMENT DATABASE & HELPERS
++const EQUIPMENT_DATABASE = [
++  {
++    id: 'item_faixa',
++    name: 'Faixa do Rock Lee',
++    slot: 'head',
++    icon: '🥋',
++    desc: 'Sua agilidade foi notada. Ganha uma borda verde neon no seu avatar.',
++    stats: { agi: 5 },
++    unlockDesc: 'Desbloqueia no Nível Geral 5 ou Mentor Rock Lee Nível 5.',
++    equivalentIds: ['item_faixa', 'has-item-faixa']
++  },
++  {
++    id: 'item_bracelete',
++    name: 'Braceletes de Aço',
++    slot: 'arms',
++    icon: '🦾',
++    desc: 'Braceletes de metal pesados equipados ao lado do seu nome.',
++    stats: { res: 5 },
++    unlockDesc: 'Desbloqueia no Nível Geral 10.',
++    equivalentIds: ['item_bracelete', 'has-item-bracelete']
++  },
++  {
++    id: 'item_aura',
++    name: 'Aura de Super Saiyajin',
++    slot: 'aura',
++    icon: '⚡',
++    desc: 'Uma aura de chamas douradas brilha ao redor do seu avatar.',
++    stats: { for: 8, foc: 4 },
++    unlockDesc: 'Desbloqueia no Nível Geral 20 ou Mentor Goku Nível 5.',
++    equivalentIds: ['item_aura', 'has-item-aura']
++  },
++  {
++    id: 'item_cinturão',
++    name: 'Cinturão de Ouro',
++    slot: 'waist',
++    icon: '🥇',
++    desc: 'O Cinturão de Ouro de Arnold. Confere uma borda dourada nos seus cards.',
++    stats: { for: 10 },
++    equivalentIds: ['item_cinturão', 'has-item-cinturo', 'has-item-cinturão'],
++    unlockDesc: 'Desbloqueia no Nível Geral 30 ou Mentor Arnold Nível 10.'
++  },
++  {
++    id: 'item_aurabroly',
++    name: 'Aura Lendária de Broly Z',
++    slot: 'aura',
++    icon: '🌋',
++    desc: 'Uma aura colossal de chamas verde néon brilha no seu avatar.',
++    stats: { for: 12, res: 6 },
++    unlockDesc: 'Desbloqueia no Nível Geral 40 ou Mentor Broly Nível 5.',
++    equivalentIds: ['item_aurabroly', 'has-item-aurabroly']
++  },
++  {
++    id: 'item_capa',
++    name: 'Capa do Saitama',
++    slot: 'aura',
++    icon: '🦸',
++    desc: 'A capa branca lendária flutua atrás do seu avatar.',
++    stats: { res: 15, agi: 10 },
++    unlockDesc: 'Desbloqueia no Nível Geral 50 ou Mentor Saitama Nível 5.',
++    equivalentIds: ['item_capa', 'has-item-capa']
++  }
++];
++
++function getEffectiveAttributes() {
++  const eff = {
++    for: state.attributes.for || 10,
++    res: state.attributes.res || 10,
++    agi: state.attributes.agi || 10,
++    vig: state.attributes.vig || 10,
++    foc: state.attributes.foc || 10
++  };
++  
++  if (state.equippedItems) {
++    Object.values(state.equippedItems).forEach(itemId => {
++      if (itemId) {
++        const item = EQUIPMENT_DATABASE.find(i => i.id === itemId);
++        if (item && item.stats) {
++          for (const [stat, val] of Object.entries(item.stats)) {
++            if (eff[stat] !== undefined) {
++              eff[stat] += val;
++            }
++          }
++        }
++      }
++    });
++  }
++  return eff;
++}
++
++function isItemUnlocked(item) {
++  if (!state.unlockedItems) return false;
++  return item.equivalentIds.some(id => state.unlockedItems.includes(id));
++}
+ 
+ // 3. EXERCISE TEMPLATES BY CLASS
+@@ -554,5 +762,8 @@
+   { id: 'limite_superado', name: 'Limite Superado', icon: '⚡', desc: 'Subiu para o Nível 5!' },
+   { id: 'freaky_tier', name: 'Atingiu Shape Lendário', icon: '👑', desc: 'Chegou ao Nível 25!' },
+-  { id: 'overload_champion', name: 'Rei do Overload', icon: '✊', desc: 'Progrediu carga pela primeira vez!' }
++  { id: 'overload_champion', name: 'Rei do Overload', icon: '✊', desc: 'Progrediu carga pela primeira vez!' },
++  { id: 'saitama_blessing', name: 'Bênção do Saitama', icon: '👊', desc: 'Selecionou o homem mais forte do mundo como mentor.' },
++  { id: 'mind_shield', name: 'Mente Blindada', icon: '🎯', desc: 'Concluiu todas as quests diárias do dia.' },
++  { id: 'gym_legend', name: 'Lenda do Ginásio', icon: '🔥', desc: 'Completou 10 treinos no total.' }
+ ];
+ 
+@@ -591,4 +802,5 @@
+ let state = {
+   charName: '',
++  eternalFlameClicks: 0,
+   charClass: 'bodybuilder',
+   charWeight: 75,
+@@ -601,7 +813,10 @@
+   focusMuscle: 'FullBody',
+   injury: 'Nenhum',
++  trainingDays: ['Seg', 'Ter', 'Qui', 'Sex'],
+   weeklyTrainGoal: 4,
+   notificationEnabled: true,
+   notificationTime: '18:00',
++  restTimerEnabled: true,
++  baseRestTime: 90,
+   workoutsThisWeek: 0,
+   lastWorkoutDate: '',
+@@ -634,4 +849,5 @@
+   dailyQuests: [],
+   unlockedTrophies: [],
++  showcaseTrophies: [],
+   soundEnabled: true,
+   
+@@ -641,5 +857,12 @@
+     A: { title: "Custom A", desc: "Sua ficha de treino customizada", exercises: [] },
+     B: { title: "Custom B", desc: "Sua ficha de treino customizada", exercises: [] },
+-    C: { title: "Custom C", desc: "Sua ficha de treino customizada", exercises: [] }
++    C: { title: "Custom C", desc: "Sua ficha de treino customizada", exercises: [] },
++    0: { title: "", desc: "Sua ficha de treino customizada", exercises: [], isCustomized: false },
++    1: { title: "", desc: "Sua ficha de treino customizada", exercises: [], isCustomized: false },
++    2: { title: "", desc: "Sua ficha de treino customizada", exercises: [], isCustomized: false },
++    3: { title: "", desc: "Sua ficha de treino customizada", exercises: [], isCustomized: false },
++    4: { title: "", desc: "Sua ficha de treino customizada", exercises: [], isCustomized: false },
++    5: { title: "", desc: "Sua ficha de treino customizada", exercises: [], isCustomized: false },
++    6: { title: "", desc: "Sua ficha de treino customizada", exercises: [], isCustomized: false }
+   },
+ 
+@@ -664,5 +887,7 @@
+   // Personal Records map for exercises: { "Supino Reto (Barra)": 40 }
+   personalRecords: {},
++  // Marcos de Força fixados pelo usuário no Cartão de Caçador (máx. 3 nomes de exercício)
+   pinnedRecords: [],
++  // Sequência de dias treinando (streak)
+   currentStreak: 0,
+   bestStreak: 0,
+@@ -702,5 +927,8 @@
+ 
+   // Persistência de séries do treino (por dia)
+-  activeSetsTracker: {}
++  activeSetsTracker: {},
++  
++  // Equipamentos equipados atualmente nos slots
++  equippedItems: { head: null, aura: null, arms: null, waist: null }
+ };
+ 
+@@ -735,4 +963,6 @@
+   Braços: { name: 'Rosca Alternada (Foco Braços)', sets: 3, targetReps: '10-12', muscle: 'Braços', weight: 10 },
+   Pernas: { name: 'Cadeira Extensora (Foco Pernas)', sets: 3, targetReps: '12-15', muscle: 'Pernas', weight: 30 },
++  Abdômen: { name: 'Abdominal Supra (Foco Abdômen)', sets: 3, targetReps: '15-20', muscle: 'Abdômen', weight: 0 },
++  Glúteos: { name: 'Elevação Pélvica (Foco Glúteos)', sets: 3, targetReps: '10-12', muscle: 'Glúteos', weight: 20 },
+   FullBody: null
+ };
+@@ -789,34 +1019,108 @@
+ }
+ 
++function getWeeklyDaysArray() {
++  if (!state.trainingDays || state.trainingDays.length === 0) {
++    state.trainingDays = ['Seg', 'Ter', 'Qui', 'Sex'];
++  }
++  return state.trainingDays;
++}
++
++function getActiveWorkoutIndex() {
++  const days = getWeeklyDaysArray();
++  let idx = parseInt(state.activeWorkoutDiv, 10);
++  if (isNaN(idx) || idx < 0 || idx >= days.length) {
++    idx = 0;
++    state.activeWorkoutDiv = '0';
++  }
++  return idx;
++}
++
++function getDefaultWorkoutTitle(index, dayName) {
++  const focuses = [
++    "Peito e Bíceps",
++    "Costas e Tríceps",
++    "Pernas e Ombros",
++    "Cardio e Core",
++    "Treino Extra",
++    "Braços e Abdômen",
++    "Alongamento"
++  ];
++  return `${dayName} - ${focuses[index % focuses.length]}`;
++}
++
+ function getResolvedWorkoutTemplate() {
++  if (!state.workoutSetsOverrides) state.workoutSetsOverrides = {};
++
++  const days = getWeeklyDaysArray();
++  const activeIdx = getActiveWorkoutIndex();
++  const dayName = days[activeIdx];
++
+   if (state.useCustomWorkout) {
+-    const base = state.customWorkouts[state.activeWorkoutDiv];
++    const base = state.customWorkouts[activeIdx];
++    let title = base.title;
++    if (!base.isCustomized || !title) {
++      title = getDefaultWorkoutTitle(activeIdx, dayName);
++    }
+     return {
+-      title: base.title,
++      title: title,
+       desc: base.desc,
+-      exercises: base.exercises.map((ex) => ({ ...ex }))
++      exercises: base.exercises.map((ex) => {
++        const overriddenSets = state.workoutSetsOverrides[ex.name];
++        return {
++          ...ex,
++          sets: (overriddenSets !== undefined) ? overriddenSets : ex.sets
++        };
++      })
+     };
+   }
+ 
+-  const raw = WORKOUT_TEMPLATES[state.charClass][state.activeWorkoutDiv];
++  const divMap = ['A', 'B', 'C'];
++  const divLetter = divMap[activeIdx % 3] || 'A';
++  const raw = WORKOUT_TEMPLATES[state.charClass][divLetter];
+   const expCfg = EXP_SCALE[state.charExp] || EXP_SCALE.rato;
+-  const exercises = raw.exercises.map((ex) => ({
+-    ...ex,
+-    weight: Math.round((ex.weight || 0) * expCfg.weight),
+-    sets: Math.max(2, Math.min(6, ex.sets + expCfg.sets))
+-  }));
++  const exercises = raw.exercises.map((ex) => {
++    const defaultSets = Math.max(2, Math.min(6, ex.sets + expCfg.sets));
++    const overriddenSets = state.workoutSetsOverrides[ex.name];
++    return {
++      ...ex,
++      weight: Math.round((ex.weight || 0) * expCfg.weight),
++      sets: (overriddenSets !== undefined) ? overriddenSets : defaultSets
++    };
++  });
+ 
+   const focus = state.focusMuscle;
+-  if (focus && focus !== 'FullBody' && FOCUS_BONUS_EXERCISES[focus]) {
+-    const bonus = { ...FOCUS_BONUS_EXERCISES[focus] };
+-    bonus.weight = Math.round((bonus.weight || 0) * expCfg.weight);
+-    exercises.unshift(bonus);
+-  }
+-
+-  const focusNote = focus && focus !== 'FullBody' ? ` · Ênfase: ${focus}` : '';
++  if (focus) {
++    const focusParts = typeof focus === 'string' ? focus.split(',').map(s => s.trim()) : (Array.isArray(focus) ? focus : [focus]);
++    const uniqueFocus = [...new Set(focusParts.filter(f => f && f !== 'FullBody' && FOCUS_BONUS_EXERCISES[f]))];
++    
++    uniqueFocus.reverse().forEach(f => {
++      const bonus = { ...FOCUS_BONUS_EXERCISES[f] };
++      bonus.weight = Math.round((bonus.weight || 0) * expCfg.weight);
++      
++      const defaultSets = bonus.sets;
++      const overriddenSets = state.workoutSetsOverrides[bonus.name];
++      bonus.sets = (overriddenSets !== undefined) ? overriddenSets : defaultSets;
++      
++      exercises.unshift(bonus);
++    });
++  }
++
++  const cleanFocusStr = focus ? (typeof focus === 'string' ? focus.split(',').map(s => s.trim()).filter(f => f && f !== 'FullBody').join(' + ') : '') : '';
++  const focusNote = cleanFocusStr ? ` · Ênfase: ${cleanFocusStr}` : '';
+   const expNote = state.charExp === 'novico' ? ' · Iniciante' : state.charExp === 'oldschool' ? ' · Avançado' : '';
+ 
++  let displayTitle = raw.title;
++  if (raw.title.includes(' - ')) {
++    const parts = raw.title.split(' - ');
++    displayTitle = `${dayName} - ${parts[1]}`;
++  } else if (raw.title.includes(' – ')) {
++    const parts = raw.title.split(' – ');
++    displayTitle = `${dayName} - ${parts[1]}`;
++  } else {
++    displayTitle = `${dayName} - ${raw.title}`;
++  }
++
+   return {
+-    title: raw.title,
++    title: displayTitle,
+     desc: raw.desc + focusNote + expNote,
+     exercises
+@@ -866,5 +1170,5 @@
+   const banner = document.getElementById('rest-timer-banner');
+   const countdown = document.getElementById('rest-timer-countdown');
+-  const fill = document.getElementById('rest-timer-progress-fill');
++  const svgFill = document.getElementById('rest-timer-fill-circle');
+   if (!banner || !countdown) return;
+ 
+@@ -885,19 +1189,26 @@
+   }
+ 
+-  const adjusted = Math.max(30, seconds - Math.floor((state.attributes.agi || 10) / 5) - leeCut);
++  const adjusted = Math.max(5, seconds - leeCut);
+   let remaining = adjusted;
++  const circumference = 264; // 2π × 42
+ 
+   if (restTimerInterval) clearInterval(restTimerInterval);
+   banner.classList.remove('hidden');
++  banner.classList.add('visible');
+   countdown.innerText = remaining;
+-  if (fill) fill.style.width = '100%';
++  if (svgFill) svgFill.style.strokeDashoffset = '0';
+ 
+   restTimerInterval = setInterval(() => {
+     remaining -= 1;
+     countdown.innerText = remaining;
+-    if (fill) fill.style.width = `${Math.max(0, (remaining / adjusted) * 100)}%`;
++    if (svgFill) {
++      const offset = circumference * (1 - remaining / adjusted);
++      svgFill.style.strokeDashoffset = offset;
++      svgFill.style.stroke = remaining <= 10 ? '#ef4444' : 'var(--color-primary)';
++    }
+     if (remaining <= 0) {
+       clearInterval(restTimerInterval);
+       restTimerInterval = null;
++      banner.classList.remove('visible');
+       banner.classList.add('hidden');
+       playSound('alarm');
+@@ -910,4 +1221,12 @@
+     }
+   }, 1000);
++
++  // +15s button
++  const addBtn = document.getElementById('btn-add-rest');
++  if (addBtn) {
++    addBtn.onclick = () => {
++      remaining = Math.min(remaining + 15, 999);
++    };
++  }
+ }
+ 
+@@ -918,5 +1237,8 @@
+   }
+   const banner = document.getElementById('rest-timer-banner');
+-  if (banner) banner.classList.add('hidden');
++  if (banner) {
++    banner.classList.remove('visible');
++    banner.classList.add('hidden');
++  }
+ }
+ 
+@@ -941,4 +1263,26 @@
+       saveState();
+     }
++  }
++}
++
++function checkDailyReset() {
++  const todayStr = new Date().toDateString();
++  if (!state.lastDailyResetDate) {
++    state.lastDailyResetDate = todayStr;
++    saveState();
++    return;
++  }
++
++  if (state.lastDailyResetDate !== todayStr) {
++    state.waterDrank = 0;
++    state.waterIntake = 0;
++    state.mealLogs = [];
++    state.dailyMacros = { kcal: 0, prot: 0, fiber: 0, carbs: 0 };
++    
++    // Generate new randomized quests
++    generateDailyQuests();
++    
++    state.lastDailyResetDate = todayStr;
++    saveState();
+   }
+ }
+@@ -960,4 +1304,51 @@
+ // 6. HIGH-QUALITY AUDIO ENGINE (IA MP3 & Web Audio Fallbacks)
+ const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
++
++// Dynamic Water Animation (Jiggle and Bubbles)
++function triggerWaterAnimation(waterPct) {
++  const cylinder = document.querySelector('.water-cylinder');
++  if (cylinder) {
++    cylinder.classList.remove('cylinder-bounce');
++    void cylinder.offsetWidth; // Force reflow
++    cylinder.classList.add('cylinder-bounce');
++    
++    // Remove class after animation ends
++    setTimeout(() => {
++      cylinder.classList.remove('cylinder-bounce');
++    }, 600);
++  }
++
++  if (waterPct > 0 && cylinder) {
++    const bubblesCount = 6 + Math.floor(Math.random() * 5); // 6 to 10 bubbles
++    const floatDist = (waterPct / 100) * 75; // cylinder height is 75px
++    
++    for (let i = 0; i < bubblesCount; i++) {
++      const bubble = document.createElement('div');
++      bubble.className = 'water-bubble';
++      
++      const size = 3 + Math.floor(Math.random() * 5); // 3px to 7px
++      bubble.style.width = `${size}px`;
++      bubble.style.height = `${size}px`;
++      
++      const leftVal = 10 + Math.random() * 80; // 10% to 90%
++      bubble.style.left = `${leftVal}%`;
++      
++      const delay = Math.random() * 0.4;
++      bubble.style.animationDelay = `${delay}s`;
++      
++      const duration = 0.5 + Math.random() * 0.4;
++      bubble.style.animationDuration = `${duration}s`;
++      
++      bubble.style.setProperty('--float-distance', `${floatDist}px`);
++      
++      cylinder.appendChild(bubble);
++      
++      const cleanupTime = (duration + delay) * 1000 + 100;
++      setTimeout(() => {
++        bubble.remove();
++      }, cleanupTime);
++    }
++  }
++}
+ 
+ function playSound(type) {
+@@ -1146,4 +1537,5 @@
+         state = JSON.parse(saved);
+         // Fallback arrays
++        if (state.eternalFlameClicks === undefined) state.eternalFlameClicks = 0;
+         if (!state.mealLogs) state.mealLogs = [];
+         if (!state.personalRecords) state.personalRecords = {};
+@@ -1152,9 +1544,16 @@
+         if (state.bestStreak === undefined) state.bestStreak = 0;
+         if (!state.customWorkouts) {
+-          state.customWorkouts = {
+-            A: { title: "Custom A", desc: "Sua ficha de treino customizada", exercises: [] },
+-            B: { title: "Custom B", desc: "Sua ficha de treino customizada", exercises: [] },
+-            C: { title: "Custom C", desc: "Sua ficha de treino customizada", exercises: [] }
+-          };
++          state.customWorkouts = {};
++        }
++        if (!state.customWorkouts.A) state.customWorkouts.A = { title: "Custom A", desc: "Sua ficha de treino customizada", exercises: [] };
++        if (!state.customWorkouts.B) state.customWorkouts.B = { title: "Custom B", desc: "Sua ficha de treino customizada", exercises: [] };
++        if (!state.customWorkouts.C) state.customWorkouts.C = { title: "Custom C", desc: "Sua ficha de treino customizada", exercises: [] };
++        for (let i = 0; i <= 6; i++) {
++          if (!state.customWorkouts[i]) {
++            state.customWorkouts[i] = { title: "", desc: "Sua ficha de treino customizada", exercises: [], isCustomized: false };
++          }
++        }
++        if (state.activeWorkoutDiv === 'A' || state.activeWorkoutDiv === 'B' || state.activeWorkoutDiv === 'C') {
++          state.activeWorkoutDiv = '0';
+         }
+         if (!state.foodsDb || state.foodsDb.length === 0) {
+@@ -1171,4 +1570,5 @@
+         }
+         if (!state.customMentors) state.customMentors = [];
++        if (!state.workoutSetsOverrides) state.workoutSetsOverrides = {};
+         
+         // Fallback for new onboarding fields
+@@ -1176,5 +1576,19 @@
+         if (state.focusMuscle === undefined) state.focusMuscle = 'FullBody';
+         if (state.injury === undefined) state.injury = 'Nenhum';
+-        if (state.weeklyTrainGoal === undefined) state.weeklyTrainGoal = 4;
++        if (state.trainingDays === undefined) {
++          const goal = state.weeklyTrainGoal || 4;
++          const mapping = {
++            1: ['Seg'],
++            2: ['Seg', 'Qua'],
++            3: ['Seg', 'Qua', 'Sex'],
++            4: ['Seg', 'Ter', 'Qui', 'Sex'],
++            5: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex'],
++            6: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'],
++            7: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab', 'Dom']
++          };
++          state.trainingDays = mapping[goal] || ['Seg', 'Ter', 'Qui', 'Sex'];
++        }
++        state.weeklyTrainGoal = state.trainingDays.length;
++        state.useCustomWorkout = true;
+         if (state.notificationEnabled === undefined) state.notificationEnabled = true;
+         if (state.notificationTime === undefined) state.notificationTime = '18:00';
+@@ -1182,8 +1596,14 @@
+         if (state.lastWorkoutDate === undefined) state.lastWorkoutDate = '';
+         if (state.lastNotificationDate === undefined) state.lastNotificationDate = '';
++        if (state.lastDailyResetDate === undefined) state.lastDailyResetDate = '';
+         if (state.targetWeight === undefined) state.targetWeight = state.charWeight || 75;
+         if (state.tutorialCompleted === undefined) state.tutorialCompleted = false;
+         if (state.unlockedItems === undefined) state.unlockedItems = [];
++        if (state.unlockedTrophies === undefined) state.unlockedTrophies = [];
++        if (state.showcaseTrophies === undefined) state.showcaseTrophies = [];
+         if (state.profilePic === undefined) state.profilePic = '';
++        if (state.equippedItems === undefined) {
++          state.equippedItems = { head: null, aura: null, arms: null, waist: null };
++        }
+         try {
+           const userObj = JSON.parse(localStorage.getItem('freaky_quest_user'));
+@@ -1231,5 +1651,5 @@
+         // Custom features fallbacks
+         if (!state.weightHistory) state.weightHistory = [parseFloat(state.charWeight) || 80];
+-        if (!state.strengthHistory) state.strengthHistory = [50 + (state.attributes.for || 10) * 1.5];
++        if (!state.strengthHistory) state.strengthHistory = [50 + (getEffectiveAttributes().for || 10) * 1.5];
+         if (!state.dailyChallenge) {
+           state.dailyChallenge = { id: 'dc_water', progress: 0, completed: false, claimed: false };
+@@ -1239,4 +1659,6 @@
+         if (state.waterDrank === undefined) state.waterDrank = state.waterIntake || 0;
+         if (state.dailyMacros === undefined) state.dailyMacros = { kcal: 0, prot: 0, fiber: 0, carbs: 0 };
++        if (state.restTimerEnabled === undefined) state.restTimerEnabled = true;
++        if (state.baseRestTime === undefined) state.baseRestTime = 90;
+ 
+         // Sync workoutHistory from freaky_quest_user into userProfile on load
+@@ -1376,10 +1798,10 @@
+ function checkLevelRewards(oldLvl, newLvl) {
+   const rewards = [
+-    { lvl: 5, id: 'item_faixa', name: 'Faixa do Rock Lee 🟩', icon: '🟢', desc: 'Sua agilidade foi notada. Você equipou a faixa do Rock Lee! Ganha uma borda verde neon no seu avatar.' },
+-    { lvl: 10, id: 'item_bracelete', name: 'Braceletes de Aço 🦾', icon: '⚙️', desc: 'Seus braços estão se tornando resistentes. Braceletes de metal equipados ao lado do seu nome!' },
+-    { lvl: 20, id: 'item_aura', name: 'Aura de Super Saiyajin ⚡🔥', icon: '🔥', desc: 'Seu Ki despertou! Uma aura de chamas douradas agora brilha ao redor do seu avatar!' },
+-    { lvl: 30, id: 'item_cinturão', name: 'Cinturão de Ouro 🏆', icon: '👑', desc: 'Estética inquestionável. O Cinturão de Ouro de Arnold foi equipado no fundo do seu Status!' },
+-    { lvl: 40, id: 'item_aurabroly', name: 'Aura Lendária de Broly Z 🟩🔥', icon: '🐉', desc: 'Seu poder é máximo! Uma aura colossal de chamas verde néon foi equipada no seu avatar!' },
+-    { lvl: 50, id: 'item_capa', name: 'Capa do Saitama ⬜', icon: '⬜', desc: 'Treino concluído. Você destravou a Capa do Saitama, que flutua atrás do seu avatar!' }
++    { lvl: 5, id: 'item_faixa', name: 'Faixa do Rock Lee', icon: '🥋', desc: 'Sua agilidade foi notada. Você equipou a faixa do Rock Lee! Ganha uma borda verde neon no seu avatar.' },
++    { lvl: 10, id: 'item_bracelete', name: 'Braceletes de Aço', icon: '🦾', desc: 'Seus braços estão se tornando resistentes. Braceletes de metal equipados ao lado do seu nome!' },
++    { lvl: 20, id: 'item_aura', name: 'Aura de Super Saiyajin', icon: '⚡', desc: 'Seu Ki despertou! Uma aura de chamas douradas agora brilha ao redor do seu avatar!' },
++    { lvl: 30, id: 'item_cinturão', name: 'Cinturão de Ouro', icon: '🥇', desc: 'Estética inquestionável. O Cinturão de Ouro de Arnold foi equipado no fundo do seu Status!' },
++    { lvl: 40, id: 'item_aurabroly', name: 'Aura Lendária de Broly Z', icon: '🌋', desc: 'Seu poder é máximo! Uma aura colossal de chamas verde néon foi equipada no seu avatar!' },
++    { lvl: 50, id: 'item_capa', name: 'Capa do Saitama', icon: '🦸', desc: 'Treino concluído. Você destravou a Capa do Saitama, que flutua atrás do seu avatar!' }
+   ];
+ 
+@@ -1737,39 +2159,85 @@
+ function generateDailyQuests() {
+   const quests = [];
+-  
+-  // 1. Water Quest
++  const todayStr = new Date().toDateString();
++  const seed = Math.abs(todayStr.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0));
++
++  // 1. Water Quest Pool
++  const waterPool = [
++    { name: 'Hidratação Padrão', desc: `Beber pelo menos ${state.waterTarget}L de água hoje`, xpReward: 20 },
++    { name: 'Cardio de H2O Supremo', desc: `Bater ou superar sua meta de água hoje (${state.waterTarget}L)`, xpReward: 25 },
++    { name: 'Purificação Líquida', desc: `Consumir pelo menos ${state.waterTarget}L de água para máxima eliminação de toxinas`, xpReward: 20 },
++    { name: 'Absorção Anabólica', desc: `Beber ${state.waterTarget}L de água hoje para otimizar síntese proteica`, xpReward: 25 }
++  ];
++  const waterChoice = waterPool[seed % waterPool.length];
+   quests.push({
+     id: 'quest_water',
+-    name: 'Hidratação Padrão',
+-    desc: `Beber pelo menos ${state.waterTarget}L de água hoje`,
+-    xpReward: 20,
++    name: waterChoice.name,
++    desc: waterChoice.desc,
++    xpReward: waterChoice.xpReward,
+     completed: false
+   });
+ 
+-  // 2. Diet Quest
++  // 2. Diet Quest Pool
++  const proteinPool = [
++    { name: 'Meta Nutricional', desc: `Bater pelo menos 80% da sua meta de proteínas (${Math.round(state.protTarget * 0.8)}g)`, xpReward: 25 },
++    { name: 'Hipertrofia Ativada', desc: `Consumir pelo menos 80% de proteínas hoje (${Math.round(state.protTarget * 0.8)}g) para anabolismo`, xpReward: 25 },
++    { name: 'Combustível Fibroso', desc: `Registrar pelo menos 80% da meta de proteínas (${Math.round(state.protTarget * 0.8)}g) nas refeições`, xpReward: 30 },
++    { name: 'Síntese de Caçador', desc: `Garantir aporte proteico diário de pelo menos (${Math.round(state.protTarget * 0.8)}g)`, xpReward: 25 }
++  ];
++  const proteinChoice = proteinPool[(seed + 1) % proteinPool.length];
+   quests.push({
+     id: 'quest_protein',
+-    name: 'Meta Nutricional',
+-    desc: `Bater pelo menos 80% da sua meta de proteínas (${Math.round(state.protTarget * 0.8)}g)`,
+-    xpReward: 25,
++    name: proteinChoice.name,
++    desc: proteinChoice.desc,
++    xpReward: proteinChoice.xpReward,
+     completed: false
+   });
+ 
+-  // 3. Class Quest
+-  let classQuest = {};
++  // 3. Class Quest Pool
++  let classPool = [];
+   switch(state.charClass) {
+     case 'bodybuilder':
+-      classQuest = { id: 'quest_class', name: 'Pump Máximo', desc: 'Finalizar um treino completo na arena de treino', xpReward: 30, completed: false };
++      classPool = [
++        { name: 'Pump Máximo', desc: 'Finalizar um treino completo na arena de treino', xpReward: 30 },
++        { name: 'Exaustão Muscular', desc: 'Finalizar um treino completo com foco em contração extrema', xpReward: 30 },
++        { name: 'Volume Anabólico', desc: 'Completar seu treino diário com esforço máximo', xpReward: 35 }
++      ];
+       break;
+     case 'powerlifter':
+-      classQuest = { id: 'quest_class', name: 'Batalha de Cargas', desc: 'Registrar cargas pesadas com postura perfeita', xpReward: 30, completed: false };
++      classPool = [
++        { name: 'Batalha de Cargas', desc: 'Registrar cargas pesadas com postura perfeita', xpReward: 30 },
++        { name: 'Tensão Extrema', desc: 'Completar um treino pesado com técnica perfeita e alta carga', xpReward: 35 },
++        { name: 'Levantamento de Ferro', desc: 'Registrar um treino focado em exercícios compostos pesados', xpReward: 30 }
++      ];
+       break;
+     case 'calistenia':
+-      classQuest = { id: 'quest_class', name: 'Controle de Aço', desc: 'Completar rotina calistênica isométrica', xpReward: 30, completed: false };
++      classPool = [
++        { name: 'Controle de Aço', desc: 'Completar rotina calistênica isométrica', xpReward: 30 },
++        { name: 'Gravidade Desafiada', desc: 'Finalizar um treino completo usando apenas o peso corporal', xpReward: 30 },
++        { name: 'Tensão Corporal', desc: 'Concluir treino focado em força isométrica e controle de core', xpReward: 35 }
++      ];
+       break;
+     case 'maratonista':
+-      classQuest = { id: 'quest_class', name: 'Cardio Violento', desc: 'Concluir treino de alta intensidade ou tiros rápidos', xpReward: 30, completed: false };
++      classPool = [
++        { name: 'Cardio Violento', desc: 'Concluir treino de alta intensidade ou tiros rápidos', xpReward: 30 },
++        { name: 'Ritmo de Caçador', desc: 'Finalizar treino de corrida ou cardio com alta frequência cardíaca', xpReward: 30 },
++        { name: 'Resistência Extrema', desc: 'Completar uma sessão de condicionamento de alta performance', xpReward: 35 }
++      ];
+       break;
+-  }
++    default:
++      classPool = [
++        { name: 'Desafio do Aço', desc: 'Concluir sua atividade física diária com foco total', xpReward: 30 }
++      ];
++  }
++  
++  const classChoice = classPool[(seed + 2) % classPool.length];
++  let classQuest = {
++    id: 'quest_class',
++    name: classChoice.name,
++    desc: classChoice.desc,
++    xpReward: classChoice.xpReward,
++    completed: false
++  };
++
+   const motivationNote = MOTIVATION_FLAVOR[state.motivation];
+   if (motivationNote) {
+@@ -1876,10 +2344,18 @@
+ // ==========================================
+ function updateUI() {
++  checkDailyReset();
+   // Recalculate targets just in case
+   recalculateMacrosTargets();
+ 
+   // Basic headers sync
+-  document.getElementById('player-name').innerText = state.charName;
++  const playerNameEl = document.getElementById('player-name');
++  if (playerNameEl) {
++    playerNameEl.innerHTML = `${state.charName} <span id="header-showcase-trophies" style="font-size: 0.95rem; display: inline-flex; gap: 4px; vertical-align: middle; margin-left: 8px;"></span>`;
++  }
+   document.getElementById('player-level-badge').innerText = `Lvl ${state.level}`;
++  
++  // Mentor HUD Level Sync
++  const mhsLevel = document.getElementById('mhs-level-badge');
++  if (mhsLevel) mhsLevel.innerText = state.level;
+   
+   const classLabels = {
+@@ -1899,4 +2375,9 @@
+   document.getElementById('xp-fill').style.width = `${xpPercent}%`;
+ 
++  const mhsXpText = document.getElementById('mhs-xp-text');
++  if (mhsXpText) mhsXpText.innerText = `${state.xp} / ${state.xpNeeded}`;
++  const mhsXpFill = document.getElementById('mhs-xp-fill');
++  if (mhsXpFill) mhsXpFill.style.width = `${xpPercent}%`;
++
+   // Get active mentor data (Official or Custom)
+   let activeMentorData = OFFICIAL_MENTORS.find(m => m.id === state.activeMentor);
+@@ -1925,11 +2406,68 @@
+   }
+ 
+-  // Mentor speech bubble
+-  document.getElementById('mentor-bubble-img').src = avatarSrc;
+-  document.getElementById('mentor-bubble-name').innerText = activeMentorData.name;
++  // ── Mentor Hero HUD (novo dashboard hero) ──
++  const heroImg = document.getElementById('mentor-bubble-img');
++  const heroName = document.getElementById('mentor-bubble-name');
++  const heroSub = document.getElementById('mhs-mentor-sub');
++  const heroQuote = document.getElementById('mentor-bubble-quote');
++  const heroCharName = document.getElementById('mhs-char-name');
++
++  if (heroImg) {
++    heroImg.src = avatarSrc;
++    if (activeMentorData.filterCSS) heroImg.style.filter = activeMentorData.filterCSS;
++  }
++  if (heroName) heroName.innerText = activeMentorData.name;
++  if (heroSub) {
++    const classLabel = classLabels[state.charClass] || state.charClass || '';
++    const mAffHero = (state.mentorAffinities && state.mentorAffinities[activeMentorData.id]) || { level: 1 };
++    const rankHero = getMentorRankTitle(mAffHero.level);
++    heroSub.innerText = `${classLabel} · ${rankHero.label}`;
++  }
++  if (heroCharName) heroCharName.innerText = state.charName || 'Hunter';
++
++  // Rings e orbs dinâmicos por cor do mentor
++  const mc = activeMentorData.colorHex || 'var(--color-primary)';
++  ['mhs-ring1','mhs-ring2'].forEach(id => {
++    const el = document.getElementById(id);
++    if (el) el.style.borderColor = mc;
++  });
++  const orb1 = document.getElementById('mhs-orb1');
++  const orb2 = document.getElementById('mhs-orb2');
++  if (orb1) orb1.style.background = mc;
++  if (orb2) orb2.style.background = activeMentorData.colorHex ? mc + 'bb' : 'var(--color-accent)';
++
++  const avatarGlow = document.getElementById('mhs-avatar-glow');
++  if (avatarGlow) avatarGlow.style.background = mc;
++
++  // Atributos no HUD
++  if (state.attributes) {
++    const eff = getEffectiveAttributes();
++    const attrMap = { for: 'dash-attr-for', res: 'dash-attr-res', agi: 'dash-attr-agi', vig: 'dash-attr-vig', foc: 'dash-attr-foc' };
++    Object.entries(attrMap).forEach(([key, elId]) => {
++      const el = document.getElementById(elId);
++      if (el) el.innerText = eff[key] ?? '—';
++    });
++  }
++
++  // Quote do mentor
+   const motivationTip = MOTIVATION_FLAVOR[state.motivation];
+-  document.getElementById('mentor-bubble-quote').innerText = motivationTip
+-    ? `${activeMentorData.quote} (${motivationTip})`
+-    : activeMentorData.quote;
++  const quoteText = motivationTip ? `${activeMentorData.quote} (${motivationTip})` : activeMentorData.quote;
++  if (heroQuote) heroQuote.innerText = quoteText.replace(/^"|"$/g, '');
++
++  // ── Active Mentor Bar (aba de mentores) ──
++  const ambImg = document.getElementById('amb-img');
++  const ambName = document.getElementById('amb-name');
++  const ambUniv = document.getElementById('amb-universe');
++  const ambLvl = document.getElementById('amb-lvl');
++  const ambRank = document.getElementById('amb-rank');
++  if (ambImg) { ambImg.src = avatarSrc; if (activeMentorData.filterCSS) ambImg.style.filter = activeMentorData.filterCSS; }
++  if (ambName) ambName.innerText = activeMentorData.name;
++  if (ambUniv) ambUniv.innerText = activeMentorData.universe || '';
++  if (ambLvl) {
++    const mAffBar = (state.mentorAffinities && state.mentorAffinities[activeMentorData.id]) || { level: 1 };
++    ambLvl.innerText = `Nv ${mAffBar.level}`;
++    const rankBar = getMentorRankTitle(mAffBar.level);
++    if (ambRank) { ambRank.innerText = rankBar.label; ambRank.style.color = rankBar.color; }
++  }
+ 
+   // Apply theme coloring
+@@ -1948,7 +2486,32 @@
+ 
+   // Sync basic UI elements based on userProfile
+-  document.getElementById('player-name').innerText = userProfile.name || state.charName || 'Nick';
+-  document.getElementById('player-level-badge').innerText = `Lvl ${state.level}`;
+-  
++  const pName = userProfile.name || state.charName || 'Nick';
++  const playerNameEl2 = document.getElementById('player-name');
++  if (playerNameEl2) {
++    playerNameEl2.innerHTML = `${pName} <span id="header-showcase-trophies" style="font-size: 0.95rem; display: inline-flex; gap: 4px; vertical-align: middle; margin-left: 8px;"></span>`;
++  }
++  document.getElementById('player-level-badge').innerText = `Nv ${state.level}`;
++
++  // Sync header badges
++  const headerTrophiesContainer = document.getElementById('header-showcase-trophies');
++  if (headerTrophiesContainer) {
++    headerTrophiesContainer.innerHTML = '';
++    if (state.showcaseTrophies && state.showcaseTrophies.length > 0) {
++      state.showcaseTrophies.forEach(slotId => {
++        const t = TROPHIES.find(item => item.id === slotId);
++        if (t) {
++          const badgeSpan = document.createElement('span');
++          badgeSpan.innerText = t.icon;
++          badgeSpan.title = t.name;
++          badgeSpan.style.cursor = 'help';
++          headerTrophiesContainer.appendChild(badgeSpan);
++        }
++      });
++    }
++  }
++
++  const mhsLevel2 = document.getElementById('mhs-level-badge');
++  if (mhsLevel2) mhsLevel2.innerText = state.level;
++
+   const uClass = userProfile.class || state.charClass || 'bodybuilder';
+   document.getElementById('player-class-name').innerText = classLabels[uClass] || uClass;
+@@ -1957,9 +2520,13 @@
+   document.getElementById('player-rank').innerText = uRank;
+ 
+-  // Mentor speech bubble
+-  const uMotivationTip = MOTIVATION_FLAVOR[userProfile.motivation || state.motivation];
+-  document.getElementById('mentor-bubble-quote').innerText = uMotivationTip
+-    ? `${activeMentorData.quote} (${uMotivationTip})`
+-    : activeMentorData.quote;
++  // Hero quote (safe — element may be the new mhs strip or legacy)
++  const heroQuoteEl = document.getElementById('mentor-bubble-quote');
++  if (heroQuoteEl) {
++    const uMotivationTip = MOTIVATION_FLAVOR[userProfile.motivation || state.motivation];
++    const fullQuote = uMotivationTip
++      ? `${activeMentorData.quote} (${uMotivationTip})`
++      : activeMentorData.quote;
++    heroQuoteEl.innerText = fullQuote.replace(/^"|"$/g, '');
++  }
+ 
+   // IMC Ficha indicators from userProfile
+@@ -1978,14 +2545,14 @@
+   if (imc < 18.5) {
+     imcCat = "Abaixo do Peso";
+-    imcRpgTip = "🏹 **Ectomorfo Ágil:** Alta agilidade nativa! Foco em bater o **Surplus de Calorias (Bulking)** urgente para ganhar massa muscular.";
++    imcRpgTip = "🏹 <strong>Ectomorfo Ágil:</strong> Alta agilidade nativa! Foco em bater o <strong>Surplus de Calorias (Bulking)</strong> urgente para ganhar massa muscular.";
+   } else if (imc < 25) {
+     imcCat = "Peso Ideal";
+-    imcRpgTip = "⚔️ **Shape Equilibrado:** Status corporais estáveis. Pronto para qualquer especialidade do ferro!";
++    imcRpgTip = "⚔️ <strong>Shape Equilibrado:</strong> Status corporais estáveis. Pronto para qualquer especialidade do ferro!";
+   } else if (imc < 30) {
+     imcCat = "Sobrepeso";
+-    imcRpgTip = "🛡️ **Potencial Tanker:** Força muscular acumulada! Ótimo para levantar cargas brutas e lapidar o shape.";
++    imcRpgTip = "🛡️ <strong>Potencial Tanker:</strong> Força muscular acumulada! Ótimo para levantar cargas brutas e lapidar o shape.";
+   } else {
+     imcCat = "Obesidade";
+-    imcRpgTip = "🌋 **Titã Supremo:** Enorme potencial de força bruta. Ajuste sua ingestão proteica e rotina semanal para lapidar essa muralha.";
++    imcRpgTip = "🌋 <strong>Titã Supremo:</strong> Enorme potencial de força bruta. Ajuste sua ingestão proteica e rotina semanal para lapidar essa muralha.";
+   }
+   document.getElementById('eval-imc-class').innerText = imcCat;
+@@ -2046,4 +2613,6 @@
+       saveState();
+       updateUI();
++      const pct = Math.min(100, Math.round((i / targetLitres) * 100));
++      triggerWaterAnimation(pct);
+     });
+     bottlesContainer.appendChild(b);
+@@ -2058,4 +2627,9 @@
+     const waterPct = Math.min(100, Math.round((currentLitres / targetLitres) * 100));
+     cylinderFill.style.height = `${waterPct}%`;
++    if (waterPct === 0) {
++      cylinderFill.classList.add('empty');
++    } else {
++      cylinderFill.classList.remove('empty');
++    }
+   }
+   
+@@ -2188,9 +2762,23 @@
+   const kcalPercent = Math.min(100, Math.floor((totalKcal / state.kcalTarget) * 100));
+   document.getElementById('diet-kcal-percent').innerText = `${kcalPercent}%`;
+-  
+-  // Circumference 251.32 for r=40
+-  const circ = 251.32;
+-  const ringOffset = circ - (kcalPercent / 100) * circ;
+-  document.getElementById('diet-kcal-ring-fill').style.strokeDashoffset = ringOffset;
++
++  // Anel KCAL — r=44, circunferência = 276.46
++  const kcalCirc = 276.46;
++  document.getElementById('diet-kcal-ring-fill').style.strokeDashoffset = kcalCirc - (kcalPercent / 100) * kcalCirc;
++
++  // Anel PROTEÍNA — r=28, circunferência = 175.93
++  const protPercent = Math.min(100, Math.floor((totalProt / state.protTarget) * 100));
++  const sideCirc = 175.93;
++  const protRing = document.getElementById('diet-prot-ring-fill');
++  if (protRing) protRing.style.strokeDashoffset = sideCirc - (protPercent / 100) * sideCirc;
++  const protVal = document.getElementById('diet-prot-val');
++  if (protVal) protVal.innerText = Math.round(totalProt);
++
++  // Anel FIBRAS — mesmo raio
++  const fiberPercent = Math.min(100, Math.floor((totalFiber / state.fiberTarget) * 100));
++  const fiberRing = document.getElementById('diet-fiber-ring-fill');
++  if (fiberRing) fiberRing.style.strokeDashoffset = sideCirc - (fiberPercent / 100) * sideCirc;
++  const fiberVal = document.getElementById('diet-fiber-val');
++  if (fiberVal) fiberVal.innerText = Math.round(totalFiber);
+ 
+   const goalText = {
+@@ -2338,10 +2926,33 @@
+   }
+ 
+-  // Attribute values
+-  document.getElementById('val-for').innerText = state.attributes.for;
+-  document.getElementById('val-res').innerText = state.attributes.res;
+-  document.getElementById('val-agi').innerText = state.attributes.agi;
+-  document.getElementById('val-vig').innerText = state.attributes.vig;
+-  document.getElementById('val-foc').innerText = state.attributes.foc;
++  // Attribute values (including gear bonuses)
++  const getGearBonus = (stat) => {
++    let bonus = 0;
++    if (state.equippedItems) {
++      Object.values(state.equippedItems).forEach(itemId => {
++        if (itemId) {
++          const item = EQUIPMENT_DATABASE.find(i => i.id === itemId);
++          if (item && item.stats && item.stats[stat]) bonus += item.stats[stat];
++        }
++      });
++    }
++    return bonus;
++  };
++
++  const renderStat = (id, base, stat) => {
++    const bonus = getGearBonus(stat);
++    const el = document.getElementById(id);
++    if (el) {
++      el.innerHTML = bonus > 0 
++        ? `${base + bonus} <span class="stat-gear-bonus" style="color: var(--color-accent); font-size: 0.8em; font-weight: bold;">(+${bonus} Equip.)</span>`
++        : `${base}`;
++    }
++  };
++
++  renderStat('val-for', state.attributes.for, 'for');
++  renderStat('val-res', state.attributes.res, 'res');
++  renderStat('val-agi', state.attributes.agi, 'agi');
++  renderStat('val-vig', state.attributes.vig, 'vig');
++  renderStat('val-foc', state.attributes.foc, 'foc');
+ 
+   // Attribute Points Indicator
+@@ -2359,8 +2970,9 @@
+   }
+ 
+-  // Render trophies slots
++  // Render trophies slots & showcase
+   renderTrophies();
+-
+-  // Apply unlocked item visual classes to body so CSS selectors work globally
++  renderShowcase();
++
++  // Apply unlocked/equipped item visual classes to body so CSS selectors work globally
+   const itemClassMap = {
+     'item_faixa':     'has-item-faixa',
+@@ -2388,17 +3000,68 @@
+     'has-men-nic25':  'has-men-nic25'
+   };
++  
+   // Strip all previous item classes from body
+   Object.values(itemClassMap).forEach(cls => document.body.classList.remove(cls));
+-  // Re-apply currently owned ones
++
++  // Re-apply currently equipped or non-equipable unlocked ones
++  const equippedIds = state.equippedItems ? Object.values(state.equippedItems) : [];
+   if (state.unlockedItems && state.unlockedItems.length > 0) {
+     state.unlockedItems.forEach(id => {
+-      const cls = itemClassMap[id];
+-      if (cls) document.body.classList.add(cls);
++      const isEquipable = ['item_faixa', 'item_bracelete', 'item_aura', 'item_cinturão', 'item_aurabroly', 'item_capa'].includes(id) 
++                       || ['has-item-faixa', 'has-item-bracelete', 'has-item-aura', 'has-item-cinturo', 'has-item-aurabroly', 'has-item-capa'].includes(id);
++                       
++      if (isEquipable) {
++        let stdId = id;
++        if (id === 'has-item-faixa') stdId = 'item_faixa';
++        if (id === 'has-item-bracelete') stdId = 'item_bracelete';
++        if (id === 'has-item-aura') stdId = 'item_aura';
++        if (id === 'has-item-cinturo' || id === 'has-item-cinturão') stdId = 'item_cinturão';
++        if (id === 'has-item-aurabroly') stdId = 'item_aurabroly';
++        if (id === 'has-item-capa') stdId = 'item_capa';
++
++        const isEquipped = equippedIds.includes(stdId) || 
++                           (stdId === 'item_faixa' && equippedIds.includes('has-item-faixa')) ||
++                           (stdId === 'item_bracelete' && equippedIds.includes('has-item-bracelete')) ||
++                           (stdId === 'item_aura' && equippedIds.includes('has-item-aura')) ||
++                           (stdId === 'item_cinturão' && equippedIds.includes('has-item-cinturo')) ||
++                           (stdId === 'item_aurabroly' && equippedIds.includes('has-item-aurabroly')) ||
++                           (stdId === 'item_capa' && equippedIds.includes('has-item-capa'));
++
++        if (isEquipped) {
++          const cls = itemClassMap[stdId] || itemClassMap[id];
++          if (cls) document.body.classList.add(cls);
++        }
++      } else {
++        const cls = itemClassMap[id];
++        if (cls) document.body.classList.add(cls);
++      }
+     });
+   }
+ 
+-  // Render Daily Challenge & Evolution SVG Chart
++  // Sincronizar temporizador de descanso na interface de treinos
++  const quickRestEnable = document.getElementById('quick-rest-enable');
++  const quickRestTime = document.getElementById('quick-rest-time');
++  if (quickRestEnable) {
++    quickRestEnable.checked = state.restTimerEnabled !== false;
++  }
++  if (quickRestTime) {
++    quickRestTime.value = state.baseRestTime || 90;
++  }
++  const quickRestTimeWrap = document.getElementById('quick-rest-time-wrap');
++  if (quickRestTimeWrap) {
++    quickRestTimeWrap.style.display = (state.restTimerEnabled !== false) ? 'flex' : 'none';
++  }
++
++  // Render Daily Challenge & Evolution SVG Chart & Equipment Tab
+   renderDailyChallenge();
+   renderEvolutionChart();
++  renderEquipment();
++
++  // Update Eternal Flame Click Counter
++  const flameCountEl = document.getElementById('eternal-flame-count');
++  if (flameCountEl) {
++    const clicks = state.eternalFlameClicks || 0;
++    flameCountEl.innerText = `${clicks.toLocaleString('pt-BR')} toques de respeito`;
++  }
+ }
+ 
+@@ -2406,5 +3069,5 @@
+ function checkQuestRequirements() {
+   let changed = false;
+-  const focBonus = 1 + (state.attributes.foc * 0.01);
++  const focBonus = 1 + (getEffectiveAttributes().foc * 0.01);
+   state.dailyQuests.forEach(q => {
+     if (!q.completed) {
+@@ -2429,4 +3092,14 @@
+     }
+   });
++
++  // Check if all daily quests are completed for Mente Blindada
++  if (state.dailyQuests && state.dailyQuests.length > 0) {
++    const allDone = state.dailyQuests.every(q => q.completed);
++    if (allDone && !state.unlockedTrophies.includes('mind_shield')) {
++      unlockTrophy('mind_shield');
++      changed = true;
++    }
++  }
++
+   if (changed) {
+     saveState();
+@@ -2454,5 +3127,5 @@
+         playSound('quest');
+         q.completed = true;
+-        const focBonus = 1 + (state.attributes.foc * 0.01);
++        const focBonus = 1 + (getEffectiveAttributes().foc * 0.01);
+         addXP(Math.round(q.xpReward * focBonus));
+         saveState();
+@@ -2470,5 +3143,5 @@
+     const rewards = document.createElement('div');
+     rewards.className = 'quest-rewards';
+-    const focBonus = 1 + (state.attributes.foc * 0.01);
++    const focBonus = 1 + (getEffectiveAttributes().foc * 0.01);
+     rewards.innerHTML = `<span class="reward-badge xp-reward">+${Math.round(q.xpReward * focBonus)} XP</span>`;
+ 
+@@ -2498,8 +3171,26 @@
+   playSound('quest');
+   
++  // Screen shake on overload toast!
++  document.body.classList.add('screen-shake');
++  setTimeout(() => {
++    document.body.classList.remove('screen-shake');
++  }, 500);
++
+   // Slide up/fade out after 3.8s
+   setTimeout(() => {
+     toast.classList.add('hidden');
+   }, 3800);
++}
++
++function showGenericNotification(msg) {
++  const toast = document.getElementById('overload-notification');
++  const message = document.getElementById('overload-msg');
++  if (toast && message) {
++    message.innerText = msg;
++    toast.classList.remove('hidden');
++    setTimeout(() => {
++      toast.classList.add('hidden');
++    }, 3000);
++  }
+ }
+ 
+@@ -2561,5 +3252,5 @@
+ 
+   // Award XP: +15 base, scaled by FOR attribute
+-  const forBonus = 15 + Math.round((state.attributes.for || 10) * 0.5);
++  const forBonus = 15 + Math.round((getEffectiveAttributes().for || 10) * 0.5);
+   addXP(forBonus);
+   unlockTrophy('overload_champion');
+@@ -2707,4 +3398,43 @@
+ function renderWorkoutRoutine() {
+   purgeOldSetTrackerKeys();
++  
++  const days = getWeeklyDaysArray();
++  const activeIdx = getActiveWorkoutIndex();
++  const dayName = days[activeIdx];
++
++  // Dynamically render the day selector tabs
++  const selector = document.querySelector('.workout-division-selector');
++  if (selector) {
++    selector.innerHTML = '';
++    selector.style.display = 'grid';
++    if (days.length > 4) {
++      selector.style.gridTemplateColumns = 'repeat(auto-fit, minmax(80px, 1fr))';
++    } else {
++      selector.style.gridTemplateColumns = `repeat(${days.length}, 1fr)`;
++    }
++    
++    days.forEach((day, index) => {
++      const btn = document.createElement('button');
++      btn.className = `workout-div-btn${index === activeIdx ? ' active' : ''}`;
++      btn.setAttribute('data-div', index.toString());
++      btn.innerText = day;
++      btn.addEventListener('click', () => {
++        playSound('click');
++        state.activeWorkoutDiv = index.toString();
++        saveState();
++        
++        const exContainer = document.getElementById('exercises-list');
++        if (exContainer) {
++          exContainer.classList.remove('workout-slide-fade');
++          void exContainer.offsetWidth; // trigger reflow
++          exContainer.classList.add('workout-slide-fade');
++        }
++        
++        renderWorkoutRoutine();
++      });
++      selector.appendChild(btn);
++    });
++  }
++
+   const template = getResolvedWorkoutTemplate();
+ 
+@@ -2715,5 +3445,6 @@
+     inputEl.addEventListener('input', (e) => {
+       const val = e.target.value;
+-      state.customWorkouts[state.activeWorkoutDiv].title = val;
++      state.customWorkouts[activeIdx].title = val;
++      state.customWorkouts[activeIdx].isCustomized = true;
+       saveState();
+     });
+@@ -2741,67 +3472,58 @@
+   template.exercises.forEach((ex, exIdx) => {
+     const card = document.createElement('div');
+-    card.className = 'exercise-card glass-panel exercise-dynamic-card';
+-
+-    // ── PR Meta row: shows current record, rival badge, and live PR badge ──
++    card.className = 'exercise-card-new';
++
+     const prevRecord = state.personalRecords[ex.name];
+-    
+-    // Check for Rivalry pinned targets
+-    let rivalHtml = '';
+     const rival = userProfile.rivals && userProfile.rivals[ex.name];
+-    if (rival) {
+-      rivalHtml = `<span class="rival-ghost-badge">🎯 Rival: ${rival.name} (${rival.weight} kg)</span>`;
+-      if (prevRecord === undefined || prevRecord < rival.weight) {
+-        card.classList.add('rival-ahead');
+-      }
+-    }
+-
+-    const prMetaRow = document.createElement('div');
+-    prMetaRow.className = 'exercise-pr-meta-row';
+-    prMetaRow.innerHTML = `
+-      <div class="exercise-title-area">
+-        <div style="display:flex; align-items:center; gap:8px;">
+-          <h4>${ex.name}</h4>
+-          ${rivalHtml}
++    if (rival && (prevRecord === undefined || prevRecord < rival.weight)) {
++      card.style.cssText += ';box-shadow:0 0 0 1.5px rgba(255,50,80,0.5),0 0 16px rgba(255,50,80,0.15)';
++    }
++
++    // ── Header ──
++    const exNum = String(exIdx + 1).padStart(2, '0');
++    card.innerHTML = `
++      <div class="exc-header">
++        <div class="exc-name-area">
++          <div class="exc-number">${exNum}</div>
++          <div class="exc-info">
++            <h4 class="exc-name">${ex.name}</h4>
++            <span class="exc-muscle">${ex.muscle}${rival ? ` · 🎯 Rival: ${rival.name} (${rival.weight}kg)` : ''}</span>
++          </div>
+         </div>
+-        <span class="exercise-muscle-tag">Grupo: ${ex.muscle}</span>
+-      </div>
+-      <div style="display:flex; flex-direction:column; align-items:flex-end; gap:2px;">
+-        <span class="badge" style="background: var(--color-primary-glow); font-size: 0.65rem;">Meta: ${ex.sets}x ${ex.targetReps} reps</span>
+-        ${prevRecord !== undefined
+-          ? `<span class="exercise-record-label">🏆 Record: ${prevRecord} kg</span>`
+-          : `<span class="exercise-record-label" style="color:var(--text-muted);">Sem record</span>`
+-        }
+-      </div>
+-    `;
+-    card.appendChild(prMetaRow);
+-
+-    // ── PR Badge (hidden until broken) ──
++        <div class="exc-meta">
++          <span class="exc-target">${ex.sets}×${ex.targetReps}</span>
++          ${prevRecord !== undefined
++            ? `<span class="exc-pr">🏆 ${prevRecord}kg</span>`
++            : `<span class="exc-pr" style="color:var(--text-muted)">Sem record</span>`}
++        </div>
++      </div>`;
++
++    // ── PR badge ──
+     const prBadge = document.createElement('div');
+-    prBadge.className = 'exercise-pr-badge';
++    prBadge.className = 'exc-pr-badge';
+     prBadge.style.display = 'none';
+-    prBadge.innerText = 'RECORD QUEBRADO! ⚔️';
++    prBadge.innerHTML = '⚡ RECORDE QUEBRADO! +15 XP';
+     card.appendChild(prBadge);
+ 
+-    // Warn about joint injury if applicable
++    // ── Alerta lesão ──
+     const warningText = checkExerciseInjuryWarning(ex.name, ex.muscle);
+     if (warningText) {
+-      const warnBadge = document.createElement('div');
+-      warnBadge.className = 'exercise-warning-badge';
+-      warnBadge.innerText = warningText;
+-      card.appendChild(warnBadge);
+-    }
+-
+-    // If Custom mode, show a small Delete button
++      const warn = document.createElement('div');
++      warn.className = 'exercise-warning-badge';
++      warn.innerText = warningText;
++      card.appendChild(warn);
++    }
++
++    // ── Botão excluir (modo custom) ──
+     if (state.useCustomWorkout) {
+       const delBtn = document.createElement('button');
+       delBtn.className = 'btn-delete-exercise';
+       delBtn.innerHTML = '✕';
+-      delBtn.title = 'Remover Exercício';
++      delBtn.title = 'Remover';
+       delBtn.addEventListener('click', () => {
+-        if (confirm(`Remover "${ex.name}" da sua ficha personalizada?`)) {
++        if (confirm(`Remover "${ex.name}" da ficha?`)) {
+           playSound('click');
+-          state.customWorkouts[state.activeWorkoutDiv].exercises.splice(exIdx, 1);
+-          saveState();
+-          updateUI();
++          state.customWorkouts[activeIdx].exercises.splice(exIdx, 1);
++          saveState(); updateUI();
+         }
+       });
+@@ -2809,24 +3531,24 @@
+     }
+ 
+-    // ── Overall Exercise Weight Input ──
+-    const maxLoadRow = document.createElement('div');
+-    maxLoadRow.className = 'exercise-max-load-row';
+-    maxLoadRow.innerHTML = `
+-      <label>Carga Máxima de Hoje:</label>
+-      <input type="number" class="set-input max-weight-input" value="${(ex.weight !== undefined) ? ex.weight : (state.personalRecords[ex.name] || ex.weight || 0)}" placeholder="kg">
+-      <span class="unit-label">kg</span>
+-    `;
+-    card.appendChild(maxLoadRow);
+-
+-    const weightInput = maxLoadRow.querySelector('.max-weight-input');
++    // ── Carga input ──
++    const loadRow = document.createElement('div');
++    loadRow.className = 'exc-load-row';
++    const initWeight = ex.weight !== undefined ? ex.weight : (state.personalRecords[ex.name] || 0);
++    const hintTxt = prevRecord !== undefined ? `↑ supere ${prevRecord}kg = novo record!` : 'Digite a carga de hoje';
++    loadRow.innerHTML = `
++      <span class="exc-load-lbl">CARGA</span>
++      <input type="number" class="exc-load-input max-weight-input" value="${initWeight}" placeholder="0" min="0" step="0.5">
++      <span class="exc-load-unit">kg</span>
++      <span class="exc-load-hint">${hintTxt}</span>`;
++    card.appendChild(loadRow);
++
++    const weightInput = loadRow.querySelector('.exc-load-input');
+     weightInput.addEventListener('input', () => {
+       const w = parseFloat(weightInput.value) || 0;
+       ex.weight = w;
+-      // Live PR preview
+-      const curRecord = state.personalRecords[ex.name];
+-      if (w > 0 && (curRecord === undefined || w > curRecord)) {
+-        prBadge.innerText = curRecord === undefined ? '⚡ PRIMEIRO REGISTRO!' : 'RECORD QUEBRADO! ⚔️';
++      const curRec = state.personalRecords[ex.name];
++      if (w > 0 && (curRec === undefined || w > curRec)) {
++        prBadge.innerHTML = curRec === undefined ? '⚡ PRIMEIRO REGISTRO!' : '⚡ RECORDE QUEBRADO! +15 XP';
+         prBadge.style.display = 'flex';
+-        prBadge.style.opacity = '0.55';
+       } else {
+         prBadge.style.display = 'none';
+@@ -2834,32 +3556,33 @@
+       saveState();
+     });
+-
+     weightInput.addEventListener('change', () => {
+       const w = parseFloat(weightInput.value) || 0;
+-      if (w > 0) {
+-        tryBreakPR(ex.name, w, prBadge);
+-      }
++      if (w > 0) tryBreakPR(ex.name, w, prBadge);
+     });
+ 
+-    // ── Dynamic Series Input ──
+-    const setsCountRow = document.createElement('div');
+-    setsCountRow.className = 'exercise-sets-count-row';
+-    setsCountRow.innerHTML = `
+-      <label>Quantidade de Séries:</label>
+-      <input type="number" class="set-input sets-count-input" value="${ex.sets}" min="1" max="10">
+-    `;
+-    card.appendChild(setsCountRow);
+-
+-    const setsInput = setsCountRow.querySelector('.sets-count-input');
+-    setsInput.addEventListener('change', (e) => {
++    // ── Séries: header + controle de quantidade ──
++    const setsHeader = document.createElement('div');
++    setsHeader.className = 'exc-sets-header';
++    setsHeader.innerHTML = `
++      <span class="exc-sets-header-lbl">SÉRIES</span>
++      <div class="exc-sets-count-wrap">
++        <input type="number" class="exc-sets-count-input sets-count-input" value="${ex.sets}" min="1" max="10">
++        <span style="font-size:9px;color:var(--text-muted)">séries</span>
++      </div>`;
++    card.appendChild(setsHeader);
++
++    setsHeader.querySelector('.exc-sets-count-input').addEventListener('change', (e) => {
+       const newSets = Math.max(1, Math.min(10, parseInt(e.target.value) || 4));
+       ex.sets = newSets;
+-      saveState();
+-      renderWorkoutRoutine();
++      if (state.useCustomWorkout) {
++        const origEx = state.customWorkouts[activeIdx].exercises.find(x => x.name === ex.name);
++        if (origEx) origEx.sets = newSets;
++      }
++      saveState(); renderWorkoutRoutine();
+     });
+ 
+-    // ── Horizontal Set Reps Input Row ──
+-    const repsRow = document.createElement('div');
+-    repsRow.className = 'exercise-reps-inline-row';
++    // ── Tiles de série ──
++    const setsRow = document.createElement('div');
++    setsRow.className = 'exc-sets-row';
+ 
+     for (let s = 1; s <= ex.sets; s++) {
+@@ -2867,64 +3590,44 @@
+       const setEntry = normalizeSetEntry(state.activeSetsTracker[setKey]);
+       const isDone = !!(setEntry && setEntry.completed);
+-
+-      const setCol = document.createElement('div');
+-      setCol.className = `rep-col ${isDone ? 'completed' : ''}`;
+-      setCol.style.display = 'flex';
+-      setCol.style.flexDirection = 'column';
+-      setCol.style.alignItems = 'center';
+-      setCol.style.gap = '3px';
+-
+-      const label = document.createElement('span');
+-      label.className = 'rep-label';
+-      label.innerText = `S${s}`;
+-      label.style.cursor = 'pointer';
+-      label.style.fontSize = '0.65rem';
+-      label.style.fontWeight = 'bold';
+-      label.style.color = isDone ? 'var(--color-primary)' : 'var(--text-muted)';
+-
+-      const repInput = document.createElement('input');
+-      repInput.type = 'text';
+-      repInput.className = 'rep-input';
+-      repInput.value = setEntry && setEntry.reps ? setEntry.reps : (ex.targetReps.includes('-') ? ex.targetReps.split('-')[0] : parseInt(ex.targetReps) || 10);
++      const repsVal = setEntry && setEntry.reps
++        ? setEntry.reps
++        : (ex.targetReps.includes('-') ? ex.targetReps.split('-')[0] : parseInt(ex.targetReps) || 10);
++
++      const tile = document.createElement('div');
++      tile.className = `exc-set-tile${isDone ? ' est-done' : ''}`;
++      tile.innerHTML = `<span class="est-label">S${s}</span><span class="est-check">✓</span>`;
++
++      const repsInput = document.createElement('input');
++      repsInput.type = 'number';
++      repsInput.className = 'est-reps rep-input';
++      repsInput.value = repsVal;
++      repsInput.min = 1; repsInput.max = 99;
++      tile.insertBefore(repsInput, tile.querySelector('.est-check'));
+ 
+       const toggleFunc = (forceState) => {
+-        const nextState = (forceState !== undefined) ? forceState : !isDone;
+-        const inputWeight = parseFloat(weightInput.value) || ex.weight || 0;
+-        const inputReps = parseInt(repInput.value, 10) || parseTargetReps(ex.targetReps);
+-
+-        if (nextState) {
+-          state.activeSetsTracker[setKey] = { completed: true, weight: inputWeight, reps: inputReps };
+-          const baseRest = 90;
+-          const restTime = Math.max(45, baseRest - state.attributes.agi);
+-          startRestTimer(restTime);
+-          if (inputWeight > 0) {
+-            tryBreakPR(ex.name, inputWeight, prBadge);
++        const next = forceState !== undefined ? forceState : !tile.classList.contains('est-done');
++        const w = parseFloat(weightInput.value) || ex.weight || 0;
++        const r = parseInt(repsInput.value, 10) || parseTargetReps(ex.targetReps);
++        if (next) {
++          state.activeSetsTracker[setKey] = { completed: true, weight: w, reps: r };
++          if (state.restTimerEnabled !== false) {
++            const baseRest = state.baseRestTime || 90;
++            startRestTimer(baseRest);
+           }
++          if (w > 0) tryBreakPR(ex.name, w, prBadge);
+         } else {
+           delete state.activeSetsTracker[setKey];
+         }
++        tile.classList.toggle('est-done', next);
++        playSound('click');
+         saveState();
+-
+-        setCol.classList.toggle('completed', nextState);
+-        label.style.color = nextState ? 'var(--color-primary)' : 'var(--text-muted)';
+-        repInput.style.border = nextState ? '1px solid var(--color-primary)' : '1px solid rgba(255,255,255,0.1)';
+-        playSound('click');
+       };
+ 
+-      setCol.addEventListener('click', (e) => {
+-        if (e.target !== repInput) {
+-          toggleFunc();
+-        }
+-      });
+-      repInput.addEventListener('change', () => {
+-        toggleFunc(true);
+-      });
+-
+-      setCol.appendChild(label);
+-      setCol.appendChild(repInput);
+-      repsRow.appendChild(setCol);
+-    }
+-
+-    card.appendChild(repsRow);
++      tile.addEventListener('click', (e) => { if (e.target !== repsInput) toggleFunc(); });
++      repsInput.addEventListener('change', () => toggleFunc(true));
++      setsRow.appendChild(tile);
++    }
++
++    card.appendChild(setsRow);
+     container.appendChild(card);
+   });
+@@ -2932,25 +3635,32 @@
+ 
+ // 16. MENTORS SELECT SYSTEM
++// ─────────────────────────────────────────────────────────────
++// ORDEM DE EXIBIÇÃO DOS UNIVERSOS NA ABA DE MENTORES
++// Para adicionar um novo universo: basta incluir o 'universe'
++// no objeto do mentor em OFFICIAL_MENTORS — aparece automaticamente.
++// ─────────────────────────────────────────────────────────────
++const UNIVERSE_ORDER = ['Dragon Ball', 'Naruto', 'One Punch Man', 'Fisiculturistas', 'Personalizados'];
++const UNIVERSE_META = {
++  'Dragon Ball':    { icon: '🐉', color: '#f97316', desc: 'O universo dos Saiyajins e do Ki infinito' },
++  'Naruto':         { icon: '🥷', color: '#22c55e', desc: 'O caminho ninja do esforço e da garra' },
++  'One Punch Man':  { icon: '👊', color: '#ef4444', desc: 'O herói que treinou até virar invencível' },
++  'Fisiculturistas':{ icon: '💪', color: '#eab308', desc: 'Lendas reais do ferro e da disciplina' },
++  'Personalizados': { icon: '⚙️', color: '#8b5cf6', desc: 'Seus mentores criados por você' },
++};
++
+ function MENTORS_LIST_FULL() {
+-  // Add category tag to mentors so we can group them
+-  const officialWithCat = OFFICIAL_MENTORS.map(m => {
+-    let category = "Outros";
+-    if (m.id === 'bebezinho' || m.id === 'ramondino' || m.id === 'arnold' || m.id === 'nickwalker') {
+-      category = "Fisiculturistas";
+-    } else if (m.id === 'rocklee') {
+-      category = "Naruto";
+-    } else if (m.id === 'brolyz' || m.id === 'goku') {
+-      category = "Dragon Ball";
+-    } else if (m.id === 'saitama') {
+-      category = "One Punch Man";
+-    }
+-    return { ...m, category };
+-  });
+-
+-  const customWithCat = state.customMentors.map(m => {
+-    return { ...m, category: "Personalizados" };
+-  });
+-
++  const officialWithCat = OFFICIAL_MENTORS.map(m => ({ ...m }));
++  const customWithCat = state.customMentors.map(m => ({ ...m, universe: 'Personalizados', category: 'custom' }));
+   return [...officialWithCat, ...customWithCat];
++}
++
++function getMentorRankTitle(lvl) {
++  if (lvl >= 30) return { label: 'ETERNO', tier: 6, color: '#fbbf24', bg: 'rgba(251,191,36,0.12)' };
++  if (lvl >= 25) return { label: 'LENDA',  tier: 5, color: '#a855f7', bg: 'rgba(168,85,247,0.12)' };
++  if (lvl >= 20) return { label: 'ELITE',  tier: 4, color: '#3b82f6', bg: 'rgba(59,130,246,0.12)' };
++  if (lvl >= 15) return { label: 'VETERANO', tier: 3, color: '#10b981', bg: 'rgba(16,185,129,0.12)' };
++  if (lvl >= 10) return { label: 'GUERREIRO', tier: 2, color: '#f59e0b', bg: 'rgba(245,158,11,0.12)' };
++  if (lvl >= 5)  return { label: 'DISCÍPULO', tier: 1, color: '#94a3b8', bg: 'rgba(148,163,184,0.12)' };
++  return { label: 'APRENDIZ', tier: 0, color: '#78716c', bg: 'rgba(120,113,108,0.1)' };
+ }
+ 
+@@ -2961,36 +3671,40 @@
+   const fullList = MENTORS_LIST_FULL();
+ 
+-  // Group mentors by category
+-  const categories = {};
++  // Group by universe in the defined order
++  const grouped = {};
++  UNIVERSE_ORDER.forEach(u => { grouped[u] = []; });
+   fullList.forEach(m => {
+-    if (!categories[m.category]) {
+-      categories[m.category] = [];
+-    }
+-    categories[m.category].push(m);
+-  });
+-
+-  // Helper to determine rank title
+-  function getMentorRankTitle(lvl) {
+-    if (lvl >= 50) return "Transcendido Supremo 🌌";
+-    if (lvl >= 25) return "Lendário Invencível 🏆";
+-    if (lvl >= 15) return "Fiel Discípulo ⚡";
+-    if (lvl >= 5) return "Iniciado Avançado 🟢";
+-    return "Aprendiz Iniciante 🍼";
+-  }
+-
+-  // Render group by group
+-  for (const catName in categories) {
+-    const sectionHeader = document.createElement('h3');
+-    sectionHeader.className = 'mentor-category-title';
+-    sectionHeader.style.marginTop = '15px';
+-    sectionHeader.style.marginBottom = '8px';
+-    sectionHeader.style.fontSize = '0.95rem';
+-    sectionHeader.style.color = 'var(--color-primary)';
+-    sectionHeader.style.borderBottom = '1px solid var(--border-glass-glow)';
+-    sectionHeader.style.paddingBottom = '4px';
+-    sectionHeader.innerText = catName;
+-    container.appendChild(sectionHeader);
+-
+-    categories[catName].forEach(m => {
++    const universe = m.universe || 'Personalizados';
++    if (!grouped[universe]) grouped[universe] = [];
++    grouped[universe].push(m);
++  });
++
++  UNIVERSE_ORDER.forEach(universeName => {
++    const mentorsInGroup = grouped[universeName];
++    if (!mentorsInGroup || mentorsInGroup.length === 0) return;
++
++    const meta = UNIVERSE_META[universeName] || { icon: '🌐', color: 'var(--color-primary)', desc: '' };
++
++    // ── Universe Header ──
++    const universeHeader = document.createElement('div');
++    universeHeader.className = 'mentor-universe-header';
++    universeHeader.style.cssText = `
++      display:flex; align-items:center; gap:10px;
++      padding:12px 4px 8px; margin-top:16px;
++      border-bottom: 1px solid ${meta.color}33;
++    `;
++    universeHeader.innerHTML = `
++      <div style="width:32px;height:32px;border-radius:8px;background:${meta.color}22;border:1px solid ${meta.color}44;
++           display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">${meta.icon}</div>
++      <div>
++        <div style="font-family:var(--font-display);font-size:13px;font-weight:800;color:${meta.color};letter-spacing:0.06em;text-transform:uppercase">${universeName}</div>
++        <div style="font-size:10px;color:var(--text-muted);margin-top:1px">${meta.desc}</div>
++      </div>
++      <div style="margin-left:auto;font-size:10px;font-weight:700;color:${meta.color};background:${meta.color}18;
++           border:1px solid ${meta.color}44;border-radius:99px;padding:2px 8px">${mentorsInGroup.length} ${mentorsInGroup.length === 1 ? 'mentor' : 'mentores'}</div>
++    `;
++    container.appendChild(universeHeader);
++
++    mentorsInGroup.forEach(m => {
+       const isActive = state.activeMentor === m.id;
+       const mAff = (state.mentorAffinities && state.mentorAffinities[m.id]) || { level: 1, xp: 0, prestige: 0 };
+@@ -2999,205 +3713,198 @@
+       const mPrestige = mAff.prestige || 0;
+       const mXpNeeded = 100 + (mLvl * 25);
+-      const xpPercent = Math.min(100, (mXp / mXpNeeded) * 100);
+-      const rankTitle = getMentorRankTitle(mLvl);
+-
+-      // Determine frame class
+-      let frameClass = '';
+-      if (mLvl >= 45) frameClass = 'frame-gold-legendary';
+-      else if (mLvl >= 20) frameClass = 'frame-silver-neon';
+-      else if (mLvl >= 2) frameClass = 'frame-bronze';
+-
+-      // Prestige star suffix
+-      const prestigeSuffix = mPrestige > 0 ? ` ⭐ Prestige ${'I'.repeat(mPrestige)}` : '';
++      const xpPct = Math.min(100, Math.round((mXp / mXpNeeded) * 100));
++      const rankInfo = getMentorRankTitle(mLvl);
++      const mc = m.colorHex || 'var(--color-primary)';
++      const prestigeSuffix = mPrestige > 0 ? ` · ⭐ Prestige ${'I'.repeat(Math.min(mPrestige, 5))}` : '';
++
++      // Next reward to unlock
++      const allRewards = MENTOR_REWARDS[m.id] || [];
++      const nextReward = allRewards.find(r => r.lvl > mLvl);
++
++      // Milestone dots (5, 10, 15, 20, 25, 30)
++      const milestoneLevels = [5, 10, 15, 20, 25, 30];
++      const milestoneDots = milestoneLevels.map(ml => {
++        const met = mLvl >= ml;
++        return `<div class="mentor-ms-dot ${met ? 'met' : ''}"
++          onclick="previewMentorMilestone('${m.id}',${ml})"
++          style="${met ? `background:${mc};border-color:${mc};box-shadow:0 0 6px ${mc}66` : ''}"
++          title="Nível ${ml} — clique para ver">
++          ${ml}
++        </div>`;
++      }).join('');
+ 
+       const card = document.createElement('div');
+-      card.className = `mentor-card glass-panel ${isActive ? 'active-mentor' : ''} ${frameClass}`;
+-
+-      const imgWrapper = document.createElement('div');
+-      imgWrapper.className = 'mentor-img-wrapper';
+-      imgWrapper.innerHTML = `<img src="${getMentorAvatarSrc(m)}" alt="${m.name}">`;
+-      card.appendChild(imgWrapper);
+-
+-      const details = document.createElement('div');
+-      details.className = 'mentor-details';
+-      const hasVoice = '';
+-      
+-      // Build milestone tracking bar HTML
+-      const milestones = [
+-        { lvl: 2, label: 'B2' },
+-        { lvl: 5, label: 'D5' },
+-        { lvl: 10, label: 'T1' },
+-        { lvl: 15, label: 'P1' },
+-        { lvl: 20, label: 'S20' },
+-        { lvl: 35, label: 'P2' },
+-        { lvl: 45, label: 'G45' }
+-      ];
+-      
+-      let milestonesHtml = `
+-        <div class="milestone-preview-wrapper" style="margin-top: 8px; margin-bottom: 8px;">
+-          <span style="font-size: 0.6rem; color: var(--text-muted); display: block; margin-bottom: 2px;">Estrada de Recompensas (Milestones - Clique para ver):</span>
+-          <div style="display: flex; gap: 4px; align-items: center;">
++      card.className = `mentor-card-new ${isActive ? 'mentor-card-active' : ''}`;
++      card.setAttribute('data-tier', rankInfo.tier);
++      card.style.cssText = `
++        border-color: ${isActive ? mc : 'rgba(255,255,255,0.06)'};
++        ${isActive ? `box-shadow: 0 0 20px ${mc}33, inset 0 0 0 1px ${mc}22;` : ''}
+       `;
+-      milestones.forEach(ms => {
+-        const met = mLvl >= ms.lvl;
+-        const stateClass = met ? 'unlocked' : 'locked';
+-        milestonesHtml += `
+-          <div class="milestone-dot ${stateClass}" onclick="previewMentorMilestone('${m.id}', ${ms.lvl})" title="Nível ${ms.lvl}: clique para pré-visualizar a recompensa">
+-            ${ms.label}
++
++      card.innerHTML = `
++        <div class="mcn-left">
++          <div class="mcn-img-wrap" style="border-color:${mc}55">
++            <img src="${getMentorAvatarSrc(m)}" alt="${m.name}"
++              style="filter:${m.filterCSS || 'none'}"
++              onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
++            <div class="mcn-img-fallback" style="display:none;color:${mc}">${m.name.charAt(0)}</div>
++            ${isActive ? `<div class="mcn-active-ring" style="border-color:${mc};box-shadow:0 0 12px ${mc}88"></div>` : ''}
+           </div>
+-        `;
+-      });
+-      milestonesHtml += `</div></div>`;
+-
+-      // Build Level 50 Ascension Quest UI if at level 50
+-      let ascensionHtml = '';
+-      if (mLvl >= 50) {
+-        let prTargetName = '';
+-        let requiredWeight = 0;
+-        if (m.id === 'brolyz') {
+-          prTargetName = "Desenvolvimento Livre";
+-          requiredWeight = 35;
+-        } else if (m.id === 'rocklee') {
+-          prTargetName = "Agachamento Livre";
+-          requiredWeight = 45;
+-        } else if (m.id === 'bebezinho') {
+-          prTargetName = "Supino Reto";
+-          requiredWeight = 40;
+-        }
+-
+-        if (prTargetName) {
+-          const currentPR = state.personalRecords[prTargetName] || 0;
+-          const meetsPR = currentPR >= requiredWeight;
+-          
+-          ascensionHtml = `
+-            <div class="ascension-quest-box" style="margin-top: 10px; padding: 10px; border-radius: 8px; text-align: center; border: 2px solid ${meetsPR ? 'var(--color-accent)' : '#e63946'}; background: ${meetsPR ? 'rgba(0, 242, 254, 0.05)' : 'rgba(230, 57, 70, 0.05)'}; box-shadow: 0 0 10px ${meetsPR ? 'var(--color-accent-glow)' : 'rgba(230, 57, 70, 0.2)'};">
+-              <h5 style="color: ${meetsPR ? 'var(--color-accent)' : '#e63946'}; font-weight: bold; font-size: 0.75rem;">Missão de Ascensão</h5>
+-              <p style="font-size: 0.65rem; color: var(--text-secondary); margin-top: 2px;">
+-                Requer PR em <strong>${prTargetName}</strong>: ${currentPR} / ${requiredWeight} kg
+-              </p>
+-          `;
+-          
+-          if (meetsPR) {
+-            ascensionHtml += `
+-              <button class="btn btn-sm btn-accent btn-block transcender-btn ripple" onclick="transcendMentor('${m.id}')" style="margin-top: 6px; font-weight: 800; border: none; background: linear-gradient(90deg, #ffc107, #ff9f1c); color: #000; box-shadow: 0 0 10px #ffc107;">
+-                TRANSCENDER 🌌
+-              </button>
+-            `;
+-          } else {
+-            ascensionHtml += `
+-              <button class="btn btn-sm btn-outline btn-block" disabled style="margin-top: 6px; border-color: #e63946; color: #e63946; background: rgba(230,57,70,0.1); cursor: not-allowed; font-weight: bold;">
+-                TRANSCENDER BLOQUEADO 🔒
+-              </button>
+-            `;
+-          }
+-          ascensionHtml += `</div>`;
+-        }
+-      }
+-
+-      details.innerHTML = `
+-        <div class="mentor-name-row">
+-          <h4 style="display: flex; align-items: center; gap: 4px;">${m.name} ${isActive ? '👑' : ''} ${hasVoice}</h4>
+-          <span class="badge" style="background: hsla(${m.hue || 140}, 80%, 50%, 0.15); color: ${m.colorHex || '#ffc107'}; font-size: 0.65rem; font-weight: 700;">Nível ${mLvl}${prestigeSuffix}</span>
++          <div class="mcn-rank-badge" style="background:${rankInfo.bg};color:${rankInfo.color};border-color:${rankInfo.color}44">
++            ${rankInfo.label}
++          </div>
++          ${mPrestige > 0 ? `<div class="mcn-prestige" title="Prestige ${mPrestige}">⭐×${mPrestige}</div>` : ''}
+         </div>
+-        <p class="mentor-rank-title">⭐ Rank: <strong style="color: var(--color-accent);">${rankTitle}</strong></p>
+-        <p class="mentor-desc" style="font-style: italic; margin-top: 4px;">${m.quote}</p>
+-        <p class="mentor-buff">💪 Bônus: ${m.buff}</p>
+-        
+-        <!-- Mentor XP progression bar -->
+-        <div class="mentor-xp-wrapper" style="margin-top: 8px; margin-bottom: 8px;">
+-          <div style="display: flex; justify-content: space-between; font-size: 0.65rem; opacity: 0.8; margin-bottom: 2px;">
+-            <span>Progresso: ${mXp}/${mXpNeeded} XP</span>
+-            <span>${Math.round(xpPercent)}%</span>
++
++        <div class="mcn-right">
++          <div class="mcn-top-row">
++            <div class="mcn-name" style="color:${isActive ? mc : '#f3f4f6'}">${m.name}${isActive ? ' 👑' : ''}</div>
++            <div class="mcn-level" style="color:${mc}">Nv ${mLvl}${prestigeSuffix}</div>
+           </div>
+-          <div class="xp-bar-container" style="height: 6px; background: rgba(255,255,255,0.07); border-radius: 4px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05);">
+-            <div style="width: ${xpPercent}%; height: 100%; background: linear-gradient(90deg, var(--color-primary), var(--color-accent)); transition: width 0.3s ease;"></div>
++
++          <div class="mcn-universe-tag" style="color:${meta.color};background:${meta.color}15;border-color:${meta.color}33">
++            ${meta.icon} ${universeName}
++          </div>
++
++          <div class="mcn-quote">${m.quote.replace(/^"|"$/g, '')}</div>
++          <div class="mcn-buff">⚡ ${m.buff}</div>
++
++          <div class="mcn-xp-section">
++            <div class="mcn-xp-row">
++              <span style="font-size:10px;color:var(--text-muted)">XP: ${mXp} / ${mXpNeeded}</span>
++              <span style="font-size:10px;font-weight:700;color:${mc}">${xpPct}%</span>
++            </div>
++            <div class="mcn-xp-track">
++              <div class="mcn-xp-fill" style="width:${xpPct}%;background:linear-gradient(90deg,${mc},${mc}99)"></div>
++            </div>
++          </div>
++
++          <div class="mcn-ms-row">${milestoneDots}</div>
++
++          ${nextReward ? `
++            <div class="mcn-next-reward">
++              <span style="font-size:9px;color:var(--text-muted)">PRÓXIMA RECOMPENSA:</span>
++              <span style="font-size:10px;font-weight:700;color:${mc}">${nextReward.icon} Nv${nextReward.lvl} — ${nextReward.name}</span>
++            </div>
++          ` : `<div class="mcn-next-reward"><span style="font-size:10px;color:#fbbf24;font-weight:700">🏆 Todas as recompensas desbloqueadas!</span></div>`}
++
++          <div class="mcn-actions">
++            ${isActive
++              ? `<button class="mcn-btn mcn-btn-active" disabled>✓ ATIVO</button>`
++              : `<button class="mcn-btn mcn-btn-choose" onclick="chooseMentor('${m.id}')">ATIVAR BASE</button>`
++            }
++            <button class="mcn-btn mcn-btn-preview" onclick="previewMentorMilestone('${m.id}', ${milestoneLevels.find(ml => ml > mLvl) || 30})">VER RECOMPENSAS</button>
+           </div>
+         </div>
+-        
+-        ${milestonesHtml}
+-        ${ascensionHtml}
+       `;
+ 
+-      const actBtn = document.createElement('button');
+-      if (isActive) {
+-        actBtn.className = 'btn btn-sm btn-primary mentor-action-btn';
+-        actBtn.innerText = 'ATIVO';
+-        actBtn.disabled = true;
+-      } else {
+-        actBtn.className = 'btn btn-sm btn-accent mentor-action-btn ripple';
+-        actBtn.innerText = 'ESCOLHER BASE';
+-        actBtn.addEventListener('click', () => {
+-          playSound('levelup');
+-          state.activeMentor = m.id;
+-          
+-          if (m.id === 'saitama') unlockTrophy('saitama_blessing');
+-
+-          saveState();
+-          updateUI();
+-          triggerNeuralFlash(m);
+-        });
++      // Ascension at level 50
++      if (mLvl >= 50) {
++        const ascBox = document.createElement('div');
++        ascBox.className = 'mcn-ascension-box';
++        ascBox.innerHTML = `
++          <div style="font-size:11px;font-weight:800;color:#fbbf24">🌌 MISSÃO DE ASCENSÃO DISPONÍVEL</div>
++          <div style="font-size:10px;color:var(--text-muted);margin-top:3px">Mentor no nível máximo. Transcenda para Prestige ${mPrestige + 1}!</div>
++          <button class="mcn-btn mcn-btn-transcend" onclick="transcendMentor('${m.id}')">TRANSCENDER 🌌</button>
++        `;
++        card.appendChild(ascBox);
+       }
+-      details.appendChild(actBtn);
+-
+-      card.appendChild(details);
++
+       container.appendChild(card);
+     });
+-  }
+-}
+-
+-window.previewMentorMilestone = function(mentorId, lvl) {
++  });
++}
++
++// Expose chooseMentor globally for inline onclick
++window.chooseMentor = function(mentorId) {
++  playSound('levelup');
++  state.activeMentor = mentorId;
++  if (mentorId === 'saitama') unlockTrophy('saitama_blessing');
++  saveState();
++  updateUI();
++  const m = MENTORS_LIST_FULL().find(x => x.id === mentorId);
++  if (m) triggerNeuralFlash(m);
++};
++
++// ── Filtro de universo: mostra/oculta seções na lista ──
++function filterMentorsByUniverse(filter) {
++  const container = document.getElementById('mentors-list-container');
++  if (!container) return;
++  const headers = container.querySelectorAll('.mentor-universe-header');
++  const cards   = container.querySelectorAll('.mentor-card-new');
++
++  if (filter === 'all') {
++    headers.forEach(h => h.style.display = '');
++    cards.forEach(c => c.style.display = '');
++    return;
++  }
++
++  // Hide all, then show matching universe header + its cards
++  headers.forEach(h => {
++    const textNode = h.querySelector('[style*="text-transform: uppercase"]') || h;
++    const universeLabel = textNode.textContent.trim().toLowerCase();
++    h.style.display = universeLabel.includes(filter.toLowerCase()) ? '' : 'none';
++  });
++
++  cards.forEach(c => {
++    const tag = c.querySelector('.mcn-universe-tag');
++    const match = tag && tag.textContent.trim().toLowerCase().includes(filter.toLowerCase());
++    c.style.display = match ? '' : 'none';
++  });
++}
++
++window.previewMentorMilestone = function(mentorId, targetLvl) {
+   playSound('click');
+   const fullList = MENTORS_LIST_FULL();
+   const mentor = fullList.find(m => m.id === mentorId);
+-  const mentorName = mentor ? mentor.name : mentorId;
+-  
+-  let reward = MENTOR_REWARDS[mentorId]?.find(r => r.lvl === lvl);
+-  if (!reward) {
+-    if (lvl === 2) {
+-      reward = {
+-        name: 'Iniciação do Mentor 🌟',
+-        desc: `Moldura de Bronze e bônus iniciais ativos com o mentor ${mentorName}!`,
+-        icon: '🌟'
+-      };
+-    } else if (lvl === 35) {
+-      reward = {
+-        name: 'Prestígio Avançado 🎖️',
+-        desc: `Desbloqueia novos patamares de conexões e ampliação do poder passivo com ${mentorName}!`,
+-        icon: '🎖️'
+-      };
+-    } else if (lvl === 45) {
+-      reward = {
+-        name: 'Ascensão Próxima 🌌',
+-        desc: `Moldura Ouro Lendária animada e preparação para o ritual de Transcendência com ${mentorName}!`,
+-        icon: '🌌'
+-      };
++  if (!mentor) return;
++
++  const mentorName = mentor.name;
++  const mAff = (state.mentorAffinities && state.mentorAffinities[mentorId]) || { level: 1, xp: 0 };
++  const currentLvl = mAff.level;
++  const allRewards = MENTOR_REWARDS[mentorId] || [];
++
++  // Show all rewards for that mentor grouped by tier
++  const TIERS = [
++    { name: 'APRENDIZ', range: [1,5], color: '#78716c' },
++    { name: 'DISCÍPULO', range: [6,10], color: '#94a3b8' },
++    { name: 'GUERREIRO', range: [11,15], color: '#f59e0b' },
++    { name: 'VETERANO', range: [16,20], color: '#10b981' },
++    { name: 'ELITE', range: [21,25], color: '#3b82f6' },
++    { name: 'LENDA', range: [26,30], color: '#a855f7' },
++  ];
++
++  // Find the specific reward at targetLvl, or show tier overview
++  const exactReward = allRewards.find(r => r.lvl === targetLvl);
++
++  if (exactReward) {
++    const tier = TIERS.find(t => targetLvl >= t.range[0] && targetLvl <= t.range[1]);
++    const isUnlocked = currentLvl >= targetLvl;
++    const prefix = isUnlocked ? '✅ DESBLOQUEADO — ' : `🔒 Nível ${targetLvl} necessário — `;
++    showItemAcquiredModal(
++      exactReward.icon,
++      prefix + exactReward.name,
++      exactReward.desc + (tier ? `\n\n📊 Tier: ${tier.name} (Nv ${tier.range[0]}–${tier.range[1]})` : '')
++    );
++  } else {
++    // Show closest reward above targetLvl
++    const nextAbove = allRewards.filter(r => r.lvl >= targetLvl).sort((a,b) => a.lvl - b.lvl)[0];
++    if (nextAbove) {
++      showItemAcquiredModal(
++        nextAbove.icon,
++        `Próxima recompensa: Nível ${nextAbove.lvl}`,
++        nextAbove.desc
++      );
+     } else {
+-      reward = {
+-        name: 'Milestone Desconhecido 🎁',
+-        desc: `Alcançar o nível ${lvl} com ${mentorName} para obter bônus exclusivos.`,
+-        icon: '🎁'
+-      };
+-    }
+-  }
+-  
+-  showItemAcquiredModal(reward.icon, reward.name, reward.desc);
++      showItemAcquiredModal('🏆', `${mentorName} Masterizado!`, 'Você desbloqueou todas as recompensas deste mentor. Lendário!');
++    }
++  }
+ };
+ 
+-window.playTributeQuote = function(quoteId) {
+-  if (quoteId === 'wakewake') {
+-    try {
+-      const audio = new Audio('wake wake.mp3');
+-      audio.volume = 0.6;
+-      audio.play().catch(err => {
+-        console.warn("Audio autoplay blocked or failed:", err);
+-        playSound('levelup');
+-      });
+-    } catch(e) {
+-      console.warn("Failed playing wake wake.mp3:", e);
+-      playSound('levelup');
+-    }
+-  } else {
+-    playSound(quoteId);
+-  }
++// Tributo: celebração visual da frase (sem áudio — apenas efeito visual)
++window.celebrateTributeQuote = function(cardEl) {
++  if (!cardEl) return;
++  cardEl.classList.add('tq-celebrating');
++  setTimeout(() => cardEl.classList.remove('tq-celebrating'), 600);
+ };
+ 
+@@ -3233,4 +3940,12 @@
+ window.triggerEternalFlameSpark = function() {
+   playSound('potion');
++  
++  state.eternalFlameClicks = (state.eternalFlameClicks || 0) + 1;
++  saveState();
++  
++  const flameCountEl = document.getElementById('eternal-flame-count');
++  if (flameCountEl) {
++    flameCountEl.innerText = `${state.eternalFlameClicks.toLocaleString('pt-BR')} toques de respeito`;
++  }
+   
+   const container = document.querySelector('.eternal-flame-container');
+@@ -3284,17 +3999,22 @@
+ function renderTrophies() {
+   const container = document.getElementById('trophies-list');
++  if (!container) return;
+   container.innerHTML = '';
++
++  if (!state.showcaseTrophies) state.showcaseTrophies = [];
++  if (!state.unlockedTrophies) state.unlockedTrophies = [];
+ 
+   TROPHIES.forEach(t => {
+     const isUnlocked = state.unlockedTrophies.includes(t.id);
++    const isFeatured = state.showcaseTrophies.includes(t.id);
+     
+     const slot = document.createElement('div');
+-    slot.className = `trophy-slot ${isUnlocked ? 'unlocked' : ''}`;
++    slot.className = `trophy-slot ${isUnlocked ? 'unlocked' : ''} ${isFeatured ? 'featured' : ''}`;
+     slot.innerHTML = isUnlocked ? t.icon : '❓';
+     
+     if (isUnlocked) {
++      slot.title = `${t.name} - ${t.desc} (Toque para destacar/remover)`;
+       slot.addEventListener('click', () => {
+-        playSound('click');
+-        showItemAcquiredModal(t.icon, t.name, t.desc);
++        toggleShowcaseTrophy(t.id);
+       });
+     } else {
+@@ -3305,4 +4025,59 @@
+ }
+ 
++function renderShowcase() {
++  const container = document.getElementById('showcase-slots');
++  if (!container) return;
++  container.innerHTML = '';
++
++  if (!state.showcaseTrophies) state.showcaseTrophies = [];
++
++  for (let i = 0; i < 3; i++) {
++    const slotId = state.showcaseTrophies[i];
++    const slotEl = document.createElement('div');
++    
++    if (slotId) {
++      const t = TROPHIES.find(item => item.id === slotId);
++      if (t) {
++        slotEl.className = 'showcase-slot active';
++        slotEl.innerHTML = `
++          <span class="showcase-icon">${t.icon}</span>
++          <span class="showcase-name">${t.name}</span>
++        `;
++        slotEl.title = `Clique para remover "${t.name}" da vitrine`;
++        slotEl.addEventListener('click', () => {
++          toggleShowcaseTrophy(slotId);
++        });
++      } else {
++        slotEl.className = 'showcase-slot';
++        slotEl.innerHTML = `<span class="showcase-empty">+ Destacar</span>`;
++      }
++    } else {
++      slotEl.className = 'showcase-slot';
++      slotEl.innerHTML = `<span class="showcase-empty">+ Destacar</span>`;
++    }
++    container.appendChild(slotEl);
++  }
++}
++
++function toggleShowcaseTrophy(trophyId) {
++  if (!state.showcaseTrophies) state.showcaseTrophies = [];
++  
++  if (state.showcaseTrophies.includes(trophyId)) {
++    state.showcaseTrophies = state.showcaseTrophies.filter(id => id !== trophyId);
++    playSound('click');
++  } else {
++    if (state.showcaseTrophies.length < 3) {
++      state.showcaseTrophies.push(trophyId);
++      playSound('click');
++    } else {
++      showGenericNotification('Vitrine cheia! Remova um destaque antes.');
++      playSound('click');
++    }
++  }
++  saveState();
++  renderTrophies();
++  renderShowcase();
++  updateUI();
++}
+ 
+ // ─────────────────────────────────────────────────────────────
+@@ -3327,26 +4102,15 @@
+   if (nameEl) nameEl.innerText = state.charName || 'Hunter';
+ 
+-  const classLabelsLocal = {
+-    bodybuilder: 'Bodybuilder \ud83d\udcaa',
+-    powerlifter: 'Powerlifter \ud83c\udfcb\ufe0f\u200d\u2642\ufe0f',
+-    calistenia: 'Calist\u00eanico \ud83e\udd38\u200d\u2642\ufe0f',
+-    maratonista: 'Maratonista \ud83c\udfc3\u200d\u2642\ufe0f'
+-  };
+-
+   const rankChar = getHunterRankChar(state.level);
+   const subEl = document.getElementById('pcm-sub');
+-  if (subEl) subEl.innerText = 'Hunter Rank ' + rankChar + ' \u00b7 ' + (classLabelsLocal[state.charClass] || state.charClass || '');
++  if (subEl) subEl.innerText = `Hunter Rank ${rankChar} · ${classLabels[state.charClass] || state.charClass || ''}`;
+ 
+   const titleEl = document.getElementById('pcm-title-badge');
+   if (titleEl) titleEl.innerText = getSubclassRank(state.charClass, state.level);
+ 
+-  const streakEl = document.getElementById('pcm-stat-streak');
+-  if (streakEl) streakEl.innerText = state.currentStreak || 0;
+-  const xpEl = document.getElementById('pcm-stat-xp');
+-  if (xpEl) xpEl.innerText = state.xp;
+-  const workoutsEl = document.getElementById('pcm-stat-workouts');
+-  if (workoutsEl) workoutsEl.innerText = state.workoutsCompleted || 0;
+-  const trophiesEl = document.getElementById('pcm-stat-trophies');
+-  if (trophiesEl) trophiesEl.innerText = (state.unlockedTrophies || []).length;
++  document.getElementById('pcm-stat-streak').innerText = state.currentStreak || 0;
++  document.getElementById('pcm-stat-xp').innerText = state.xp + (state.level > 1 ? '' : '');
++  document.getElementById('pcm-stat-workouts').innerText = state.workoutsCompleted || 0;
++  document.getElementById('pcm-stat-trophies').innerText = (state.unlockedTrophies || []).length;
+ 
+   renderPinnedRecords();
+@@ -3366,11 +4130,14 @@
+     if (exName && state.personalRecords[exName] !== undefined) {
+       row.className = 'pcm-record-row filled';
+-      row.innerHTML = '<span class="pcm-record-name">\ud83c\udfcb\ufe0f ' + exName + '</span><span class="pcm-record-val">' + state.personalRecords[exName] + ' kg</span>';
++      row.innerHTML = `
++        <span class="pcm-record-name">🏋️ ${exName}</span>
++        <span class="pcm-record-val">${state.personalRecords[exName]} kg</span>
++      `;
+       row.title = 'Toque para remover este marco';
+-      row.addEventListener('click', function() { togglePinnedRecord(exName); });
++      row.addEventListener('click', () => togglePinnedRecord(exName));
+     } else {
+       row.className = 'pcm-record-row';
+-      row.innerHTML = '<span class="pcm-record-empty">+ Fixar um marco de for\u00e7a</span>';
+-      row.addEventListener('click', function() { openRecordPicker(); });
++      row.innerHTML = `<span class="pcm-record-empty">+ Fixar um marco de força</span>`;
++      row.addEventListener('click', () => openRecordPicker());
+     }
+     container.appendChild(row);
+@@ -3381,5 +4148,5 @@
+   if (!state.pinnedRecords) state.pinnedRecords = [];
+   if (state.pinnedRecords.includes(exerciseName)) {
+-    state.pinnedRecords = state.pinnedRecords.filter(function(n) { return n !== exerciseName; });
++    state.pinnedRecords = state.pinnedRecords.filter(n => n !== exerciseName);
+     playSound('click');
+   } else {
+@@ -3388,5 +4155,5 @@
+       playSound('click');
+     } else {
+-      showGenericNotification('Voc\u00ea j\u00e1 fixou 3 marcos! Remova um antes.');
++      showGenericNotification('Você já fixou 3 marcos! Remova um antes.');
+       playSound('click');
+     }
+@@ -3397,19 +4164,23 @@
+ 
+ function openRecordPicker() {
+-  var available = Object.keys(state.personalRecords || {}).filter(function(n) { return !(state.pinnedRecords || []).includes(n); });
+-  var overlay = document.createElement('div');
++  const available = Object.keys(state.personalRecords || {}).filter(n => !(state.pinnedRecords || []).includes(n));
++  const overlay = document.createElement('div');
+   overlay.className = 'pcm-record-picker';
+-  var card = document.createElement('div');
++  const card = document.createElement('div');
+   card.className = 'pcm-record-picker-card';
+ 
+   if (available.length === 0) {
+-    card.innerHTML = '<p class="pcm-record-picker-title">Nenhum recorde dispon\u00edvel</p><p style="font-size:0.68rem;color:var(--text-secondary);margin-bottom:8px;">Registre cargas na Arena de Treino para poder fix\u00e1-las aqui.</p><button class="pcm-record-picker-close">Fechar</button>';
++    card.innerHTML = `
++      <p class="pcm-record-picker-title">Nenhum recorde disponível</p>
++      <p style="font-size:0.68rem;color:var(--text-secondary);margin-bottom:8px;">Registre cargas na Arena de Treino para poder fixá-las aqui.</p>
++      <button class="pcm-record-picker-close">Fechar</button>
++    `;
+   } else {
+-    card.innerHTML = '<p class="pcm-record-picker-title">Escolha um marco para fixar</p>';
+-    available.forEach(function(name) {
+-      var item = document.createElement('div');
++    card.innerHTML = `<p class="pcm-record-picker-title">Escolha um marco para fixar</p>`;
++    available.forEach(name => {
++      const item = document.createElement('div');
+       item.className = 'pcm-record-picker-item';
+-      item.innerHTML = '<span>' + name + '</span><span style="color:var(--color-primary);font-weight:800;">' + state.personalRecords[name] + ' kg</span>';
+-      item.addEventListener('click', function() {
++      item.innerHTML = `<span>${name}</span><span style="color:var(--color-primary);font-weight:800;">${state.personalRecords[name]} kg</span>`;
++      item.addEventListener('click', () => {
+         togglePinnedRecord(name);
+         overlay.remove();
+@@ -3417,5 +4188,5 @@
+       card.appendChild(item);
+     });
+-    var closeBtn = document.createElement('button');
++    const closeBtn = document.createElement('button');
+     closeBtn.className = 'pcm-record-picker-close';
+     closeBtn.innerText = 'Cancelar';
+@@ -3425,52 +4196,55 @@
+   overlay.appendChild(card);
+   document.body.appendChild(overlay);
+-  overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
+-  card.querySelectorAll('.pcm-record-picker-close').forEach(function(b) { b.addEventListener('click', function() { overlay.remove(); }); });
++  overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
++  card.querySelectorAll('.pcm-record-picker-close').forEach(b => b.addEventListener('click', () => overlay.remove()));
+ }
+ 
+ function renderProfileMentorMinis() {
+-  var container = document.getElementById('pcm-mentors-mini');
++  const container = document.getElementById('pcm-mentors-mini');
+   if (!container) return;
+   container.innerHTML = '';
+ 
+-  var affinities = state.mentorAffinities || {};
+-  var ranked = Object.keys(affinities)
+-    .map(function(id) { return { id: id, level: affinities[id].level || 1 }; })
+-    .sort(function(a, b) { return b.level - a.level; })
++  const affinities = state.mentorAffinities || {};
++  const ranked = Object.keys(affinities)
++    .map(id => ({ id, level: affinities[id].level || 1 }))
++    .sort((a, b) => b.level - a.level)
+     .slice(0, 2);
+ 
+   if (ranked.length === 0) {
+-    container.innerHTML = '<div class="pcm-mentor-mini-empty">Treine com um mentor para ele aparecer aqui!</div>';
++    container.innerHTML = `<div class="pcm-mentor-mini-empty">Treine com um mentor para ele aparecer aqui!</div>`;
+     return;
+   }
+ 
+-  var fullList = MENTORS_LIST_FULL();
+-  ranked.forEach(function(r) {
+-    var m = fullList.find(function(x) { return x.id === r.id; });
++  const fullList = MENTORS_LIST_FULL();
++  ranked.forEach(r => {
++    const m = fullList.find(x => x.id === r.id);
+     if (!m) return;
+-    var rankInfo = getMentorRankTitle(r.level);
+-    var cardEl = document.createElement('div');
+-    cardEl.className = 'pcm-mentor-mini';
+-    cardEl.innerHTML = '<div class="pcm-mentor-mini-name">' + m.name + '</div><div class="pcm-mentor-mini-lvl">Nv ' + r.level + ' \u00b7 ' + rankInfo.label + '</div>';
+-    container.appendChild(cardEl);
++    const rankInfo = getMentorRankTitle(r.level);
++    const card = document.createElement('div');
++    card.className = 'pcm-mentor-mini';
++    card.innerHTML = `
++      <div class="pcm-mentor-mini-name">${m.name}</div>
++      <div class="pcm-mentor-mini-lvl">Nv ${r.level} · ${rankInfo.label}</div>
++    `;
++    container.appendChild(card);
+   });
+ }
+ 
+ function renderProfileTrophiesPreview() {
+-  var container = document.getElementById('pcm-trophies-preview');
++  const container = document.getElementById('pcm-trophies-preview');
+   if (!container) return;
+   container.innerHTML = '';
+ 
+-  var showcased = (state.showcaseTrophies || []).filter(Boolean);
++  const showcased = (state.showcaseTrophies || []).filter(Boolean);
+   if (showcased.length === 0) {
+-    container.innerHTML = '<span class="pcm-trophies-empty">Nenhum trof\u00e9u fixado ainda \u2014 v\u00e1 em Status \u2192 Vitrine de Conquistas.</span>';
++    container.innerHTML = `<span class="pcm-trophies-empty">Nenhum troféu fixado ainda — vá em Status → Vitrine de Conquistas.</span>`;
+     return;
+   }
+-  showcased.forEach(function(tId) {
+-    var t = TROPHIES.find(function(item) { return item.id === tId; });
++  showcased.forEach(tId => {
++    const t = TROPHIES.find(item => item.id === tId);
+     if (!t) return;
+-    var chip = document.createElement('div');
++    const chip = document.createElement('div');
+     chip.className = 'pcm-trophy-chip';
+-    chip.innerHTML = '<span>' + t.icon + '</span><span>' + t.name + '</span>';
++    chip.innerHTML = `<span>${t.icon}</span><span>${t.name}</span>`;
+     container.appendChild(chip);
+   });
+@@ -3485,4 +4259,5 @@
+     saveState();
+     renderTrophies();
++    renderShowcase();
+     
+     const trophy = TROPHIES.find(t => t.id === trophyId);
+@@ -3503,11 +4278,11 @@
+ 
+   if (wHist.length === 0) wHist.push(parseFloat(state.charWeight) || 80);
+-  if (sHist.length === 0) sHist.push(50 + (state.attributes.for || 10) * 1.5);
++  if (sHist.length === 0) sHist.push(50 + (getEffectiveAttributes().for || 10) * 1.5);
+ 
+   const finalW = [...wHist];
+   const finalS = [...sHist];
+ 
+-  if (finalW.length === 1) finalW.unshift(finalW[0] - 1);
+-  if (finalS.length === 1) finalS.unshift(finalS[0] - 5);
++  if (finalW.length === 1) finalW.unshift(finalW[0]);
++  if (finalS.length === 1) finalS.unshift(finalS[0]);
+ 
+   const width = 400;
+@@ -3626,4 +4401,179 @@
+ }
+ 
++// 17b. EQUIPAMENTOS RENDER & CONTROL SYSTEMS
++function renderEquipment() {
++  const tabEquipment = document.getElementById('tab-equipment');
++  if (!tabEquipment) return;
++
++  // 1. Render Active Slots
++  const slots = ['head', 'aura', 'arms', 'waist'];
++  slots.forEach(slot => {
++    const equippedItemId = state.equippedItems ? state.equippedItems[slot] : null;
++    const slotEl = document.getElementById(`equip-slot-${slot}`);
++    if (!slotEl) return;
++    
++    if (equippedItemId) {
++      const item = EQUIPMENT_DATABASE.find(i => i.id === equippedItemId);
++      if (item) {
++        const iconHtml = item.icon.endsWith('.png') || item.icon.endsWith('.jpg') || item.icon.endsWith('.webp')
++          ? `<img src="${item.icon}" alt="${item.name}" class="eq-icon-img" style="width: 28px; height: 28px; object-fit: contain; filter: drop-shadow(0 0 5px rgba(255,255,255,0.15)); flex-shrink: 0;" />`
++          : `<span class="equip-slot-icon">${item.icon}</span>`;
++        slotEl.innerHTML = `
++          <div class="equip-slot-filled">
++            ${iconHtml}
++            <div class="equip-slot-info">
++              <span class="equip-slot-name">${item.name}</span>
++              <span class="equip-slot-type">${getSlotLabel(slot)}</span>
++            </div>
++            <button class="btn-unequip-slot" data-slot="${slot}" title="Desequipar">❌</button>
++          </div>
++        `;
++        slotEl.querySelector('.btn-unequip-slot').addEventListener('click', (e) => {
++          e.stopPropagation();
++          unequipItem(slot);
++        });
++      } else {
++        renderEmptySlot(slotEl, slot);
++      }
++    } else {
++      renderEmptySlot(slotEl, slot);
++    }
++  });
++
++  // 2. Render Attribute Buffs Summary
++  const eff = getEffectiveAttributes();
++  const getGearBonus = (stat) => {
++    let bonus = 0;
++    if (state.equippedItems) {
++      Object.values(state.equippedItems).forEach(itemId => {
++        if (itemId) {
++          const item = EQUIPMENT_DATABASE.find(i => i.id === itemId);
++          if (item && item.stats && item.stats[stat]) bonus += item.stats[stat];
++        }
++      });
++    }
++    return bonus;
++  };
++  
++  const attrSummaryEl = document.getElementById('equipment-attributes-summary');
++  if (attrSummaryEl) {
++    attrSummaryEl.innerHTML = `
++      <div class="eq-attr-row"><span>✊ FORÇA (FOR):</span><strong>${eff.for} <span class="eq-attr-bonus">${getGearBonus('for') > 0 ? `(+${getGearBonus('for')})` : ''}</span></strong></div>
++      <div class="eq-attr-row"><span>🫁 RESISTÊNCIA (RES):</span><strong>${eff.res} <span class="eq-attr-bonus">${getGearBonus('res') > 0 ? `(+${getGearBonus('res')})` : ''}</span></strong></div>
++      <div class="eq-attr-row"><span>⚡ AGILIDADE (AGI):</span><strong>${eff.agi} <span class="eq-attr-bonus">${getGearBonus('agi') > 0 ? `(+${getGearBonus('agi')})` : ''}</span></strong></div>
++      <div class="eq-attr-row"><span>❤️ VIGOR (VIG):</span><strong>${eff.vig} <span class="eq-attr-bonus">${getGearBonus('vig') > 0 ? `(+${getGearBonus('vig')})` : ''}</span></strong></div>
++      <div class="eq-attr-row"><span>🎯 FOCO (FOC):</span><strong>${eff.foc} <span class="eq-attr-bonus">${getGearBonus('foc') > 0 ? `(+${getGearBonus('foc')})` : ''}</span></strong></div>
++    `;
++  }
++
++  // 3. Render Inventory List
++  const gridEl = document.getElementById('equipment-inventory-grid');
++  if (gridEl) {
++    gridEl.innerHTML = '';
++    EQUIPMENT_DATABASE.forEach(item => {
++      const unlocked = isItemUnlocked(item);
++      const isEquipped = state.equippedItems && state.equippedItems[item.slot] === item.id;
++      
++      const card = document.createElement('div');
++      card.className = `equipment-item-card glass-panel ${unlocked ? 'unlocked' : 'locked'} ${isEquipped ? 'equipped' : ''}`;
++      
++      let statsText = '';
++      for (const [stat, val] of Object.entries(item.stats)) {
++        statsText += `+${val} ${stat.toUpperCase()} `;
++      }
++      
++      const iconHtml = item.icon.endsWith('.png') || item.icon.endsWith('.jpg') || item.icon.endsWith('.webp')
++        ? `<img src="${item.icon}" alt="${item.name}" class="eq-icon-img" style="width: 36px; height: 36px; object-fit: contain;" />`
++        : `<span class="eq-card-icon">${item.icon}</span>`;
++      card.innerHTML = `
++        <div class="eq-card-header">
++          ${iconHtml}
++          <span class="eq-card-badge">${getSlotLabel(item.slot)}</span>
++        </div>
++        <h4 class="eq-card-name">${item.name}</h4>
++        <p class="eq-card-desc">${unlocked ? item.desc : `<span class="eq-card-locked-text">🔒 ${item.unlockDesc}</span>`}</p>
++        <div class="eq-card-stats">${statsText}</div>
++        <div class="eq-card-actions">
++          ${unlocked 
++            ? (isEquipped 
++                ? `<button class="btn btn-sm btn-outline btn-block btn-equip-action" data-action="unequip" data-id="${item.id}">DESEQUIPAR</button>`
++                : `<button class="btn btn-sm btn-accent btn-block btn-equip-action" data-action="equip" data-id="${item.id}">EQUIPAR</button>`
++              )
++            : `<button class="btn btn-sm btn-outline btn-block" disabled>BLOQUEADO</button>`
++          }
++        </div>
++      `;
++      
++      gridEl.appendChild(card);
++    });
++
++    gridEl.querySelectorAll('.btn-equip-action').forEach(btn => {
++      btn.addEventListener('click', (e) => {
++        playSound('click');
++        const itemId = btn.getAttribute('data-id');
++        const action = btn.getAttribute('data-action');
++        const item = EQUIPMENT_DATABASE.find(i => i.id === itemId);
++        if (item) {
++          if (action === 'equip') {
++            equipItem(item.slot, item.id);
++          } else {
++            unequipItem(item.slot);
++          }
++        }
++      });
++    });
++  }
++
++  // Update silhouette preview image and active aura glow
++  const silPic = document.getElementById('eq-silhouette-pic');
++  if (silPic) {
++    silPic.src = getUserAvatarSrc();
++  }
++  const previewAura = document.getElementById('eq-preview-aura');
++  if (previewAura) {
++    // Determine preview aura color depending on equipped items
++    let auraColor = 'var(--color-primary-glow)';
++    if (state.equippedItems && state.equippedItems.aura) {
++      if (state.equippedItems.aura === 'item_aura') auraColor = 'rgba(255, 140, 0, 0.6)'; // SSJ
++      else if (state.equippedItems.aura === 'item_aurabroly') auraColor = 'rgba(57, 255, 20, 0.6)'; // Broly
++      else if (state.equippedItems.aura === 'item_capa') auraColor = 'rgba(255, 255, 255, 0.4)'; // Saitama
++    }
++    previewAura.style.background = `radial-gradient(circle, ${auraColor} 0%, transparent 70%)`;
++  }
++}
++
++function getSlotLabel(slot) {
++  const labels = { head: 'Cabeça', aura: 'Aura/Costas', arms: 'Braços', waist: 'Cintura' };
++  return labels[slot] || slot;
++}
++
++function renderEmptySlot(slotEl, slot) {
++  const slotIcons = { head: '👑', aura: '✨', arms: '🦾', waist: '🏆' };
++  slotEl.innerHTML = `
++    <div class="equip-slot-empty">
++      <span class="equip-slot-icon-placeholder">${slotIcons[slot]}</span>
++      <span class="equip-slot-empty-label">Vazio (${getSlotLabel(slot)})</span>
++    </div>
++  `;
++}
++
++function equipItem(slot, itemId) {
++  if (!state.equippedItems) {
++    state.equippedItems = { head: null, aura: null, arms: null, waist: null };
++  }
++  state.equippedItems[slot] = itemId;
++  saveState();
++  updateUI();
++}
++
++function unequipItem(slot) {
++  if (!state.equippedItems) {
++    state.equippedItems = { head: null, aura: null, arms: null, waist: null };
++  }
++  state.equippedItems[slot] = null;
++  saveState();
++  updateUI();
++}
++
+ // ==========================================
+ // 18. NUTRITION & FOOD SYSTEMS
+@@ -3646,4 +4596,18 @@
+ }
+ 
++function getFoodIcon(name) {
++  const n = (name || '').toLowerCase();
++  if (n.includes('frango')) return '🍗';
++  if (n.includes('arroz')) return '🍚';
++  if (n.includes('ovo')) return '🥚';
++  if (n.includes('whey')) return '🥛';
++  if (n.includes('banana')) return '🍌';
++  if (n.includes('batata')) return '🍠';
++  if (n.includes('aveia')) return '🌾';
++  if (n.includes('feij')) return '🍲';
++  if (n.includes('marmita')) return '🍱';
++  return '🍴';
++}
++
+ function renderMealLogs() {
+   const container = document.getElementById('diet-history-list');
+@@ -3661,22 +4625,21 @@
+   state.mealLogs.forEach((m, idx) => {
+     const card = document.createElement('div');
+-    card.className = 'diet-history-item';
+-    
++    card.className = 'diet-food-card';
++
+     card.innerHTML = `
+-      <div class="diet-item-info">
+-        <h5>${m.name}</h5>
+-        <p>${m.weight}g consumidos</p>
++      <div class="dfc-icon">${getFoodIcon(m.name)}</div>
++      <div class="dfc-info">
++        <div class="dfc-name">${m.name}</div>
++        <div class="dfc-weight">${m.weight}g consumidos</div>
+       </div>
+-      <div class="diet-item-right">
+-        <div class="diet-item-macros">
+-          <span class="prot">+${m.prot.toFixed(1)}g P</span>
+-          <span class="kcal">+${Math.round(m.kcal)} kcal</span>
+-        </div>
+-        <button class="diet-item-delete" title="Deletar Refeição">✕</button>
++      <div class="dfc-macros">
++        <span class="prot">+${m.prot.toFixed(1)}g P</span>
++        <span class="kcal">+${Math.round(m.kcal)} kcal</span>
+       </div>
++      <button class="dfc-delete" title="Deletar Refeição">✕</button>
+     `;
+-    
++
+     // Wire delete button
+-    card.querySelector('.diet-item-delete').addEventListener('click', () => {
++    card.querySelector('.dfc-delete').addEventListener('click', () => {
+       playSound('click');
+       state.mealLogs.splice(idx, 1);
+@@ -3701,5 +4664,10 @@
+ function showItemAcquiredModal(icon, name, desc) {
+   const modal = document.getElementById('item-acquired-modal');
+-  document.getElementById('modal-item-icon').innerText = icon;
++  const iconEl = document.getElementById('modal-item-icon');
++  if (icon && (icon.endsWith('.png') || icon.endsWith('.jpg') || icon.endsWith('.webp'))) {
++    iconEl.innerHTML = `<img src="${icon}" alt="${name}" style="width: 44px; height: 44px; object-fit: contain;" />`;
++  } else {
++    iconEl.innerText = icon;
++  }
+   document.getElementById('modal-item-name').innerText = name;
+   document.getElementById('modal-item-desc').innerText = desc;
+@@ -3807,10 +4775,10 @@
+       icon: '⚡',
+       name: 'AGILIDADE (AGI)',
+-      desc: 'Tempo de reação e coordenação neuromuscular. Acelera as animações de descanso e aumenta a velocidade metabólica na queima de calorias.'
++      desc: 'Aumenta a velocidade metabólica e a eficiência do treino. Cada ponto de Agilidade acima de 10 concede +1% de bônus de XP ao finalizar qualquer treino.'
+     },
+     vig: {
+       icon: '❤️',
+       name: 'VIGOR (VIG)',
+-      desc: 'Seu fôlego cardíaco e velocidade de recuperação. Cada ponto reduz permanentemente em 0.2 segundos o descanso recomendado nos treinos.'
++      desc: 'Aumenta a eficácia de hidratação e recuperação de HP. Cada ponto de Vigor acima de 10 concede +2% de bônus de XP ao beber água no reservatório.'
+     },
+     foc: {
+@@ -3861,27 +4829,37 @@
+ const TUTORIAL_STEPS = [
+   {
+-    title: 'Bem-vindo, Recruta! ⚔️',
+-    icon: '🎯',
+-    text: 'Este é o FreakyQuest — o primeiro RPG de academia. Aqui você transforma suor em XP e deixa o frango para trás de vez!'
++    title: 'Bem-vindo, Caçador! ⚔️',
++    illoHTML: '<div class="tutorial-illustration-container"><div class="tutorial-rune-welcome">🎯</div></div>',
++    text: 'O FreakyQuest transforma seu treino de academia em um RPG de verdade. Suor virando XP, disciplina virando nível. Toque em "Avançar" pra ver o mapa rápido antes de começar a jornada.'
+   },
+   {
+-    title: 'Complete Quests Diárias 📋',
+-    icon: '✅',
+-    text: 'Todo dia aparecem Quests: beber água, bater proteínas, completar treino. Cada quest dá XP. FOC (Foco) aumenta o XP recebido de cada quest!'
++    title: 'Seu Painel é a Base de Operações 📋',
++    illoHTML: '<div class="tutorial-anim-quests"><div class="tutorial-quest-row"><span class="tutorial-quest-check">✓</span><span style="font-size:10px;color:var(--text-secondary)">Beber água</span></div><div class="tutorial-quest-row"><span class="tutorial-quest-check">✓</span><span style="font-size:10px;color:var(--text-secondary)">Bater proteína</span></div><div class="tutorial-quest-row"><span class="tutorial-quest-check">✓</span><span style="font-size:10px;color:var(--text-secondary)">Treino do dia</span></div></div>',
++    text: 'No Painel você vê seu mentor, sua barra de XP e seus atributos em tempo real. Beba água, complete as Missões Diárias e o Desafio Freaky pra garantir XP extra todo santo dia.'
+   },
+   {
+-    title: 'Atributos Mudam Tudo 📊',
+-    icon: '⬆️',
+-    text: 'Ao subir de nível você recebe 5 pontos. FOR aumenta XP de treino, RES aumenta XP base, AGI reduz descanso, VIG aumenta XP de hidratação, FOC multiplica XP de quests!'
++    title: 'Arena de Treino: Cada Série Conta 🏋️',
++    illoHTML: '<div class="tutorial-illustration-container"><div class="tutorial-anim-workout">💪</div></div>',
++    text: 'Registre a carga, toque nas séries pra completar e deixe o Cronômetro de Descanso cuidar do tempo entre elas. Supere seu próprio recorde e a Progressão de Carga te recompensa com XP bônus na hora.'
+   },
+   {
+-    title: 'Desbloqueie Auras e Itens 🔥',
+-    icon: '🏆',
+-    text: 'Atingindo marcos de nível você desbloqueia cosméticos: Faixa do Lee (Nv5), Aura SSJ (Nv20), Cinturão de Ouro (Nv30), AURA LENDÁRIA DO BROLY (Nv40) e mais!'
++    title: 'Dieta: Três Anéis, Um Objetivo 🍗',
++    illoHTML: '<div class="tutorial-anim-attributes"><div class="tutorial-attr-node node-n"></div><div class="tutorial-attr-node node-e"></div><div class="tutorial-attr-node node-w"></div><div class="tutorial-attr-core">🍗</div></div>',
++    text: 'Calorias, proteína e fibra ganharam HUD próprio com três anéis. Registre suas refeições e veja eles se preencherem — sua meta calórica já é calculada automaticamente com base no seu objetivo.'
+   },
+   {
+-    title: 'Mentores Lendários te Esperam 🐉',
+-    icon: '🌟',
+-    text: 'Com progressão, mentores como Goku (Nv20), Arnold (Nv30) e Broly Z (Nv40) ficam disponíveis — cada um com buff exclusivo e visual único. Vai ser Freaky!'
++    title: 'Mentores: Todos Liberados desde o Nível 1 🐉',
++    illoHTML: '<div class="tutorial-illustration-container"><div class="tutorial-anim-mentors">🐉</div></div>',
++    text: 'Filtre por universo — Dragon Ball, Naruto, One Punch Man, Fisiculturistas — e escolha seu mentor base sem precisar destravar nada. Cada um sobe até o nível 30 com 23 recompensas próprias: a jornada é longa de propósito.'
++  },
++  {
++    title: 'Equipamentos: Vista suas Conquistas 🛡️',
++    illoHTML: '<div class="tutorial-illustration-container"><div class="tutorial-anim-auras">🛡️</div></div>',
++    text: 'Subindo de nível com um mentor, você destrava itens — auras, faixas, cinturões. Equipe-os na aba Itens e ganhe bônus reais de atributo, não é só visual!'
++  },
++  {
++    title: 'Seu Cartão de Caçador 🪪',
++    illoHTML: '<div class="tutorial-illustration-container"><div class="tutorial-anim-profile">🪪</div></div>',
++    text: 'Na aba Status, abra o Cartão de Caçador pra ver seu Hunter Rank, fixar seus marcos de força favoritos e destacar troféus. Em breve você vai poder comparar tudo isso com amigos. Bora treinar?'
+   }
+ ];
+@@ -3898,5 +4876,5 @@
+   const step = TUTORIAL_STEPS[idx];
+   document.getElementById('tutorial-step-title').innerText = step.title;
+-  document.getElementById('tutorial-step-illustration').innerText = step.icon;
++  document.getElementById('tutorial-step-illustration').innerHTML = step.illoHTML;
+   document.getElementById('tutorial-step-text').innerText = step.text;
+   // Dots
+@@ -3915,4 +4893,28 @@
+ }
+ 
++function applyNumericSanitizer(selector, decimals) {
++  const el = document.querySelector(selector);
++  if (!el) return;
++  el.type = 'text';
++  el.inputMode = 'decimal';
++  el.addEventListener('input', (e) => {
++    let val = e.target.value.replace(',', '.').replace(/[^0-9.]/g, '');
++    const parts = val.split('.');
++    if (parts.length > 2) {
++      val = parts[0] + '.' + parts.slice(1).join('');
++    }
++    if (parts.length === 2 && parts[1].length > decimals) {
++      val = parts[0] + '.' + parts[1].substring(0, decimals);
++    }
++    e.target.value = val;
++  });
++  el.addEventListener('change', (e) => {
++    let val = e.target.value;
++    if (val.endsWith('.')) {
++      e.target.value = val.slice(0, -1);
++    }
++  });
++}
++
+ // ==========================================
+ // 21. EVENTS TRIGGERS AND FORM INITS
+@@ -3920,4 +4922,14 @@
+ document.addEventListener('DOMContentLoaded', () => {
+   
++  applyNumericSanitizer('#water-target-input', 1);
++  applyNumericSanitizer('#settings-weight', 3);
++  applyNumericSanitizer('#settings-target-weight', 3);
++  applyNumericSanitizer('#settings-weekly-days', 0);
++  applyNumericSanitizer('#cust-ex-sets', 1);
++  applyNumericSanitizer('#cust-ex-weight', 3);
++  applyNumericSanitizer('#cust-food-kcal', 2);
++  applyNumericSanitizer('#cust-food-prot', 2);
++  applyNumericSanitizer('#cust-food-fiber', 2);
++
+   const hasSave = loadState();
+ 
+@@ -4013,5 +5025,4 @@
+     { step: '3', selector: '[data-step="3"] .option-select-card', field: 'mainObjective' },
+     { step: '4', selector: '[data-step="4"] .option-select-card', field: 'motivation' },
+-    { step: '5', selector: '[data-step="5"] .option-select-card', field: 'focusArea' },
+     { step: '6', selector: '[data-step="6"] .option-select-card', field: 'class' },
+     { step: '7', selector: '[data-step="7"] .option-select-card', field: 'experienceLevel' },
+@@ -4111,4 +5122,105 @@
+   });
+ 
++  // Custom Step 5: Multi-select Focus Area with Cybernetic SVG map sync
++  const step5Cards = document.querySelectorAll('[data-step="5"] .option-select-card');
++  const svgMuscleGroups = document.querySelectorAll('#body-focus-svg .muscle-group');
++  const activeFocusMuscles = new Set(['FullBody', 'Ombros', 'Braços', 'Peito', 'Abdômen', 'Costas', 'Glúteos', 'Pernas']);
++
++  // Sync userProfile.focusArea initially since all are selected by default
++  userProfile.focusArea = Array.from(activeFocusMuscles).join(',');
++
++  function updateStep5Selection() {
++    // 1. Sync list cards
++    step5Cards.forEach(card => {
++      const val = card.getAttribute('data-value');
++      if (activeFocusMuscles.has(val)) {
++        card.classList.add('active');
++      } else {
++        card.classList.remove('active');
++      }
++    });
++
++    // 2. Sync SVG muscle paths
++    svgMuscleGroups.forEach(path => {
++      const muscle = path.getAttribute('data-muscle');
++      if (activeFocusMuscles.has('FullBody') || activeFocusMuscles.has(muscle)) {
++        path.classList.add('active');
++      } else {
++        path.classList.remove('active');
++      }
++    });
++
++    // 3. Update profile focusArea
++    userProfile.focusArea = Array.from(activeFocusMuscles).join(',');
++  }
++
++  // Card click event listeners
++  step5Cards.forEach(card => {
++    card.addEventListener('click', () => {
++      card.classList.add('neon-card-flash');
++      setTimeout(() => card.classList.remove('neon-card-flash'), 400);
++      playSound('click');
++
++      const val = card.getAttribute('data-value');
++      if (val === 'FullBody') {
++        const isCurrentlyActive = activeFocusMuscles.has('FullBody');
++        if (isCurrentlyActive) {
++          activeFocusMuscles.clear();
++        } else {
++          step5Cards.forEach(c => {
++            activeFocusMuscles.add(c.getAttribute('data-value'));
++          });
++        }
++      } else {
++        if (activeFocusMuscles.has(val)) {
++          activeFocusMuscles.delete(val);
++          activeFocusMuscles.delete('FullBody');
++        } else {
++          activeFocusMuscles.add(val);
++          // Check if all individual muscles are selected to auto-enable FullBody
++          const individualMuscles = Array.from(step5Cards)
++            .map(c => c.getAttribute('data-value'))
++            .filter(v => v !== 'FullBody');
++          const allActive = individualMuscles.every(v => activeFocusMuscles.has(v));
++          if (allActive) {
++            activeFocusMuscles.add('FullBody');
++          }
++        }
++      }
++      updateStep5Selection();
++    });
++  });
++
++  // SVG muscle click event listeners
++  svgMuscleGroups.forEach(path => {
++    path.addEventListener('click', () => {
++      const muscle = path.getAttribute('data-muscle');
++      playSound('click');
++
++      // Flash corresponding card
++      const card = document.querySelector(`[data-step="5"] .option-select-card[data-value="${muscle}"]`);
++      if (card) {
++        card.classList.add('neon-card-flash');
++        setTimeout(() => card.classList.remove('neon-card-flash'), 400);
++      }
++
++      if (activeFocusMuscles.has(muscle)) {
++        activeFocusMuscles.delete(muscle);
++        activeFocusMuscles.delete('FullBody');
++      } else {
++        activeFocusMuscles.add(muscle);
++        // Check if all individual muscles are selected
++        const individualMuscles = Array.from(step5Cards)
++          .map(c => c.getAttribute('data-value'))
++          .filter(v => v !== 'FullBody');
++        const allActive = individualMuscles.every(v => activeFocusMuscles.has(v));
++        if (allActive) {
++          activeFocusMuscles.add('FullBody');
++        }
++      }
++      updateStep5Selection();
++    });
++  });
++
+   // Atributos Roller Click Handlers
+   document.querySelectorAll('.btn-attr-roll-inc').forEach(btn => {
+@@ -4263,17 +5375,36 @@
+   // Days Weekly Target Controls
+   const daysDisplay = document.getElementById('display-days');
+-  let weeklyDaysVal = 4;
+-  userProfile.weeklyDaysGoal = weeklyDaysVal;
+-  document.getElementById('btn-dec-days').addEventListener('click', () => {
+-    playSound('click');
+-    weeklyDaysVal = Math.max(1, weeklyDaysVal - 1);
+-    daysDisplay.innerText = weeklyDaysVal;
+-    userProfile.weeklyDaysGoal = weeklyDaysVal;
+-  });
+-  document.getElementById('btn-inc-days').addEventListener('click', () => {
+-    playSound('click');
+-    weeklyDaysVal = Math.min(7, weeklyDaysVal + 1);
+-    daysDisplay.innerText = weeklyDaysVal;
+-    userProfile.weeklyDaysGoal = weeklyDaysVal;
++  userProfile.trainingDays = ['Seg', 'Ter', 'Qui', 'Sex'];
++  userProfile.weeklyDaysGoal = 4;
++  if (daysDisplay) daysDisplay.innerText = 4;
++
++  const wizDayButtons = document.querySelectorAll('.wizard-days-selector .day-toggle-btn');
++  wizDayButtons.forEach(btn => {
++    const day = btn.getAttribute('data-day');
++    // Sync initial state
++    if (userProfile.trainingDays.includes(day)) {
++      btn.classList.add('active');
++    } else {
++      btn.classList.remove('active');
++    }
++
++    btn.addEventListener('click', () => {
++      playSound('click');
++      const dayVal = btn.getAttribute('data-day');
++      if (userProfile.trainingDays.includes(dayVal)) {
++        if (userProfile.trainingDays.length > 1) {
++          userProfile.trainingDays = userProfile.trainingDays.filter(d => d !== dayVal);
++          btn.classList.remove('active');
++        }
++      } else {
++        userProfile.trainingDays.push(dayVal);
++        btn.classList.add('active');
++      }
++      const order = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab', 'Dom'];
++      userProfile.trainingDays.sort((a, b) => order.indexOf(a) - order.indexOf(b));
++
++      userProfile.weeklyDaysGoal = userProfile.trainingDays.length;
++      if (daysDisplay) daysDisplay.innerText = userProfile.trainingDays.length;
++    });
+   });
+ 
+@@ -4357,9 +5488,26 @@
+ 
+     let suffix = "do Ginásio";
+-    if (focus === 'Peito') suffix = "do Supino";
+-    else if (focus === 'Costas') suffix = "das Asas Gigantes";
+-    else if (focus === 'Ombros') suffix = "dos Ombros de Aço";
+-    else if (focus === 'Braços') suffix = "dos Bíceps Mutantes";
+-    else if (focus === 'Pernas') suffix = "do Agachamento Monstro";
++  if (focus.includes('FullBody')) {
++    suffix = "do Ginásio";
++  } else if (focus.includes(',')) {
++    const parts = focus.split(',').map(s => s.trim());
++    const formatted = parts.slice(0, 2).map(p => {
++      if (p === 'Peito') return 'Supino';
++      if (p === 'Costas') return 'Asas';
++      if (p === 'Ombros') return 'Ombros';
++      if (p === 'Braços') return 'Braços';
++      if (p === 'Pernas') return 'Pernas';
++      if (p === 'Abdômen') return 'Abdômen';
++      if (p === 'Glúteos') return 'Glúteos';
++      return p;
++    }).join(' & ');
++    suffix = `do Foco em ${formatted}`;
++  } else if (focus === 'Peito') suffix = "do Supino";
++  else if (focus === 'Costas') suffix = "das Asas Gigantes";
++  else if (focus === 'Ombros') suffix = "dos Ombros de Aço";
++  else if (focus === 'Braços') suffix = "dos Bíceps Mutantes";
++  else if (focus === 'Pernas') suffix = "do Agachamento Monstro";
++  else if (focus === 'Abdômen') suffix = "do Core Blindado";
++  else if (focus === 'Glúteos') suffix = "dos Glúteos de Ferro";
+ 
+     const classNames = {
+@@ -4391,5 +5539,5 @@
+           <div>⚖️ Peso Inicial: <strong>${weight} kg</strong></div>
+           <div>🎯 Meta: <strong>${targetW} kg</strong></div>
+-          <div>🏋️‍♂️ Frequência: <strong>${weeklyDaysVal} treinos/semana</strong></div>
++          <div>🏋️‍♂️ Frequência: <strong>${userProfile.trainingDays ? userProfile.trainingDays.length : 4} treinos/semana</strong></div>
+         </div>
+         <div style="margin-top: 4px; border-top: 1px dashed rgba(255,255,255,0.08); padding-top: 6px;">
+@@ -4478,6 +5626,7 @@
+     userProfile.motivation = activeMotivation ? activeMotivation.getAttribute('data-value') : 'saude';
+ 
+-    const activeFocus = document.querySelector('[data-step="5"] .option-select-card.active');
+-    userProfile.focusArea = activeFocus ? activeFocus.getAttribute('data-value') : 'FullBody';
++    const activeFocusCards = document.querySelectorAll('[data-step="5"] .option-select-card.active');
++    const selectedFocus = Array.from(activeFocusCards).map(c => c.getAttribute('data-value'));
++    userProfile.focusArea = selectedFocus.join(',') || 'FullBody';
+ 
+     const activeClass = document.querySelector('[data-step="6"] .option-select-card.active');
+@@ -4498,5 +5647,5 @@
+     }
+ 
+-    userProfile.weeklyDaysGoal = weeklyDaysVal;
++    userProfile.weeklyDaysGoal = userProfile.trainingDays ? userProfile.trainingDays.length : 4;
+     userProfile.notificationsEnabled = notifCheck.checked;
+     userProfile.notificationTime = document.getElementById('wiz-notif-time').value || '18:00';
+@@ -4525,5 +5674,7 @@
+     state.injury = userProfile.jointPain;
+     state.profilePic = userProfile.profilePic || '';
+-    state.weeklyTrainGoal = userProfile.weeklyDaysGoal;
++    state.trainingDays = userProfile.trainingDays || ['Seg', 'Ter', 'Qui', 'Sex'];
++    state.weeklyTrainGoal = state.trainingDays.length;
++    state.useCustomWorkout = true;
+     state.notificationEnabled = userProfile.notificationsEnabled;
+     state.notificationTime = userProfile.notificationTime;
+@@ -4536,4 +5687,5 @@
+     state.waterTargetManual = false;
+     state.unlockedTrophies = [];
++    state.showcaseTrophies = [];
+     state.activeMentor = 'rocklee';
+     state.mealLogs = [];
+@@ -4560,7 +5712,10 @@
+     document.getElementById('screen-onboarding').classList.add('hidden');
+     document.getElementById('main-app').classList.remove('hidden');
+-    
++
++    const starterMentor = OFFICIAL_MENTORS.find(m => m.id === state.activeMentor);
++    if (starterMentor) triggerNeuralFlash(starterMentor);
++
+     updateUI();
+-    setTimeout(() => startTutorial(), 1000);
++    setTimeout(() => startTutorial(), 2200);
+   }
+ 
+@@ -4630,5 +5785,5 @@
+     if (state.waterDrank > target) {
+       // VIG (Vigor) multiplies extra water XP — +2% per point above 10
+-      const vigMulti = 1 + Math.max(0, (state.attributes.vig - 10) * 0.02);
++      const vigMulti = 1 + Math.max(0, (getEffectiveAttributes().vig - 10) * 0.02);
+       addXP(Math.round(10 * vigMulti)); // Base 10 XP, boosted by VIG
+     } else {
+@@ -4639,4 +5794,7 @@
+     saveState();
+     updateUI();
++
++    const pct = Math.min(100, Math.round((state.waterDrank / target) * 100));
++    triggerWaterAnimation(pct);
+   };
+ 
+@@ -4715,26 +5873,5 @@
+   });
+ 
+-  // WORKOUT DIVISIONS SELECTORS (A, B, C)
+-  const divButtons = document.querySelectorAll('.workout-div-btn');
+-  divButtons.forEach(btn => {
+-    btn.addEventListener('click', () => {
+-      playSound('click');
+-      divButtons.forEach(b => b.classList.remove('active'));
+-      btn.classList.add('active');
+-      state.activeWorkoutDiv = btn.getAttribute('data-div');
+-      
+-      saveState();
+-      
+-      const exContainer = document.getElementById('exercises-list');
+-      if (exContainer) {
+-        exContainer.classList.remove('workout-slide-fade');
+-        void exContainer.offsetWidth; // trigger reflow
+-        exContainer.classList.add('workout-slide-fade');
+-      }
+-      
+-      renderWorkoutRoutine();
+-    });
+-  });
+-
++  // WORKOUT DIVISIONS SELECTORS (A, B, C) - Now handled dynamically in renderWorkoutRoutine
+   // ADD CUSTOM EXERCISE SUBMISSION
+   const addExForm = document.getElementById('add-exercise-form');
+@@ -4756,6 +5893,7 @@
+     };
+ 
+-    // Push into active division custom workouts
+-    state.customWorkouts[state.activeWorkoutDiv].exercises.push(newEx);
++    // Push into active division custom workouts using resolved activeIdx
++    const activeIdx = getActiveWorkoutIndex();
++    state.customWorkouts[activeIdx].exercises.push(newEx);
+     
+     playSound('quest');
+@@ -4868,4 +6006,35 @@
+     });
+   }
++
++  const filterBtns = document.querySelectorAll('.btn-arsenal-filter');
++  filterBtns.forEach(btn => {
++    btn.addEventListener('click', () => {
++      playSound('click');
++      filterBtns.forEach(b => b.classList.remove('active'));
++      btn.classList.add('active');
++      
++      const filterValue = btn.getAttribute('data-filter');
++      const items = document.querySelectorAll('.arsenal-item');
++      
++      items.forEach(item => {
++        const itemType = item.getAttribute('data-type');
++        if (filterValue === 'all' || itemType === filterValue) {
++          item.classList.remove('hidden');
++        } else {
++          item.classList.add('hidden');
++        }
++      });
++      
++      const groups = document.querySelectorAll('.arsenal-group');
++      groups.forEach(group => {
++        const visibleItems = group.querySelectorAll('.arsenal-item:not(.hidden)');
++        if (visibleItems.length > 0) {
++          group.classList.remove('hidden');
++        } else {
++          group.classList.add('hidden');
++        }
++      });
++    });
++  });
+ 
+   const arsenalItems = document.querySelectorAll('.arsenal-item');
+@@ -4963,4 +6132,19 @@
+   });
+ 
++  // SETTINGS MODAL HELPERS & CORE
++  window.toggleRestSettingsVisibility = function() {
++    const container = document.getElementById('settings-rest-time-container');
++    const enableCb = document.getElementById('settings-rest-enable');
++    if (container && enableCb) {
++      container.style.display = enableCb.checked ? 'flex' : 'none';
++    }
++  };
++
++  // Register settings-rest-enable change listener
++  const settingsRestEnable = document.getElementById('settings-rest-enable');
++  if (settingsRestEnable) {
++    settingsRestEnable.addEventListener('change', toggleRestSettingsVisibility);
++  }
++
+   // SETTINGS MODAL
+   function openSettingsModal() {
+@@ -4968,6 +6152,22 @@
+     document.getElementById('settings-target-weight').value = state.targetWeight || state.charWeight;
+     document.getElementById('settings-weekly-days').value = state.weeklyTrainGoal;
++    const settingsDayButtons = document.querySelectorAll('.settings-days-selector .settings-day-btn');
++    settingsDayButtons.forEach(btn => {
++      const day = btn.getAttribute('data-day');
++      if (state.trainingDays && state.trainingDays.includes(day)) {
++        btn.classList.add('active');
++      } else {
++        btn.classList.remove('active');
++      }
++    });
+     document.getElementById('settings-notif-time').value = state.notificationTime || '18:00';
+     document.getElementById('settings-notif-enable').checked = state.notificationEnabled !== false;
++
++    // Popula preferências do temporizador de descanso
++    const restEnableCb = document.getElementById('settings-rest-enable');
++    const restTimeInput = document.getElementById('settings-rest-time');
++    if (restEnableCb) restEnableCb.checked = state.restTimerEnabled !== false;
++    if (restTimeInput) restTimeInput.value = state.baseRestTime || 90;
++    toggleRestSettingsVisibility();
+ 
+     const preview = document.getElementById('settings-profile-pic-preview');
+@@ -5005,4 +6205,27 @@
+   });
+ 
++  // Cartão de Caçador — abrir/fechar
++  const btnOpenProfileCard = document.getElementById('btn-open-profile-card');
++  if (btnOpenProfileCard) {
++    btnOpenProfileCard.addEventListener('click', () => {
++      playSound('click');
++      renderProfileCard();
++      document.getElementById('profile-card-modal').classList.remove('hidden');
++    });
++  }
++  const btnCloseProfileCard = document.getElementById('btn-close-profile-card');
++  if (btnCloseProfileCard) {
++    btnCloseProfileCard.addEventListener('click', () => {
++      playSound('click');
++      document.getElementById('profile-card-modal').classList.add('hidden');
++    });
++  }
++  const profileCardModalEl = document.getElementById('profile-card-modal');
++  if (profileCardModalEl) {
++    profileCardModalEl.addEventListener('click', (e) => {
++      if (e.target === profileCardModalEl) profileCardModalEl.classList.add('hidden');
++    });
++  }
++
+   const btnSettingsGear = document.getElementById('btn-settings-gear');
+   if (btnSettingsGear) {
+@@ -5013,27 +6236,4 @@
+   }
+ 
+-  // Cartão de Caçador — abrir/fechar
+-  var btnOpenProfileCard = document.getElementById('btn-open-profile-card');
+-  if (btnOpenProfileCard) {
+-    btnOpenProfileCard.addEventListener('click', function() {
+-      playSound('click');
+-      renderProfileCard();
+-      document.getElementById('profile-card-modal').classList.remove('hidden');
+-    });
+-  }
+-  var btnCloseProfileCard = document.getElementById('btn-close-profile-card');
+-  if (btnCloseProfileCard) {
+-    btnCloseProfileCard.addEventListener('click', function() {
+-      playSound('click');
+-      document.getElementById('profile-card-modal').classList.add('hidden');
+-    });
+-  }
+-  var profileCardModalEl = document.getElementById('profile-card-modal');
+-  if (profileCardModalEl) {
+-    profileCardModalEl.addEventListener('click', function(e) {
+-      if (e.target === profileCardModalEl) profileCardModalEl.classList.add('hidden');
+-    });
+-  }
+-
+   const btnEditMeasuresShortcut = document.getElementById('btn-edit-measures-shortcut');
+   if (btnEditMeasuresShortcut) {
+@@ -5044,22 +6244,31 @@
+   }
+ 
+-  // Mentor message bubble interactive quote swap and bounce effect
+-  const mentorBox = document.querySelector('.mentor-message-box');
+-  if (mentorBox) {
+-    mentorBox.addEventListener('click', () => {
++  // ── Hero do mentor: clique no avatar troca a quote ──
++  const heroSection = document.getElementById('mentor-hero-section');
++  if (heroSection) {
++    heroSection.addEventListener('click', () => {
+       playSound('click');
+-      mentorBox.classList.remove('mentor-bounce');
+-      void mentorBox.offsetWidth; // trigger reflow
+-      mentorBox.classList.add('mentor-bounce');
+-      
+       const mId = state.activeMentor || 'rocklee';
+       const quotesList = MENTOR_DASHBOARD_QUOTES[mId] || [];
+-      if (quotesList.length > 0) {
++      const heroQuoteEl = document.getElementById('mentor-bubble-quote');
++      if (quotesList.length > 0 && heroQuoteEl) {
+         const randQuote = quotesList[Math.floor(Math.random() * quotesList.length)];
+-        const uMotivationTip = MOTIVATION_FLAVOR[userProfile.motivation || state.motivation];
+-        document.getElementById('mentor-bubble-quote').innerText = uMotivationTip
+-          ? `${randQuote} (${uMotivationTip})`
+-          : randQuote;
++        heroQuoteEl.innerText = randQuote.replace(/^"|"$/g, '');
++        heroSection.style.transform = 'scale(0.995)';
++        setTimeout(() => { heroSection.style.transform = ''; }, 120);
+       }
++    });
++  }
++
++  // ── Filtro de universo na aba de mentores ──
++  const filterContainer = document.getElementById('mentor-universe-filter');
++  if (filterContainer) {
++    filterContainer.addEventListener('click', (e) => {
++      const btn = e.target.closest('.muf-btn');
++      if (!btn) return;
++      filterContainer.querySelectorAll('.muf-btn').forEach(b => b.classList.remove('active'));
++      btn.classList.add('active');
++      const filter = btn.dataset.filter;
++      filterMentorsByUniverse(filter);
+     });
+   }
+@@ -5127,4 +6336,27 @@
+   }
+ 
++  const settingsDayButtons = document.querySelectorAll('.settings-days-selector .settings-day-btn');
++  settingsDayButtons.forEach(btn => {
++    btn.addEventListener('click', () => {
++      playSound('click');
++      const dayVal = btn.getAttribute('data-day');
++      if (!state.trainingDays) state.trainingDays = ['Seg', 'Ter', 'Qui', 'Sex'];
++      if (state.trainingDays.includes(dayVal)) {
++        if (state.trainingDays.length > 1) {
++          state.trainingDays = state.trainingDays.filter(d => d !== dayVal);
++          btn.classList.remove('active');
++        }
++      } else {
++        state.trainingDays.push(dayVal);
++        btn.classList.add('active');
++      }
++      const order = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab', 'Dom'];
++      state.trainingDays.sort((a, b) => order.indexOf(a) - order.indexOf(b));
++      
++      const settingsWeeklyInput = document.getElementById('settings-weekly-days');
++      if (settingsWeeklyInput) settingsWeeklyInput.value = state.trainingDays.length;
++    });
++  });
++
+   document.getElementById('btn-close-settings-modal').addEventListener('click', () => {
+     playSound('click');
+@@ -5138,7 +6370,18 @@
+     state.charWeight = parseFloat(document.getElementById('settings-weight').value) || state.charWeight;
+     state.targetWeight = parseFloat(document.getElementById('settings-target-weight').value) || state.targetWeight;
+-    state.weeklyTrainGoal = parseInt(document.getElementById('settings-weekly-days').value, 10) || 4;
++    
++    if (!state.trainingDays || state.trainingDays.length === 0) {
++      state.trainingDays = ['Seg', 'Ter', 'Qui', 'Sex'];
++    }
++    state.weeklyTrainGoal = state.trainingDays.length;
++    
+     state.notificationTime = document.getElementById('settings-notif-time').value || '18:00';
+     state.notificationEnabled = document.getElementById('settings-notif-enable').checked;
++    
++    // Salvar preferências de temporizador de descanso
++    state.restTimerEnabled = document.getElementById('settings-rest-enable').checked;
++    let baseRestTimeVal = parseInt(document.getElementById('settings-rest-time').value, 10) || 90;
++    if (baseRestTimeVal > 99) baseRestTimeVal = 99;
++    state.baseRestTime = baseRestTimeVal;
+     
+     const injuryVal = document.getElementById('settings-injury').value || 'Nenhum';
+@@ -5151,4 +6394,5 @@
+         userObj.profilePic = state.profilePic;
+         userObj.targetWeight = state.targetWeight;
++        userObj.trainingDays = state.trainingDays;
+         userObj.weeklyDaysGoal = state.weeklyTrainGoal;
+         userObj.notificationsEnabled = state.notificationEnabled;
+@@ -5156,4 +6400,6 @@
+         userObj.currentWeight = state.charWeight;
+         userObj.jointPain = state.injury;
++        userObj.restTimerEnabled = state.restTimerEnabled;
++        userObj.baseRestTime = state.baseRestTime;
+         localStorage.setItem('freaky_quest_user', JSON.stringify(userObj));
+         userProfile = userObj;
+@@ -5175,4 +6421,50 @@
+       playSound('click');
+       stopRestTimer();
++    });
++  }
++
++  // Sincronizar e escutar alterações rápidas do temporizador de descanso na aba Treinos
++  const quickRestEnable = document.getElementById('quick-rest-enable');
++  if (quickRestEnable) {
++    quickRestEnable.addEventListener('change', (e) => {
++      state.restTimerEnabled = e.target.checked;
++      const wrap = document.getElementById('quick-rest-time-wrap');
++      if (wrap) wrap.style.display = e.target.checked ? 'flex' : 'none';
++
++      // Manter o settings-modal sincronizado
++      const globEnable = document.getElementById('settings-rest-enable');
++      if (globEnable) globEnable.checked = e.target.checked;
++      toggleRestSettingsVisibility();
++
++      saveState();
++    });
++  }
++
++  const quickRestTime = document.getElementById('quick-rest-time');
++  if (quickRestTime) {
++    quickRestTime.addEventListener('change', (e) => {
++      let val = parseInt(e.target.value, 10) || 90;
++      if (val > 99) val = 99;
++      state.baseRestTime = val;
++
++      // Manter o settings-modal sincronizado
++      const globTime = document.getElementById('settings-rest-time');
++      if (globTime) globTime.value = val;
++
++      saveState();
++    });
++    quickRestTime.addEventListener('input', (e) => {
++      if (e.target.value.length > 2) {
++        e.target.value = e.target.value.slice(0, 2);
++      }
++    });
++  }
++
++  const settingsRestTime = document.getElementById('settings-rest-time');
++  if (settingsRestTime) {
++    settingsRestTime.addEventListener('input', (e) => {
++      if (e.target.value.length > 2) {
++        e.target.value = e.target.value.slice(0, 2);
++      }
+     });
+   }
+@@ -5307,8 +6599,8 @@
+   // Track weekly count
+   state.workoutsThisWeek = (state.workoutsThisWeek || 0) + 1;
+-  // Sequência de dias treinando (streak)
+-  var todayDateStr = new Date().toDateString();
+-  var yesterdayDateStr = new Date(Date.now() - 86400000).toDateString();
+-  var prevWorkoutDateStr = state.lastWorkoutDate ? new Date(state.lastWorkoutDate).toDateString() : null;
++  // Sequência de dias treinando (streak) — calculada antes de sobrescrever lastWorkoutDate
++  const todayDateStr = new Date().toDateString();
++  const yesterdayDateStr = new Date(Date.now() - 86400000).toDateString();
++  const prevWorkoutDateStr = state.lastWorkoutDate ? new Date(state.lastWorkoutDate).toDateString() : null;
+   if (!state.currentStreak) state.currentStreak = 0;
+   if (prevWorkoutDateStr !== todayDateStr) {
+@@ -5320,7 +6612,11 @@
+ 
+   // Resistência (RES) increases base workout XP
+-  let xpGained = 50 + state.attributes.res + rpeBonusXp;
++  let xpGained = 50 + getEffectiveAttributes().res + rpeBonusXp;
+   if (completion.percent < 50) xpGained = Math.round(xpGained * 0.5);
+   else if (completion.percent < 100) xpGained = Math.round(xpGained * 0.85);
++
++  // Agilidade (AGI) increases workout completion XP (+1% per point > 10)
++  const agiBonus = 1 + Math.max(0, (getEffectiveAttributes().agi - 10) * 0.01);
++  xpGained = Math.round(xpGained * agiBonus);
+ 
+   // Apply dynamic visual badge bonus (+10% Treino XP) if anabolic is active
+@@ -5340,9 +6636,10 @@
+   
+   if (state.workoutsCompleted === 1) unlockTrophy('primeiro_passo');
++  if (state.workoutsCompleted >= 10) unlockTrophy('gym_legend');
+ 
+   const classQuest = state.dailyQuests.find(q => q.id === 'quest_class');
+   if (classQuest && !classQuest.completed && completion.percent >= 50) {
+     classQuest.completed = true;
+-    const focBonus = 1 + (state.attributes.foc * 0.01);
++    const focBonus = 1 + (getEffectiveAttributes().foc * 0.01);
+     addXP(Math.round(classQuest.xpReward * focBonus));
+     playSound('quest');
+@@ -5381,12 +6678,2 @@
+   if (dashboardNavBtn) dashboardNavBtn.click();
+ }
+-
+-// Global: Tribute quote card celebration animation
+-function celebrateTributeQuote(el) {
+-  if (!el) return;
+-  if (typeof playSound === 'function') playSound('click');
+-  el.classList.remove('tq-celebrating');
+-  void el.offsetWidth; // trigger reflow for re-animation
+-  el.classList.add('tq-celebrating');
+-  setTimeout(() => el.classList.remove('tq-celebrating'), 700);
+-}

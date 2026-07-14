@@ -1,0 +1,514 @@
+{
+  "summary": {
+    "P1": 2,
+    "P3": 58
+  },
+  "issues": [
+    [
+      "P1",
+      "[iPhone SE (2020)/simple] nao clicou no card de modo"
+    ],
+    [
+      "P1",
+      "[Galaxy Fold (fechado)/simple] nao clicou no card de modo"
+    ],
+    [
+      "P3",
+      "[iPhone SE (2020)/rpg/dashboard] 3 alvos de toque <32px: ['#btn-edit-measures-shortcut 60x20', '#add-water-btn 66x28', '#go-to-diet-btn 66x23']"
+    ],
+    [
+      "P3",
+      "[iPhone SE (2020)/rpg/workouts] 6 alvos de toque <32px: ['#toggle-workout-std 84x21', '#toggle-workout-cust 86x21', 'Seg 83x27', 'Ter 83x27']"
+    ],
+    [
+      "P3",
+      "[iPhone SE (2020)/rpg/mentors] 8 alvos de toque <32px: ['#btn-open-custom-mentor-modal 74x29', 'Todos 59x27', '🐉 DB 60x27', '🥷 NRT 68x27']"
+    ],
+    [
+      "P3",
+      "[iPhone SE (2020)/rpg/status] 5 alvos de toque <32px: ['? 14x14', '? 14x14', '? 14x14', '? 14x14']"
+    ],
+    [
+      "P3",
+      "[iPhone 12/13/14/rpg/dashboard] 2 alvos de toque <32px: ['#btn-edit-measures-shortcut 60x20', '#add-water-btn 66x28']"
+    ],
+    [
+      "P3",
+      "[iPhone 12/13/14/rpg/workouts] 6 alvos de toque <32px: ['#toggle-workout-std 84x21', '#toggle-workout-cust 86x21', 'Seg 87x27', 'Ter 87x27']"
+    ],
+    [
+      "P3",
+      "[iPhone 12/13/14/rpg/mentors] 8 alvos de toque <32px: ['#btn-open-custom-mentor-modal 74x29', 'Todos 59x27', '🐉 DB 60x27', '🥷 NRT 68x27']"
+    ],
+    [
+      "P3",
+      "[iPhone 12/13/14/rpg/status] 5 alvos de toque <32px: ['? 14x14', '? 14x14', '? 14x14', '? 14x14']"
+    ],
+    [
+      "P3",
+      "[iPhone 14 Pro Max/rpg/dashboard] 2 alvos de toque <32px: ['#btn-edit-measures-shortcut 60x20', '#add-water-btn 66x28']"
+    ],
+    [
+      "P3",
+      "[iPhone 14 Pro Max/rpg/workouts] 6 alvos de toque <32px: ['#toggle-workout-std 84x21', '#toggle-workout-cust 86x21', 'Seg 97x27', 'Ter 97x27']"
+    ],
+    [
+      "P3",
+      "[iPhone 14 Pro Max/rpg/diet] 2 alvos de toque <32px: ['Adicionar Custom 221x31', '#btn-open-custom-food-modal 147x31']"
+    ],
+    [
+      "P3",
+      "[iPhone 14 Pro Max/rpg/mentors] 8 alvos de toque <32px: ['#btn-open-custom-mentor-modal 74x29', 'Todos 59x27', '🐉 DB 60x27', '🥷 NRT 68x27']"
+    ],
+    [
+      "P3",
+      "[iPhone 14 Pro Max/rpg/status] 5 alvos de toque <32px: ['? 14x14', '? 14x14', '? 14x14', '? 14x14']"
+    ],
+    [
+      "P3",
+      "[iPhone 4/antigo/rpg/dashboard] 2 alvos de toque <32px: ['#add-water-btn 66x28', '#go-to-diet-btn 66x23']"
+    ],
+    [
+      "P3",
+      "[iPhone 4/antigo/rpg/workouts] 4 alvos de toque <32px: ['Seg 70x27', 'Ter 70x27', 'Qui 70x27', 'Sex 70x27']"
+    ],
+    [
+      "P3",
+      "[iPhone 4/antigo/rpg/diet] 2 alvos de toque <32px: ['Adicionar Custom 266x28', '#btn-open-custom-food-modal 266x31']"
+    ],
+    [
+      "P3",
+      "[iPhone 4/antigo/rpg/mentors] 8 alvos de toque <32px: ['#btn-open-custom-mentor-modal 74x29', 'Todos 59x27', '🐉 DB 60x27', '🥷 NRT 68x27']"
+    ],
+    [
+      "P3",
+      "[iPhone 4/antigo/rpg/status] 5 alvos de toque <32px: ['? 14x14', '? 14x14', '? 14x14', '? 14x14']"
+    ],
+    [
+      "P3",
+      "[Galaxy S8/S22/rpg/dashboard] 2 alvos de toque <32px: ['#add-water-btn 66x28', '#go-to-diet-btn 66x23']"
+    ],
+    [
+      "P3",
+      "[Galaxy S8/S22/rpg/workouts] 6 alvos de toque <32px: ['#toggle-workout-std 84x21', '#toggle-workout-cust 86x21', 'Seg 80x27', 'Ter 80x27']"
+    ],
+    [
+      "P3",
+      "[Galaxy S8/S22/rpg/diet] 2 alvos de toque <32px: ['Adicionar Custom 306x28', '#btn-open-custom-food-modal 306x31']"
+    ],
+    [
+      "P3",
+      "[Galaxy S8/S22/rpg/mentors] 8 alvos de toque <32px: ['#btn-open-custom-mentor-modal 74x29', 'Todos 59x27', '🐉 DB 60x27', '🥷 NRT 68x27']"
+    ],
+    [
+      "P3",
+      "[Galaxy S8/S22/rpg/status] 5 alvos de toque <32px: ['? 14x14', '? 14x14', '? 14x14', '? 14x14']"
+    ],
+    [
+      "P3",
+      "[Galaxy S20 Ultra/rpg/dashboard] 2 alvos de toque <32px: ['#btn-edit-measures-shortcut 60x20', '#add-water-btn 66x28']"
+    ],
+    [
+      "P3",
+      "[Galaxy S20 Ultra/rpg/workouts] 6 alvos de toque <32px: ['#toggle-workout-std 84x21', '#toggle-workout-cust 86x21', 'Seg 93x27', 'Ter 93x27']"
+    ],
+    [
+      "P3",
+      "[Galaxy S20 Ultra/rpg/diet] 2 alvos de toque <32px: ['Adicionar Custom 210x31', '#btn-open-custom-food-modal 140x31']"
+    ],
+    [
+      "P3",
+      "[Galaxy S20 Ultra/rpg/mentors] 8 alvos de toque <32px: ['#btn-open-custom-mentor-modal 74x29', 'Todos 59x27', '🐉 DB 60x27', '🥷 NRT 68x27']"
+    ],
+    [
+      "P3",
+      "[Galaxy S20 Ultra/rpg/status] 5 alvos de toque <32px: ['? 14x14', '? 14x14', '? 14x14', '? 14x14']"
+    ],
+    [
+      "P3",
+      "[Pixel 5/rpg/dashboard] 2 alvos de toque <32px: ['#btn-edit-measures-shortcut 60x20', '#add-water-btn 66x28']"
+    ],
+    [
+      "P3",
+      "[Pixel 5/rpg/workouts] 6 alvos de toque <32px: ['#toggle-workout-std 84x21', '#toggle-workout-cust 86x21', 'Seg 88x27', 'Ter 88x27']"
+    ],
+    [
+      "P3",
+      "[Pixel 5/rpg/diet] 2 alvos de toque <32px: ['Adicionar Custom 199x31', '#btn-open-custom-food-modal 132x31']"
+    ],
+    [
+      "P3",
+      "[Pixel 5/rpg/mentors] 8 alvos de toque <32px: ['#btn-open-custom-mentor-modal 74x29', 'Todos 59x27', '🐉 DB 60x27', '🥷 NRT 68x27']"
+    ],
+    [
+      "P3",
+      "[Pixel 5/rpg/status] 5 alvos de toque <32px: ['? 14x14', '? 14x14', '? 14x14', '? 14x14']"
+    ],
+    [
+      "P3",
+      "[Galaxy Fold (fechado)/rpg/dashboard] 2 alvos de toque <32px: ['#add-water-btn 66x28', '#go-to-diet-btn 66x23']"
+    ],
+    [
+      "P3",
+      "[Galaxy Fold (fechado)/rpg/workouts] 4 alvos de toque <32px: ['Seg 60x27', 'Ter 60x27', 'Qui 60x27', 'Sex 60x27']"
+    ],
+    [
+      "P3",
+      "[Galaxy Fold (fechado)/rpg/diet] 2 alvos de toque <32px: ['Adicionar Custom 226x28', '#btn-open-custom-food-modal 226x31']"
+    ],
+    [
+      "P3",
+      "[Galaxy Fold (fechado)/rpg/mentors] 8 alvos de toque <32px: ['#btn-open-custom-mentor-modal 74x29', 'Todos 59x27', '🐉 DB 60x27', '🥷 NRT 68x27']"
+    ],
+    [
+      "P3",
+      "[Galaxy Fold (fechado)/rpg/status] 5 alvos de toque <32px: ['? 14x14', '? 14x14', '? 14x14', '? 14x14']"
+    ],
+    [
+      "P3",
+      "[Android baixo custo/rpg/dashboard] 2 alvos de toque <32px: ['#add-water-btn 66x28', '#go-to-diet-btn 66x23']"
+    ],
+    [
+      "P3",
+      "[Android baixo custo/rpg/workouts] 6 alvos de toque <32px: ['#toggle-workout-std 84x21', '#toggle-workout-cust 86x21', 'Seg 80x27', 'Ter 80x27']"
+    ],
+    [
+      "P3",
+      "[Android baixo custo/rpg/diet] 2 alvos de toque <32px: ['Adicionar Custom 306x28', '#btn-open-custom-food-modal 306x31']"
+    ],
+    [
+      "P3",
+      "[Android baixo custo/rpg/mentors] 8 alvos de toque <32px: ['#btn-open-custom-mentor-modal 74x29', 'Todos 59x27', '🐉 DB 60x27', '🥷 NRT 68x27']"
+    ],
+    [
+      "P3",
+      "[Android baixo custo/rpg/status] 5 alvos de toque <32px: ['? 14x14', '? 14x14', '? 14x14', '? 14x14']"
+    ],
+    [
+      "P3",
+      "[iPad Mini/rpg/dashboard] 2 alvos de toque <32px: ['#btn-edit-measures-shortcut 60x20', '#add-water-btn 66x28']"
+    ],
+    [
+      "P3",
+      "[iPad Mini/rpg/workouts] 6 alvos de toque <32px: ['#toggle-workout-std 84x21', '#toggle-workout-cust 86x21', 'Seg 101x27', 'Ter 101x27']"
+    ],
+    [
+      "P3",
+      "[iPad Mini/rpg/diet] 2 alvos de toque <32px: ['Adicionar Custom 229x31', '#btn-open-custom-food-modal 153x31']"
+    ],
+    [
+      "P3",
+      "[iPad Mini/rpg/mentors] 8 alvos de toque <32px: ['#btn-open-custom-mentor-modal 74x29', 'Todos 59x27', '🐉 DB 60x27', '🥷 NRT 68x27']"
+    ],
+    [
+      "P3",
+      "[iPad Mini/rpg/status] 5 alvos de toque <32px: ['? 14x14', '? 14x14', '? 14x14', '? 14x14']"
+    ],
+    [
+      "P3",
+      "[iPad Pro 11/rpg/dashboard] 2 alvos de toque <32px: ['#btn-edit-measures-shortcut 60x20', '#add-water-btn 66x28']"
+    ],
+    [
+      "P3",
+      "[iPad Pro 11/rpg/workouts] 6 alvos de toque <32px: ['#toggle-workout-std 84x21', '#toggle-workout-cust 86x21', 'Seg 101x27', 'Ter 101x27']"
+    ],
+    [
+      "P3",
+      "[iPad Pro 11/rpg/diet] 2 alvos de toque <32px: ['Adicionar Custom 229x31', '#btn-open-custom-food-modal 153x31']"
+    ],
+    [
+      "P3",
+      "[iPad Pro 11/rpg/mentors] 8 alvos de toque <32px: ['#btn-open-custom-mentor-modal 74x29', 'Todos 59x27', '🐉 DB 60x27', '🥷 NRT 68x27']"
+    ],
+    [
+      "P3",
+      "[iPad Pro 11/rpg/status] 5 alvos de toque <32px: ['? 14x14', '? 14x14', '? 14x14', '? 14x14']"
+    ],
+    [
+      "P3",
+      "[Desktop/rpg/dashboard] 2 alvos de toque <32px: ['#btn-edit-measures-shortcut 60x20', '#add-water-btn 66x28']"
+    ],
+    [
+      "P3",
+      "[Desktop/rpg/workouts] 6 alvos de toque <32px: ['#toggle-workout-std 84x21', '#toggle-workout-cust 86x21', 'Seg 101x27', 'Ter 101x27']"
+    ],
+    [
+      "P3",
+      "[Desktop/rpg/diet] 2 alvos de toque <32px: ['Adicionar Custom 229x31', '#btn-open-custom-food-modal 153x31']"
+    ],
+    [
+      "P3",
+      "[Desktop/rpg/mentors] 8 alvos de toque <32px: ['#btn-open-custom-mentor-modal 74x29', 'Todos 59x27', '🐉 DB 60x27', '🥷 NRT 68x27']"
+    ],
+    [
+      "P3",
+      "[Desktop/rpg/status] 5 alvos de toque <32px: ['? 14x14', '? 14x14', '? 14x14', '? 14x14']"
+    ]
+  ],
+  "per_device": {
+    "iPhone SE (2020)": [
+      [
+        "P3",
+        "[iPhone SE (2020)/rpg/dashboard] 3 alvos de toque <32px: ['#btn-edit-measures-shortcut 60x20', '#add-water-btn 66x28', '#go-to-diet-btn 66x23']"
+      ],
+      [
+        "P3",
+        "[iPhone SE (2020)/rpg/workouts] 6 alvos de toque <32px: ['#toggle-workout-std 84x21', '#toggle-workout-cust 86x21', 'Seg 83x27', 'Ter 83x27']"
+      ],
+      [
+        "P3",
+        "[iPhone SE (2020)/rpg/mentors] 8 alvos de toque <32px: ['#btn-open-custom-mentor-modal 74x29', 'Todos 59x27', '🐉 DB 60x27', '🥷 NRT 68x27']"
+      ],
+      [
+        "P3",
+        "[iPhone SE (2020)/rpg/status] 5 alvos de toque <32px: ['? 14x14', '? 14x14', '? 14x14', '? 14x14']"
+      ],
+      [
+        "P1",
+        "[iPhone SE (2020)/simple] nao clicou no card de modo"
+      ]
+    ],
+    "iPhone 12/13/14": [
+      [
+        "P3",
+        "[iPhone 12/13/14/rpg/dashboard] 2 alvos de toque <32px: ['#btn-edit-measures-shortcut 60x20', '#add-water-btn 66x28']"
+      ],
+      [
+        "P3",
+        "[iPhone 12/13/14/rpg/workouts] 6 alvos de toque <32px: ['#toggle-workout-std 84x21', '#toggle-workout-cust 86x21', 'Seg 87x27', 'Ter 87x27']"
+      ],
+      [
+        "P3",
+        "[iPhone 12/13/14/rpg/mentors] 8 alvos de toque <32px: ['#btn-open-custom-mentor-modal 74x29', 'Todos 59x27', '🐉 DB 60x27', '🥷 NRT 68x27']"
+      ],
+      [
+        "P3",
+        "[iPhone 12/13/14/rpg/status] 5 alvos de toque <32px: ['? 14x14', '? 14x14', '? 14x14', '? 14x14']"
+      ]
+    ],
+    "iPhone 14 Pro Max": [
+      [
+        "P3",
+        "[iPhone 14 Pro Max/rpg/dashboard] 2 alvos de toque <32px: ['#btn-edit-measures-shortcut 60x20', '#add-water-btn 66x28']"
+      ],
+      [
+        "P3",
+        "[iPhone 14 Pro Max/rpg/workouts] 6 alvos de toque <32px: ['#toggle-workout-std 84x21', '#toggle-workout-cust 86x21', 'Seg 97x27', 'Ter 97x27']"
+      ],
+      [
+        "P3",
+        "[iPhone 14 Pro Max/rpg/diet] 2 alvos de toque <32px: ['Adicionar Custom 221x31', '#btn-open-custom-food-modal 147x31']"
+      ],
+      [
+        "P3",
+        "[iPhone 14 Pro Max/rpg/mentors] 8 alvos de toque <32px: ['#btn-open-custom-mentor-modal 74x29', 'Todos 59x27', '🐉 DB 60x27', '🥷 NRT 68x27']"
+      ],
+      [
+        "P3",
+        "[iPhone 14 Pro Max/rpg/status] 5 alvos de toque <32px: ['? 14x14', '? 14x14', '? 14x14', '? 14x14']"
+      ]
+    ],
+    "iPhone 4/antigo": [
+      [
+        "P3",
+        "[iPhone 4/antigo/rpg/dashboard] 2 alvos de toque <32px: ['#add-water-btn 66x28', '#go-to-diet-btn 66x23']"
+      ],
+      [
+        "P3",
+        "[iPhone 4/antigo/rpg/workouts] 4 alvos de toque <32px: ['Seg 70x27', 'Ter 70x27', 'Qui 70x27', 'Sex 70x27']"
+      ],
+      [
+        "P3",
+        "[iPhone 4/antigo/rpg/diet] 2 alvos de toque <32px: ['Adicionar Custom 266x28', '#btn-open-custom-food-modal 266x31']"
+      ],
+      [
+        "P3",
+        "[iPhone 4/antigo/rpg/mentors] 8 alvos de toque <32px: ['#btn-open-custom-mentor-modal 74x29', 'Todos 59x27', '🐉 DB 60x27', '🥷 NRT 68x27']"
+      ],
+      [
+        "P3",
+        "[iPhone 4/antigo/rpg/status] 5 alvos de toque <32px: ['? 14x14', '? 14x14', '? 14x14', '? 14x14']"
+      ]
+    ],
+    "Galaxy S8/S22": [
+      [
+        "P3",
+        "[Galaxy S8/S22/rpg/dashboard] 2 alvos de toque <32px: ['#add-water-btn 66x28', '#go-to-diet-btn 66x23']"
+      ],
+      [
+        "P3",
+        "[Galaxy S8/S22/rpg/workouts] 6 alvos de toque <32px: ['#toggle-workout-std 84x21', '#toggle-workout-cust 86x21', 'Seg 80x27', 'Ter 80x27']"
+      ],
+      [
+        "P3",
+        "[Galaxy S8/S22/rpg/diet] 2 alvos de toque <32px: ['Adicionar Custom 306x28', '#btn-open-custom-food-modal 306x31']"
+      ],
+      [
+        "P3",
+        "[Galaxy S8/S22/rpg/mentors] 8 alvos de toque <32px: ['#btn-open-custom-mentor-modal 74x29', 'Todos 59x27', '🐉 DB 60x27', '🥷 NRT 68x27']"
+      ],
+      [
+        "P3",
+        "[Galaxy S8/S22/rpg/status] 5 alvos de toque <32px: ['? 14x14', '? 14x14', '? 14x14', '? 14x14']"
+      ]
+    ],
+    "Galaxy S20 Ultra": [
+      [
+        "P3",
+        "[Galaxy S20 Ultra/rpg/dashboard] 2 alvos de toque <32px: ['#btn-edit-measures-shortcut 60x20', '#add-water-btn 66x28']"
+      ],
+      [
+        "P3",
+        "[Galaxy S20 Ultra/rpg/workouts] 6 alvos de toque <32px: ['#toggle-workout-std 84x21', '#toggle-workout-cust 86x21', 'Seg 93x27', 'Ter 93x27']"
+      ],
+      [
+        "P3",
+        "[Galaxy S20 Ultra/rpg/diet] 2 alvos de toque <32px: ['Adicionar Custom 210x31', '#btn-open-custom-food-modal 140x31']"
+      ],
+      [
+        "P3",
+        "[Galaxy S20 Ultra/rpg/mentors] 8 alvos de toque <32px: ['#btn-open-custom-mentor-modal 74x29', 'Todos 59x27', '🐉 DB 60x27', '🥷 NRT 68x27']"
+      ],
+      [
+        "P3",
+        "[Galaxy S20 Ultra/rpg/status] 5 alvos de toque <32px: ['? 14x14', '? 14x14', '? 14x14', '? 14x14']"
+      ]
+    ],
+    "Pixel 5": [
+      [
+        "P3",
+        "[Pixel 5/rpg/dashboard] 2 alvos de toque <32px: ['#btn-edit-measures-shortcut 60x20', '#add-water-btn 66x28']"
+      ],
+      [
+        "P3",
+        "[Pixel 5/rpg/workouts] 6 alvos de toque <32px: ['#toggle-workout-std 84x21', '#toggle-workout-cust 86x21', 'Seg 88x27', 'Ter 88x27']"
+      ],
+      [
+        "P3",
+        "[Pixel 5/rpg/diet] 2 alvos de toque <32px: ['Adicionar Custom 199x31', '#btn-open-custom-food-modal 132x31']"
+      ],
+      [
+        "P3",
+        "[Pixel 5/rpg/mentors] 8 alvos de toque <32px: ['#btn-open-custom-mentor-modal 74x29', 'Todos 59x27', '🐉 DB 60x27', '🥷 NRT 68x27']"
+      ],
+      [
+        "P3",
+        "[Pixel 5/rpg/status] 5 alvos de toque <32px: ['? 14x14', '? 14x14', '? 14x14', '? 14x14']"
+      ]
+    ],
+    "Galaxy Fold (fechado)": [
+      [
+        "P3",
+        "[Galaxy Fold (fechado)/rpg/dashboard] 2 alvos de toque <32px: ['#add-water-btn 66x28', '#go-to-diet-btn 66x23']"
+      ],
+      [
+        "P3",
+        "[Galaxy Fold (fechado)/rpg/workouts] 4 alvos de toque <32px: ['Seg 60x27', 'Ter 60x27', 'Qui 60x27', 'Sex 60x27']"
+      ],
+      [
+        "P3",
+        "[Galaxy Fold (fechado)/rpg/diet] 2 alvos de toque <32px: ['Adicionar Custom 226x28', '#btn-open-custom-food-modal 226x31']"
+      ],
+      [
+        "P3",
+        "[Galaxy Fold (fechado)/rpg/mentors] 8 alvos de toque <32px: ['#btn-open-custom-mentor-modal 74x29', 'Todos 59x27', '🐉 DB 60x27', '🥷 NRT 68x27']"
+      ],
+      [
+        "P3",
+        "[Galaxy Fold (fechado)/rpg/status] 5 alvos de toque <32px: ['? 14x14', '? 14x14', '? 14x14', '? 14x14']"
+      ],
+      [
+        "P1",
+        "[Galaxy Fold (fechado)/simple] nao clicou no card de modo"
+      ]
+    ],
+    "Android baixo custo": [
+      [
+        "P3",
+        "[Android baixo custo/rpg/dashboard] 2 alvos de toque <32px: ['#add-water-btn 66x28', '#go-to-diet-btn 66x23']"
+      ],
+      [
+        "P3",
+        "[Android baixo custo/rpg/workouts] 6 alvos de toque <32px: ['#toggle-workout-std 84x21', '#toggle-workout-cust 86x21', 'Seg 80x27', 'Ter 80x27']"
+      ],
+      [
+        "P3",
+        "[Android baixo custo/rpg/diet] 2 alvos de toque <32px: ['Adicionar Custom 306x28', '#btn-open-custom-food-modal 306x31']"
+      ],
+      [
+        "P3",
+        "[Android baixo custo/rpg/mentors] 8 alvos de toque <32px: ['#btn-open-custom-mentor-modal 74x29', 'Todos 59x27', '🐉 DB 60x27', '🥷 NRT 68x27']"
+      ],
+      [
+        "P3",
+        "[Android baixo custo/rpg/status] 5 alvos de toque <32px: ['? 14x14', '? 14x14', '? 14x14', '? 14x14']"
+      ]
+    ],
+    "iPad Mini": [
+      [
+        "P3",
+        "[iPad Mini/rpg/dashboard] 2 alvos de toque <32px: ['#btn-edit-measures-shortcut 60x20', '#add-water-btn 66x28']"
+      ],
+      [
+        "P3",
+        "[iPad Mini/rpg/workouts] 6 alvos de toque <32px: ['#toggle-workout-std 84x21', '#toggle-workout-cust 86x21', 'Seg 101x27', 'Ter 101x27']"
+      ],
+      [
+        "P3",
+        "[iPad Mini/rpg/diet] 2 alvos de toque <32px: ['Adicionar Custom 229x31', '#btn-open-custom-food-modal 153x31']"
+      ],
+      [
+        "P3",
+        "[iPad Mini/rpg/mentors] 8 alvos de toque <32px: ['#btn-open-custom-mentor-modal 74x29', 'Todos 59x27', '🐉 DB 60x27', '🥷 NRT 68x27']"
+      ],
+      [
+        "P3",
+        "[iPad Mini/rpg/status] 5 alvos de toque <32px: ['? 14x14', '? 14x14', '? 14x14', '? 14x14']"
+      ]
+    ],
+    "iPad Pro 11": [
+      [
+        "P3",
+        "[iPad Pro 11/rpg/dashboard] 2 alvos de toque <32px: ['#btn-edit-measures-shortcut 60x20', '#add-water-btn 66x28']"
+      ],
+      [
+        "P3",
+        "[iPad Pro 11/rpg/workouts] 6 alvos de toque <32px: ['#toggle-workout-std 84x21', '#toggle-workout-cust 86x21', 'Seg 101x27', 'Ter 101x27']"
+      ],
+      [
+        "P3",
+        "[iPad Pro 11/rpg/diet] 2 alvos de toque <32px: ['Adicionar Custom 229x31', '#btn-open-custom-food-modal 153x31']"
+      ],
+      [
+        "P3",
+        "[iPad Pro 11/rpg/mentors] 8 alvos de toque <32px: ['#btn-open-custom-mentor-modal 74x29', 'Todos 59x27', '🐉 DB 60x27', '🥷 NRT 68x27']"
+      ],
+      [
+        "P3",
+        "[iPad Pro 11/rpg/status] 5 alvos de toque <32px: ['? 14x14', '? 14x14', '? 14x14', '? 14x14']"
+      ]
+    ],
+    "Desktop": [
+      [
+        "P3",
+        "[Desktop/rpg/dashboard] 2 alvos de toque <32px: ['#btn-edit-measures-shortcut 60x20', '#add-water-btn 66x28']"
+      ],
+      [
+        "P3",
+        "[Desktop/rpg/workouts] 6 alvos de toque <32px: ['#toggle-workout-std 84x21', '#toggle-workout-cust 86x21', 'Seg 101x27', 'Ter 101x27']"
+      ],
+      [
+        "P3",
+        "[Desktop/rpg/diet] 2 alvos de toque <32px: ['Adicionar Custom 229x31', '#btn-open-custom-food-modal 153x31']"
+      ],
+      [
+        "P3",
+        "[Desktop/rpg/mentors] 8 alvos de toque <32px: ['#btn-open-custom-mentor-modal 74x29', 'Todos 59x27', '🐉 DB 60x27', '🥷 NRT 68x27']"
+      ],
+      [
+        "P3",
+        "[Desktop/rpg/status] 5 alvos de toque <32px: ['? 14x14', '? 14x14', '? 14x14', '? 14x14']"
+      ]
+    ]
+  }
+}

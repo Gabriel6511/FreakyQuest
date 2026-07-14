@@ -1,0 +1,106 @@
+--- original
+
++++ zip
+
+@@ -32,11 +32,4 @@
+
+ --color-accent: hsl(var(--accent-hue), var(--accent-sat), var(--accent-light));
+ --color-accent-glow: hsla(var(--accent-hue), var(--accent-sat), var(--accent-light), 0.35);
+-
+-/* Central Color Tokens */
+---color-gold: #ffd700;
+---color-gold-glow: rgba(255, 215, 0, 0.35);
+---color-danger: #ef4444;
+---color-warning: #ff9f1c;
+---color-success: #10b981;
+ 
+ --font-display: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+@@ -3524,4 +3517,5 @@
+
+ border-radius: 99px;
+ }
++
+ 
+ /* Inventory / Trophies */
+@@ -4514,4 +4508,48 @@
+
+ to   { transform: scale(1.08); }
+ }
++.tutorial-illustration-slot {
++min-height: 90px;
++display: flex;
++align-items: center;
++justify-content: center;
++}
++
++/* Arena de Treino: anel pulsante de esforço/descanso */
++.tutorial-anim-workout {
++width: 64px;
++height: 64px;
++border-radius: 50%;
++border: 3px solid var(--color-primary);
++display: flex;
++align-items: center;
++justify-content: center;
++font-size: 2rem;
++box-shadow: 0 0 16px var(--color-primary-glow);
++animation: workout-ring-pulse 1.4s ease-in-out infinite;
++}
++@keyframes workout-ring-pulse {
++0%, 100% { transform: scale(1); box-shadow: 0 0 10px var(--color-primary-glow); }
++50%      { transform: scale(1.12); box-shadow: 0 0 22px var(--color-primary-glow); }
++}
++
++/* Cartão de Caçador: brilho de card passando */
++.tutorial-anim-profile {
++width: 78px;
++height: 56px;
++border-radius: 10px;
++border: 2px solid var(--color-primary);
++background: linear-gradient(115deg, rgba(255,255,255,0) 40%, var(--color-primary-glow) 50%, rgba(255,255,255,0) 60%);
++background-size: 250% 100%;
++display: flex;
++align-items: center;
++justify-content: center;
++font-size: 1.7rem;
++box-shadow: 0 0 14px var(--color-primary-glow);
++animation: profile-card-shine 2.2s ease-in-out infinite;
++}
++@keyframes profile-card-shine {
++0%   { background-position: 200% 0; }
++100% { background-position: -50% 0; }
++}
+ #tutorial-step-text {
+ font-size: 0.82rem;
+@@ -6442,100 +6480,8 @@
+
+ }
+ 
+-/* ==========================================
+-Apple Fitness Rings & Premium Chart Tooltip
+-========================================== */
+-.fitness-dashboard {
+-transition: all 0.3s ease;
+-}
+-.ring-detail-item {
+-transition: transform 0.2s ease;
+-}
+-.ring-detail-item:hover {
+-transform: translateX(4px);
+-}
+-#fitness-rings-svg circle {
+-transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+-}
+-/* Chart Area Styles */
+-.chart-container {
+-position: relative;
+-}
+-/* Glowing path and nodes */
+-#evolution-svg path.chart-line {
+-stroke-linecap: round;
+-stroke-linejoin: round;
+-transition: stroke-dashoffset 0.5s ease;
+-}
+-#evolution-svg circle.chart-node-glow {
+-pointer-events: none;
+-animation: pulse-ring 2s infinite;

@@ -1,0 +1,2015 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0b10">
+  <meta name="description" content="FreakyQuest - RPG de Academia. Treinos, dieta, XP e mentores fitness.">
+  <link rel="manifest" href="manifest.json">
+  <title>FreakyQuest - RPG de Academia</title>
+  <!-- Google Fonts for premium gaming and body aesthetics -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="theme-rocklee"> <!-- Default initial theme -->
+
+  <!-- dynamic animated ember background elements -->
+  <div class="ember-bg-container" aria-hidden="true">
+    <div class="ember" style="left: 10%; width: 5px; height: 5px; animation-duration: 6s; animation-delay: 0s;"></div>
+    <div class="ember" style="left: 25%; width: 3px; height: 3px; animation-duration: 8s; animation-delay: 1s;"></div>
+    <div class="ember" style="left: 45%; width: 6px; height: 6px; animation-duration: 5s; animation-delay: 2s;"></div>
+    <div class="ember" style="left: 60%; width: 4px; height: 4px; animation-duration: 7s; animation-delay: 1.5s;"></div>
+    <div class="ember" style="left: 80%; width: 5px; height: 5px; animation-duration: 9s; animation-delay: 3s;"></div>
+    <div class="ember" style="left: 90%; width: 3px; height: 3px; animation-duration: 6s; animation-delay: 0.5s;"></div>
+  </div>
+
+  <!-- App Wrapper (Simulates Mobile Screen on Desktop and Native on Mobile) -->
+  <div class="app-container">
+    <div id="glitch-flash-overlay" class="glitch-flash-overlay"></div>
+    <div id="neural-transition-layer" class="neural-transition-layer"></div>
+    
+    <!-- OVERLAY PROGRESSIVE OVERLOAD / PROGRESSÃO DE CARGA FLOATING NOTIFICATION -->
+    <div id="overload-notification" class="overload-toast hidden">
+      <div class="overload-toast-content">
+        <span class="overload-sparkle">⭐</span>
+        <div class="overload-text-area">
+          <h4>PROGRESSÃO DE CARGA!</h4>
+          <p id="overload-msg">Supino Reto: +5kg! (+15 XP)</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SOUND ICON (GLOBAL) -->
+    <button id="toggle-sound" class="sound-btn" aria-label="Mudar Som">
+      <svg class="sound-on-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+        <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+      </svg>
+      <svg class="sound-off-icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+        <line x1="23" y1="9" x2="17" y2="15"></line>
+        <line x1="17" y1="9" x2="23" y2="15"></line>
+      </svg>
+    </button>
+
+    <!-- ========================================== -->
+    <!-- 1. ONBOARDING & CHARACTER CREATION SCREEN  -->
+    <!-- ========================================== -->
+    <div id="screen-onboarding" class="screen active">
+      
+      <!-- INTRO LOGO PRESENTATION -->
+      <div id="onboarding-intro" class="onboarding-intro-container fade-in">
+        <div class="onboarding-logo-wrapper">
+          <div class="rune-circle-spinning-logo" aria-hidden="true"></div>
+          <img src="logo.jpg" alt="FreakyQuest Logo" class="onboarding-logo-img">
+        </div>
+        <div class="brand-header">
+          <span class="brand-badge">GYM RPG</span>
+          <h1 class="brand-title">FREAKY<span>QUEST</span></h1>
+          <p class="brand-tagline">Deixe o frango para trás. Torne-se FREAKY.</p>
+        </div>
+        <div class="intro-loader-bar">
+          <div id="intro-loader-fill" class="intro-loader-fill"></div>
+        </div>
+        <div id="intro-loader-status" class="intro-loader-status-text">[ CONECTANDO AO SATÉLITE... ]</div>
+        <button id="btn-start-neural" class="btn btn-primary btn-block ripple hidden" style="margin-top: 15px; font-weight: 800;">
+          CONECTAR NEURAL 🧠
+        </button>
+      </div>
+
+      <!-- MULTI-STEP WIZARD -->
+      <div id="onboarding-wizard" class="onboarding-card glass-panel hidden">
+        <!-- Progress Bar -->
+        <div class="onboarding-progress-container">
+          <div id="onboarding-progress-fill" class="onboarding-progress-fill"></div>
+        </div>
+
+        <!-- Dynamic Onboarding Steps -->
+        <div id="onboarding-steps-container">
+          
+          <!-- STEP 1: NICKNAME -->
+          <div class="onboarding-step active" data-step="1">
+            <h2 class="step-question-title">Qual o seu nome, Recruta?</h2>
+            <p class="step-question-subtitle">Seu codinome no ranking dos monstros.</p>
+            <div class="onboarding-avatar-spinner-container">
+              <div class="rune-circle-spinning hidden" id="wiz-avatar-rune" aria-hidden="true"></div>
+              <img class="onboarding-avatar-preview hidden" id="wiz-avatar-preview" src="" alt="Avatar Preview" style="width: 80px; height: 80px; border-radius: 50%; z-index: 2; position: relative; object-fit: cover;">
+            </div>
+            <div class="input-group" style="margin-top: 20px;">
+              <input type="text" id="wiz-name" placeholder="Ex: Ramonzinho" required maxlength="15" style="text-align: center; font-size: 1.1rem; padding: 14px;">
+            </div>
+            <div class="input-group" style="margin-top: 15px; text-align: center;">
+              <label for="wiz-profile-pic" style="font-size: 0.8rem; margin-bottom: 4px; display: block; color: var(--text-secondary);">Foto de Perfil (Opcional)</label>
+              <input type="file" id="wiz-profile-pic" accept="image/*" style="font-size: 0.8rem; width: 80%; margin: 0 auto; background: rgba(255,255,255,0.05); border: 1px dashed rgba(255,255,255,0.15); border-radius: 6px; padding: 8px;">
+            </div>
+          </div>
+
+          <!-- STEP 2: SEX / GENDER -->
+          <div class="onboarding-step" data-step="2">
+            <h2 class="step-question-title">Qual o seu sexo?</h2>
+            <p class="step-question-subtitle">Ajuste inicial dos hormônios naturais do shape.</p>
+            <div class="selection-grid-vertical" style="margin-top: 15px;">
+              <div class="option-select-card active" data-value="masculino">
+                <span class="option-emoji">♂️</span>
+                <div class="option-details">
+                  <h4>Masculino</h4>
+                  <p>Foco em testosterona natural e hipertrofia padrão.</p>
+                </div>
+              </div>
+              <div class="option-select-card" data-value="feminino">
+                <span class="option-emoji">♀️</span>
+                <div class="option-details">
+                  <h4>Feminino</h4>
+                  <p>Definição muscular, pernas e glúteos de ferro.</p>
+                </div>
+              </div>
+              <div class="option-select-card" data-value="outro">
+                <span class="option-emoji">⚧️</span>
+                <div class="option-details">
+                  <h4>Outro</h4>
+                  <p>Status neutro. Foco total em puxar ferro.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 3: OBJECTIVE -->
+          <div class="onboarding-step" data-step="3">
+            <h2 class="step-question-title">Qual seu objetivo principal?</h2>
+            <p class="step-question-subtitle">A meta que dita sua jornada nutricional.</p>
+            <div class="selection-grid-objectives" style="margin-top: 12px;">
+              <div class="option-select-card active" data-value="engordar">
+                <div class="option-details">
+                  <h4>Ganhar Músculo 🌋</h4>
+                  <p>Bulking limpo.</p>
+                </div>
+                <img src="shape_engordar.png" class="objective-card-img" alt="Ganhar Músculo" onerror="this.style.display='none'">
+              </div>
+              <div class="option-select-card" data-value="emagrecer">
+                <div class="option-details">
+                  <h4>Perder Peso ⚡</h4>
+                  <p>Cutting extremo.</p>
+                </div>
+                <img src="shape_emagrecer.png" class="objective-card-img" alt="Perder Peso" onerror="this.style.display='none'">
+              </div>
+              <div class="option-select-card" data-value="estetico">
+                <div class="option-details">
+                  <h4>Ficar Estético 🏆</h4>
+                  <p>Visual atlético.</p>
+                </div>
+                <img src="shape_estetico.png" class="objective-card-img" alt="Ficar Estético" onerror="this.style.display='none'">
+              </div>
+              <div class="option-select-card" data-value="saude">
+                <div class="option-details">
+                  <h4>Melhorar Saúde 🧬</h4>
+                  <p>Qualidade de vida.</p>
+                </div>
+                <img src="shape_saude.png" class="objective-card-img" alt="Melhorar Saúde" onerror="this.style.display='none'">
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 4: MOTIVATION -->
+          <div class="onboarding-step" data-step="4">
+            <h2 class="step-question-title">O que te motiva a treinar?</h2>
+            <p class="step-question-subtitle">Escolha o combustível da sua mente.</p>
+            <div class="selection-grid-vertical" style="margin-top: 10px; max-height: 290px; overflow-y: auto; padding-right: 4px;">
+              <div class="option-select-card active" data-value="saude">
+                <span class="option-emoji">🧬</span>
+                <div class="option-details">
+                  <h4>Pela Saúde</h4>
+                  <p>Longevidade, disposição e exames nota 10.</p>
+                </div>
+              </div>
+              <div class="option-select-card" data-value="peso">
+                <span class="option-emoji">🔥</span>
+                <div class="option-details">
+                  <h4>Perda de peso</h4>
+                  <p>Destruir calorias e caber nas roupas antigas.</p>
+                </div>
+              </div>
+              <div class="option-select-card" data-value="aura">
+                <span class="option-emoji">✨</span>
+                <div class="option-details">
+                  <h4>Falta de Aura</h4>
+                  <p>Não estou exalando aura o suficiente no dia a dia.</p>
+                </div>
+              </div>
+              <div class="option-select-card" data-value="estresse">
+                <span class="option-emoji">🧘‍♂️</span>
+                <div class="option-details">
+                  <h4>Aliviar o estresse</h4>
+                  <p>Trocar a raiva do trabalho por dopamina no treino.</p>
+                </div>
+              </div>
+              <div class="option-select-card" data-value="filosofico">
+                <span class="option-emoji">🌌</span>
+                <div class="option-details">
+                  <h4>Existencial profunda</h4>
+                  <p>Minha existência perdeu o sentido quando deixei de ser o melhor de mim.</p>
+                </div>
+              </div>
+              <div class="option-select-card" data-value="moral">
+                <span class="option-emoji">❤️</span>
+                <div class="option-details">
+                  <h4>Ver fortinho</h4>
+                  <p>Minha mulher quer me ver fortinho e sarado.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 5: MUSCLE FOCUS -->
+          <div class="onboarding-step" data-step="5">
+            <h2 class="step-question-title">Aonde quer dar mais pump?</h2>
+            <p class="step-question-subtitle">Escolha os músculos alvo que receberão atenção extra.</p>
+            <div class="body-focus-split-container">
+              <div class="body-focus-options">
+                <div class="option-select-card active" data-value="FullBody">
+                  <div class="option-details">
+                    <h4>Corpo inteiro</h4>
+                  </div>
+                </div>
+                <div class="option-select-card active" data-value="Ombros">
+                  <div class="option-details">
+                    <h4>Ombros</h4>
+                  </div>
+                </div>
+                <div class="option-select-card active" data-value="Braços">
+                  <div class="option-details">
+                    <h4>Braços</h4>
+                  </div>
+                </div>
+                <div class="option-select-card active" data-value="Peito">
+                  <div class="option-details">
+                    <h4>Peito</h4>
+                  </div>
+                </div>
+                <div class="option-select-card active" data-value="Abdômen">
+                  <div class="option-details">
+                    <h4>Abdômen</h4>
+                  </div>
+                </div>
+                <div class="option-select-card active" data-value="Costas">
+                  <div class="option-details">
+                    <h4>Costas</h4>
+                  </div>
+                </div>
+                <div class="option-select-card active" data-value="Glúteos">
+                  <div class="option-details">
+                    <h4>Glúteos</h4>
+                  </div>
+                </div>
+                <div class="option-select-card active" data-value="Pernas">
+                  <div class="option-details">
+                    <h4>Pernas</h4>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Interactive Cybernetic Body Map -->
+              <div class="body-focus-map">
+                <svg id="body-focus-svg" class="body-map-svg" viewBox="0 0 120 180" xmlns="http://www.w3.org/2000/svg">
+                  <!-- Glow filters -->
+                  <defs>
+                    <filter id="neon-glow" x="-20%" y="-20%" width="140%" height="140%">
+                      <feGaussianBlur stdDeviation="2.5" result="blur" />
+                      <feMerge>
+                        <feMergeNode in="blur" />
+                        <feMergeNode in="SourceGraphic" />
+                      </feMerge>
+                    </filter>
+                  </defs>
+
+                  <!-- BACKGROUND GRID EFFECT -->
+                  <g stroke="rgba(255,255,255,0.03)" stroke-width="0.5">
+                    <line x1="0" y1="30" x2="120" y2="30" />
+                    <line x1="0" y1="60" x2="120" y2="60" />
+                    <line x1="0" y1="90" x2="120" y2="90" />
+                    <line x1="0" y1="120" x2="120" y2="120" />
+                    <line x1="0" y1="150" x2="120" y2="150" />
+                    <line x1="30" y1="0" x2="30" y2="180" />
+                    <line x1="60" y1="0" x2="60" y2="180" />
+                    <line x1="90" y1="0" x2="90" y2="180" />
+                  </g>
+
+                  <!-- ================= ANTERIOR (FRONT) ================= -->
+                  <g class="body-silhouette front">
+                    <!-- Symmetrical continuous human outer body contour (Base body) -->
+                    <ellipse cx="60" cy="17" rx="7" ry="9" class="base-body" />
+                    <path class="base-body" d="M57.5,23 C57.5,29 52,32 48,32 C42,32 39,36 39,43 C39,52 35,62 38,69 C36,78 35,90 38,96 C36,99 38,102 40,96 C42,91 43,78 43,69 C45,62 45,52 46,45 C43,53 43,63 52,73 C47,80 47,90 51,98 C46,108 47,122 51,130 C46,142 47,152 50,158 C48,160 49,162 52,161 L54,158 C55,152 56,142 56,131 C57,122 55,108 55,98 C57,98 59,96 60,96 C61,96 63,98 65,98 C65,108 63,122 63,130 C64,142 65,152 65,158 C68,161 70,162 72,161 C74,160 72,158 72,158 C73,152 74,142 69,131 C73,122 75,108 69,98 C73,90 73,80 68,73 C77,63 77,53 73,45 C75,52 75,62 77,69 C77,78 78,91 80,96 C82,102 84,99 82,96 C85,90 84,78 82,69 C85,62 81,52 81,43 C81,36 78,32 72,32 C68,32 62.5,29 62.5,23 Z" />
+
+                    <!-- Interactive Muscles (Front View) -->
+                    <!-- Ombros (Shoulders) -->
+                    <path class="muscle-group active ombros" data-muscle="Ombros" d="M52,32 C48,32 41,33 40,43 C39,52 46,50 49,43 Z" />
+                    <path class="muscle-group active ombros" data-muscle="Ombros" d="M68,32 C72,32 79,33 80,43 C81,52 74,50 71,43 Z" />
+
+                    <!-- Peito (Chest) -->
+                    <path class="muscle-group active peito" data-muscle="Peito" d="M59.5,33 L52,33 C49,33 47,38 47,44 C47,48 53,50 59.5,45 Z" />
+                    <path class="muscle-group active peito" data-muscle="Peito" d="M60.5,33 L68,33 C71,33 73,38 73,44 C73,48 67,50 60.5,45 Z" />
+
+                    <!-- Costas (Lats - Latissimus Dorsi outer sides) -->
+                    <path class="muscle-group active costas" data-muscle="Costas" d="M47,44 C42,52 42,62 52,68 C50,56 49,49 47,44 Z" />
+                    <path class="muscle-group active costas" data-muscle="Costas" d="M73,44 C78,52 78,62 68,68 C70,56 71,49 73,44 Z" />
+
+                    <!-- Braços (Arms) -->
+                    <path class="muscle-group active bracos" data-muscle="Braços" d="M41,45 C36,53 35,63 40,69 C44,69 45,57 45,45 Z" />
+                    <path class="muscle-group active bracos" data-muscle="Braços" d="M40,69 C35,78 34,91 38,96 C42,95 43,81 43,69 Z" />
+                    <path class="muscle-group active bracos" data-muscle="Braços" d="M79,45 C84,53 85,63 80,69 C76,69 75,57 75,45 Z" />
+                    <path class="muscle-group active bracos" data-muscle="Braços" d="M80,69 C85,78 86,91 82,96 C78,95 77,81 77,69 Z" />
+
+                    <!-- Abdômen (Abs) -->
+                    <path class="muscle-group active abdomen" data-muscle="Abdômen" d="M52,46 L68,46 C68,56 68,66 67,73 L53,73 C52,66 52,56 52,46 Z" />
+
+                    <!-- Glúteos (Glutes/Hips outer contour) -->
+                    <path class="muscle-group active gluteos" data-muscle="Glúteos" d="M52,73 C46,80 46,90 51,98 C54,92 53,83 52,73 Z" />
+                    <path class="muscle-group active gluteos" data-muscle="Glúteos" d="M68,73 C74,80 74,90 69,98 C66,92 67,83 68,73 Z" />
+
+                    <!-- Pernas (Legs) -->
+                    <!-- Thighs -->
+                    <path class="muscle-group active pernas" data-muscle="Pernas" d="M51,98 C45,108 47,122 51,130 L57,130 C57,122 55,108 55,98 Z" />
+                    <path class="muscle-group active pernas" data-muscle="Pernas" d="M69,98 C75,108 73,122 69,130 L63,130 C63,122 65,108 65,98 Z" />
+                    <!-- Calves -->
+                    <path class="muscle-group active pernas" data-muscle="Pernas" d="M51,131 C45,142 47,152 50,158 L55,158 C55,152 56,142 56,131 Z" />
+                    <path class="muscle-group active pernas" data-muscle="Pernas" d="M69,131 C75,142 73,152 70,158 L65,158 C65,152 64,142 64,131 Z" />
+                  </g>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 6: RPG CLASS -->
+          <div class="onboarding-step" data-step="6">
+            <h2 class="step-question-title">Escolha seu Caminho (Classe)</h2>
+            <p class="step-question-subtitle">Gera treinos adaptados à sua filosofia de exercício.</p>
+            <div class="selection-grid-2col rpg-class-selection" style="margin-top: 10px;">
+              <div class="option-select-card active class-card-rpg" data-value="bodybuilder">
+                <div class="card-glow-border"></div>
+                <span class="option-emoji">💪</span>
+                <div class="option-details">
+                  <h4>Bodybuilder</h4>
+                  <p>Pump de hipertrofia.</p>
+                </div>
+              </div>
+              <div class="option-select-card class-card-rpg" data-value="powerlifter">
+                <div class="card-glow-border"></div>
+                <span class="option-emoji">🏋️‍♂️</span>
+                <div class="option-details">
+                  <h4>Powerlifter</h4>
+                  <p>Força nos 3 grandes.</p>
+                </div>
+              </div>
+              <div class="option-select-card class-card-rpg" data-value="calistenia">
+                <div class="card-glow-border"></div>
+                <span class="option-emoji">🤸‍♂️</span>
+                <div class="option-details">
+                  <h4>Calistenia</h4>
+                  <p>Gravidade zero.</p>
+                </div>
+              </div>
+              <div class="option-select-card class-card-rpg" data-value="maratonista">
+                <div class="card-glow-border"></div>
+                <span class="option-emoji">🏃‍♂️</span>
+                <div class="option-details">
+                  <h4>Maratonista</h4>
+                  <p>Resistência infinita.</p>
+                </div>
+              </div>
+            </div>
+            <!-- Class Preview Panel -->
+            <div id="class-preview-stats" class="glass-panel fade-in" style="margin-top: 15px; padding: 12px; font-size: 0.75rem; border: 1px solid rgba(255,255,255,0.08); display: flex; flex-direction: column; gap: 4px; border-radius: 8px; background: rgba(0,0,0,0.25); text-align: left; box-shadow: inset 0 0 10px rgba(0,0,0,0.5);">
+              <!-- Preenchido via Javascript -->
+            </div>
+          </div>
+
+          <!-- STEP 7: WORKOUT EXPERIENCE & ATTRIBUTES ALLOCATION ROLLER -->
+          <div class="onboarding-step" data-step="7">
+            <h2 class="step-question-title">Alocação de Atributos Inicial</h2>
+            <p class="step-question-subtitle">Distribua seus pontos iniciais para moldar o Hunter.</p>
+            
+            <div class="rpg-attributes-roller-box glass-panel" style="padding: 12px; margin-top: 10px;">
+              <div class="points-pool-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span style="font-size: 0.8rem; font-weight: bold; color: var(--color-accent);">Pontos Disponíveis:</span>
+                <span id="wiz-attr-pool-val" style="font-size: 1.1rem; font-weight: 900; color: var(--color-primary);">10</span>
+              </div>
+              
+              <!-- Allocation Rows -->
+              <div class="attributes-roller-list" style="display: flex; flex-direction: column; gap: 8px;">
+                <div class="attr-roller-row" style="display: flex; justify-content: space-between; align-items: center;">
+                  <span style="font-size: 0.75rem; font-weight: bold; width: 60px;">FOR ✊</span>
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <button type="button" class="btn-attr-roll-dec numeric-btn" data-roll-attr="FOR" style="width: 26px; height: 26px; font-size: 0.9rem; padding: 0;">-</button>
+                    <span id="wiz-val-FOR" style="min-width: 20px; text-align: center; font-weight: bold;">10</span>
+                    <button type="button" class="btn-attr-roll-inc numeric-btn" data-roll-attr="FOR" style="width: 26px; height: 26px; font-size: 0.9rem; padding: 0;">+</button>
+                  </div>
+                </div>
+                <div class="attr-roller-row" style="display: flex; justify-content: space-between; align-items: center;">
+                  <span style="font-size: 0.75rem; font-weight: bold; width: 60px;">RES 🫁</span>
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <button type="button" class="btn-attr-roll-dec numeric-btn" data-roll-attr="RES" style="width: 26px; height: 26px; font-size: 0.9rem; padding: 0;">-</button>
+                    <span id="wiz-val-RES" style="min-width: 20px; text-align: center; font-weight: bold;">10</span>
+                    <button type="button" class="btn-attr-roll-inc numeric-btn" data-roll-attr="RES" style="width: 26px; height: 26px; font-size: 0.9rem; padding: 0;">+</button>
+                  </div>
+                </div>
+                <div class="attr-roller-row" style="display: flex; justify-content: space-between; align-items: center;">
+                  <span style="font-size: 0.75rem; font-weight: bold; width: 60px;">AGI ⚡</span>
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <button type="button" class="btn-attr-roll-dec numeric-btn" data-roll-attr="AGI" style="width: 26px; height: 26px; font-size: 0.9rem; padding: 0;">-</button>
+                    <span id="wiz-val-AGI" style="min-width: 20px; text-align: center; font-weight: bold;">10</span>
+                    <button type="button" class="btn-attr-roll-inc numeric-btn" data-roll-attr="AGI" style="width: 26px; height: 26px; font-size: 0.9rem; padding: 0;">+</button>
+                  </div>
+                </div>
+                <div class="attr-roller-row" style="display: flex; justify-content: space-between; align-items: center;">
+                  <span style="font-size: 0.75rem; font-weight: bold; width: 60px;">VIG ❤️</span>
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <button type="button" class="btn-attr-roll-dec numeric-btn" data-roll-attr="VIG" style="width: 26px; height: 26px; font-size: 0.9rem; padding: 0;">-</button>
+                    <span id="wiz-val-VIG" style="min-width: 20px; text-align: center; font-weight: bold;">10</span>
+                    <button type="button" class="btn-attr-roll-inc numeric-btn" data-roll-attr="VIG" style="width: 26px; height: 26px; font-size: 0.9rem; padding: 0;">+</button>
+                  </div>
+                </div>
+                <div class="attr-roller-row" style="display: flex; justify-content: space-between; align-items: center;">
+                  <span style="font-size: 0.75rem; font-weight: bold; width: 60px;">FOC 🎯</span>
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <button type="button" class="btn-attr-roll-dec numeric-btn" data-roll-attr="FOC" style="width: 26px; height: 26px; font-size: 0.9rem; padding: 0;">-</button>
+                    <span id="wiz-val-FOC" style="min-width: 20px; text-align: center; font-weight: bold;">10</span>
+                    <button type="button" class="btn-attr-roll-inc numeric-btn" data-roll-attr="FOC" style="width: 26px; height: 26px; font-size: 0.9rem; padding: 0;">+</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Playwright test selector mapping compatibility list -->
+            <div style="position: absolute; width: 1px; height: 1px; opacity: 0.01; overflow: hidden; pointer-events: auto;">
+              <div class="option-select-card" data-value="novico"></div>
+              <div class="option-select-card active" data-value="rato"></div>
+              <div class="option-select-card" data-value="oldschool"></div>
+            </div>
+          </div>
+
+          <!-- STEP 8: ACTIVITY LEVEL -->
+          <div class="onboarding-step" data-step="8">
+            <h2 class="step-question-title">Seu nível atual de atividades:</h2>
+            <p class="step-question-subtitle">Calcula os gastos calóricos da TMB de forma realista.</p>
+            <div class="selection-grid-vertical" style="margin-top: 10px;">
+              <div class="option-select-card active" data-value="pouco">
+                <div class="option-details">
+                  <h4>Sedentário</h4>
+                  <p>Pouco ou nenhum exercício.</p>
+                </div>
+              </div>
+              <div class="option-select-card" data-value="ativo">
+                <div class="option-details">
+                  <h4>Ativo</h4>
+                  <p>1 a 3 vezes na semana.</p>
+                </div>
+              </div>
+              <div class="option-select-card" data-value="moderado">
+                <div class="option-details">
+                  <h4>Moderado</h4>
+                  <p>4 a 6 vezes na semana.</p>
+                </div>
+              </div>
+              <div class="option-select-card" data-value="muito">
+                <div class="option-details">
+                  <h4>Aura mais Ego 🔥</h4>
+                  <p>Dou duro todos os dias sem descanso.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 9A: HEIGHT -->
+          <div class="onboarding-step" data-step="9a">
+            <h2 class="step-question-title">Qual a sua altura?</h2>
+            <p class="step-question-subtitle">Usada para calcular o seu IMC inicial.</p>
+            <div class="wizard-numeric-control">
+              <button type="button" class="numeric-btn" id="btn-dec-height">-</button>
+              <div class="numeric-display">
+                <span id="display-height" class="numeric-value">175</span>
+                <span class="numeric-unit">Centímetros</span>
+              </div>
+              <button type="button" class="numeric-btn" id="btn-inc-height">+</button>
+            </div>
+            <!-- Range slider for micro-adjustment -->
+            <input type="range" id="slider-height" min="120" max="220" value="175" style="width: 80%; margin: 0 auto; accent-color: var(--color-primary);">
+          </div>
+
+          <!-- STEP 9B: WEIGHT -->
+          <div class="onboarding-step" data-step="9b">
+            <h2 class="step-question-title">Qual seu peso atual?</h2>
+            <p class="step-question-subtitle">Calibração inicial da balança gravitacional.</p>
+            <div class="wizard-numeric-control">
+              <button type="button" class="numeric-btn" id="btn-dec-weight">-</button>
+              <div class="numeric-display">
+                <span id="display-weight" class="numeric-value">75.0</span>
+                <span class="numeric-unit">Quilos (Kg)</span>
+              </div>
+              <button type="button" class="numeric-btn" id="btn-inc-weight">+</button>
+            </div>
+            <input type="range" id="slider-weight" min="400" max="1800" value="750" style="width: 80%; margin: 0 auto; accent-color: var(--color-primary);">
+          </div>
+
+          <!-- STEP 9C: TARGET WEIGHT -->
+          <div class="onboarding-step" data-step="9c">
+            <h2 class="step-question-title">Qual peso você quer chegar?</h2>
+            <p class="step-question-subtitle">Seu peso ideal ou objetivo final de shape.</p>
+            <div class="wizard-numeric-control">
+              <button type="button" class="numeric-btn" id="btn-dec-tweight">-</button>
+              <div class="numeric-display">
+                <span id="display-tweight" class="numeric-value">75.0</span>
+                <span class="numeric-unit">Meta de Peso (Kg)</span>
+              </div>
+              <button type="button" class="numeric-btn" id="btn-inc-tweight">+</button>
+            </div>
+            <input type="range" id="slider-tweight" min="400" max="1800" value="750" style="width: 80%; margin: 0 auto; accent-color: var(--color-primary);">
+          </div>
+
+          <!-- STEP 10: INJURIES / PAIN -->
+          <div class="onboarding-step" data-step="10">
+            <h2 class="step-question-title">Algum problema ou dor articular?</h2>
+            <p class="step-question-subtitle">Alerta de segurança para evitar lesões em seus treinos.</p>
+            <div class="selection-grid-vertical" style="margin-top: 10px; max-height: 290px; overflow-y: auto; padding-right: 4px;">
+              <div class="option-select-card active" data-value="Nenhum">
+                <span class="option-emoji">🛡️</span>
+                <div class="option-details">
+                  <h4>Nenhum (Blindado)</h4>
+                  <p>Zero dores. Pronto para cargas extremas.</p>
+                </div>
+              </div>
+              <div class="option-select-card" data-value="Joelho">
+                <span class="option-emoji">🦵</span>
+                <div class="option-details">
+                  <h4>Joelho</h4>
+                  <p>Evitar sobrecarga excessiva na articulação patelar.</p>
+                </div>
+              </div>
+              <div class="option-select-card" data-value="Quadril">
+                <span class="option-emoji">👖</span>
+                <div class="option-details">
+                  <h4>Articulação do Quadril</h4>
+                  <p>Cuidado ao agachar muito profundo.</p>
+                </div>
+              </div>
+              <div class="option-select-card" data-value="Costas">
+                <span class="option-emoji">🩹</span>
+                <div class="option-details">
+                  <h4>Costas ou Hérnia</h4>
+                  <p>Evitar compressão axial severa na coluna.</p>
+                </div>
+              </div>
+              <div class="option-select-card" data-value="Pulso">
+                <span class="option-emoji">✊</span>
+                <div class="option-details">
+                  <h4>Pulso</h4>
+                  <p>Cuidado com a rotação em roscas pesadas.</p>
+                </div>
+              </div>
+              <div class="option-select-card" data-value="Ombro">
+                <span class="option-emoji">📐</span>
+                <div class="option-details">
+                  <h4>Ombro</h4>
+                  <p>Reduzir inclinação em desenvolvimentos.</p>
+                </div>
+              </div>
+              <div class="option-select-card" data-value="Cotovelo">
+                <span class="option-emoji">💪</span>
+                <div class="option-details">
+                  <h4>Cotovelo</h4>
+                  <p>Cuidado ao travar o braço em tríceps pesados.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 11: METAS & NOTIFICAÇÕES -->
+          <div class="onboarding-step" data-step="11">
+            <h2 class="step-question-title">Metas Semanais & Lembretes</h2>
+            <p class="step-question-subtitle">Planeje seus treinos e configure notificações no horário ideal.</p>
+            
+            <div class="input-group" style="align-items: center; margin-top: 10px;">
+              <label>Escolha os dias da semana que quer treinar:</label>
+              <div class="wizard-days-selector">
+                <button type="button" class="day-toggle-btn" data-day="Seg">Seg</button>
+                <button type="button" class="day-toggle-btn" data-day="Ter">Ter</button>
+                <button type="button" class="day-toggle-btn" data-day="Qua">Qua</button>
+                <button type="button" class="day-toggle-btn" data-day="Qui">Qui</button>
+                <button type="button" class="day-toggle-btn" data-day="Sex">Sex</button>
+                <button type="button" class="day-toggle-btn" data-day="Sab">Sab</button>
+                <button type="button" class="day-toggle-btn" data-day="Dom">Dom</button>
+              </div>
+              <div style="display: none;">
+                <button type="button" id="btn-dec-days">-</button>
+                <span id="display-days">4</span>
+                <button type="button" id="btn-inc-days">+</button>
+              </div>
+            </div>
+
+            <div class="notification-picker-box" style="margin-top: 10px;">
+              <label style="display:flex; align-items:center; gap:8px; font-size:0.75rem; cursor:pointer; user-select:none;">
+                <input type="checkbox" id="wiz-notif-enable" checked style="width:16px; height:16px; accent-color:var(--color-primary);">
+                Receber notificações e alertas de treino
+              </label>
+              
+              <div id="wiz-notif-time-container" style="display:flex; flex-direction:column; align-items:center; gap:4px; margin-top:6px;">
+                <span style="font-size:0.65rem; color:var(--text-muted);">HORÁRIO DO ALERTA</span>
+                <input type="time" id="wiz-notif-time" value="18:00" class="time-input-styled">
+              </div>
+            </div>
+
+            <!-- Character Summary Card -->
+            <div id="wiz-summary-card" class="glass-panel hidden fade-in" style="margin-top: 15px; padding: 12px; border: 1px solid var(--color-primary-glow); border-radius: 8px; background: rgba(0,0,0,0.35); text-align: left; box-shadow: 0 0 15px rgba(var(--color-primary-rgb), 0.15);">
+              <!-- Preenchido via Javascript -->
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Back and Forward Nav Buttons -->
+        <div class="onboarding-buttons-row">
+          <button type="button" id="wiz-btn-back" class="btn btn-outline">VOLTAR</button>
+          <button type="button" id="wiz-btn-next" class="btn btn-primary ripple">AVANÇAR</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 2. MAIN APPLICATION CONTENT (SPA TABS)    -->
+    <!-- ========================================== -->
+    <div id="main-app" class="hidden">
+      
+      <!-- HEADER STATUS BAR -->
+      <header class="app-header glass-panel-header">
+        <div class="player-mini-profile">
+          <div class="player-avatar-wrapper" style="position: relative;">
+            <img id="header-avatar" src="rocklee.png" alt="Avatar">
+            <span id="player-level-badge" class="level-badge">Lvl 1</span>
+            <button id="btn-settings-gear" style="position: absolute; bottom: -5px; right: -5px; background: var(--color-primary); border: none; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; color: #000; cursor: pointer; z-index: 5; box-shadow: 0 0 5px rgba(0,0,0,0.5);" type="button" aria-label="Editar Perfil">⚙️</button>
+          </div>
+          <div class="player-info">
+            <h2 id="player-name" style="display: flex; align-items: center; gap: 8px;">Nick <span id="header-showcase-trophies" style="font-size: 0.95rem; display: inline-flex; gap: 4px; vertical-align: middle;"></span></h2>
+            <div class="rank-badge-wrapper">
+              <span id="player-class-name" class="class-name-badge">Bodybuilder</span>
+              <span id="player-rank" class="rank-badge">FIT 🤡</span>
+            </div>
+            <div id="player-status-badges" style="display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px;"></div>
+          </div>
+        </div>
+
+        <div class="xp-bar-container">
+          <div class="xp-labels">
+            <span>XP</span>
+            <span id="xp-text">0 / 100</span>
+          </div>
+          <div class="xp-progress-bg">
+            <div id="xp-fill" class="xp-progress-fill" style="width: 0%;"></div>
+          </div>
+        </div>
+      </header>
+
+      <!-- TAB 1: DASHBOARD (HOME) -->
+      <div id="tab-dashboard" class="tab-content active">
+
+        <!-- ══════════════════════════════════════
+             HERO DO MENTOR — HUD Cinemático
+             ══════════════════════════════════════ -->
+        <div class="mentor-hero-section" id="mentor-hero-section">
+
+          <!-- Fundo animado -->
+          <div class="mhs-bg">
+            <div class="mhs-grid"></div>
+            <div class="mhs-orb mhs-orb1" id="mhs-orb1"></div>
+            <div class="mhs-orb mhs-orb2" id="mhs-orb2"></div>
+          </div>
+          <div class="mhs-scanlines"></div>
+
+          <!-- Container concêntrico do avatar e suas auras -->
+          <div class="mhs-avatar-container" id="mhs-avatar-container">
+            <!-- Cantos cibernéticos de mira -->
+            <div class="mhs-avatar-frame-corners">
+              <div class="corner corner-tl"></div>
+              <div class="corner corner-tr"></div>
+              <div class="corner corner-bl"></div>
+              <div class="corner corner-br"></div>
+            </div>
+            <!-- Anéis de aura do mentor -->
+            <div class="mhs-ring mhs-ring1" id="mhs-ring1"></div>
+            <div class="mhs-ring mhs-ring2" id="mhs-ring2"></div>
+            <!-- Avatar do mentor -->
+            <div class="mhs-avatar-wrap" id="mhs-avatar-wrap">
+              <img id="mentor-bubble-img" src="rocklee.png" alt="Mentor"
+                onerror="this.style.opacity='0.3'">
+              <div class="mhs-avatar-glow" id="mhs-avatar-glow"></div>
+            </div>
+          </div>
+
+          <!-- HUD overlay (canto superior esquerdo e direito) -->
+          <div class="mhs-hud">
+            <div class="mhs-hud-top">
+              <!-- Badge mentor (esquerda) -->
+              <div class="mhs-mentor-badge" id="mhs-mentor-badge">
+                <div class="mhs-mentor-name" id="mentor-bubble-name">Rock Lee</div>
+                <div class="mhs-mentor-sub" id="mhs-mentor-sub">Bodybuilder</div>
+              </div>
+              <!-- Nível do Hunter (direita) -->
+              <div class="mhs-level-display">
+                <div class="mhs-level-num" id="mhs-level-badge">1</div>
+                <div class="mhs-level-lbl">Hunter</div>
+              </div>
+            </div>
+
+            <!-- Barra XP + Atributos (rodapé do hero) -->
+            <div class="mhs-hud-bot">
+              <div class="mhs-char-name" id="mhs-char-name">Hunter</div>
+              <div class="mhs-xp-row">
+                <span class="mhs-xp-lbl">XP</span>
+                <span class="mhs-xp-val" id="mhs-xp-text">0 / 100</span>
+              </div>
+              <div class="mhs-xp-track">
+                <div class="mhs-xp-fill" id="mhs-xp-fill" style="width:0%"></div>
+              </div>
+              <div class="mhs-attrs" id="mhs-attrs-row">
+                <div class="mhs-attr"><span class="mhs-attr-lbl">FOR</span><span class="mhs-attr-val" id="dash-attr-for">—</span></div>
+                <div class="mhs-attr"><span class="mhs-attr-lbl">RES</span><span class="mhs-attr-val" id="dash-attr-res">—</span></div>
+                <div class="mhs-attr"><span class="mhs-attr-lbl">AGI</span><span class="mhs-attr-val" id="dash-attr-agi">—</span></div>
+                <div class="mhs-attr"><span class="mhs-attr-lbl">VIG</span><span class="mhs-attr-val" id="dash-attr-vig">—</span></div>
+                <div class="mhs-attr"><span class="mhs-attr-lbl">FOC</span><span class="mhs-attr-val" id="dash-attr-foc">—</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Frase do mentor (abaixo do hero, estilo ticker) -->
+        <div class="mhs-quote-strip glass-panel" id="mhs-quote-strip">
+          <span class="mhs-quote-icon">💬</span>
+          <span id="mentor-bubble-quote">"O trabalho duro vence o talento natural quando o talento natural não trabalha duro!"</span>
+        </div>
+
+        <!-- Ficha de Avaliação IMC/RPG Integrada -->
+        <div class="evaluation-mini-card glass-panel">
+          <div class="eval-header">
+            <h4>📋 Ficha de Medidas</h4>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span id="eval-goal-badge" class="badge">Bulking</span>
+              <button id="btn-edit-measures-shortcut" type="button" class="btn btn-sm btn-outline" style="font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; display: inline-flex; align-items: center; gap: 2px;">✏️ Editar</button>
+            </div>
+          </div>
+          <div class="eval-grid">
+            <div class="eval-item">
+              <span class="eval-val" id="eval-weight">0kg</span>
+              <span class="eval-lbl">Peso</span>
+            </div>
+            <div class="eval-item">
+              <span class="eval-val" id="eval-height">0cm</span>
+              <span class="eval-lbl">Altura</span>
+            </div>
+            <div class="eval-item">
+              <span class="eval-val" id="eval-imc">0.0</span>
+              <span class="eval-lbl" id="eval-imc-lbl">IMC</span>
+            </div>
+            <div class="eval-item">
+              <span class="eval-val" id="eval-imc-class" style="color: var(--color-primary); font-size: 0.75rem;">Ideal</span>
+              <span class="eval-lbl">Classe de Peso</span>
+            </div>
+          </div>
+          <div class="eval-custom-tip" id="eval-rpg-tip">
+            Calculando status...
+          </div>
+        </div>
+
+        <!-- Meta Semanal de Treinos -->
+        <div class="weekly-goal-card glass-panel">
+          <div class="eval-header">
+            <h4>📅 Meta Semanal</h4>
+            <span id="weekly-goal-badge" class="badge">0/4</span>
+          </div>
+          <div class="weekly-progress-bar-bg">
+            <div id="weekly-progress-fill" class="weekly-progress-fill"></div>
+          </div>
+          <p id="weekly-goal-text" class="eval-custom-tip">Treinos desta semana...</p>
+        </div>
+
+        <!-- Atividades Rápidas (Water & Quest Tracker) -->
+        <div class="trackers-grid">
+          <!-- WATER CARD (REVISED) -->
+          <div class="tracker-card glass-panel">
+            <div class="tracker-header">
+              <span class="tracker-icon">💧</span>
+              <div>
+                <h3>Cardio de H2O</h3>
+                <p>Meta em Litros</p>
+              </div>
+            </div>
+            <div class="water-config">
+              <label for="water-target-input">Meta (L):</label>
+              <input type="number" id="water-target-input" value="3" min="1" max="10" step="1">
+            </div>
+            
+            <div class="water-interactive-row" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 5px 0; width: 100%;">
+              <div class="water-cylinder" title="Tanque de Água">
+                <div id="water-cylinder-fill" class="water-cylinder-fill"></div>
+                <div class="water-cylinder-glass-glare"></div>
+              </div>
+              <div class="water-bottles-wrapper" id="water-bottles-container" style="flex: 1; margin: 0;">
+                <!-- Dynamically spawns 1L bottles based on target and current intake -->
+              </div>
+            </div>
+            
+            <div id="water-extra-text" class="water-extra-info hidden">
+              +0 Litros Extras! (+0 XP)
+            </div>
+
+            <div class="tracker-footer">
+              <span id="water-text">0 / 3 L</span>
+              <button id="add-water-btn" class="btn btn-sm btn-accent">+1 Litro</button>
+            </div>
+          </div>
+
+          <!-- DOCK META DIÁRIA (DIET SUMMARY CARD) -->
+          <div class="tracker-card glass-panel">
+            <div class="tracker-header">
+              <span class="tracker-icon">🍗</span>
+              <div>
+                <h3>Nutrição Diária</h3>
+                <p>Combustível</p>
+              </div>
+            </div>
+            
+            <div class="diet-summary-bar">
+              <div class="nutrient-progress-row">
+                <span class="nut-name">Kcal</span>
+                <div class="nut-bar-bg"><div id="bar-kcal" class="nut-bar-fill bg-kcal" style="width: 0%;"></div></div>
+                <span class="nut-val" id="text-kcal">0/2400</span>
+              </div>
+              <div class="nutrient-progress-row">
+                <span class="nut-name">Prot</span>
+                <div class="nut-bar-bg"><div id="bar-prot" class="nut-bar-fill bg-prot" style="width: 0%;"></div></div>
+                <span class="nut-val" id="text-prot">0/150g</span>
+              </div>
+              <div class="nutrient-progress-row">
+                <span class="nut-name">Fibra</span>
+                <div class="nut-bar-bg"><div id="bar-fiber" class="nut-bar-fill bg-fiber" style="width: 0%;"></div></div>
+                <span class="nut-val" id="text-fiber">0/25g</span>
+              </div>
+            </div>
+            <div class="tracker-footer" style="margin-top: 4px;">
+              <span id="protein-dock-percent" style="font-size: 0.75rem; font-weight: 700;">Dieta: 0% concluída</span>
+              <button id="go-to-diet-btn" class="btn btn-sm btn-outline" style="font-size: 0.65rem; padding: 4px 8px;">Aba Dieta</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Desafio Freaky Diário (Daily Challenge) -->
+        <div class="daily-challenge-section tribute-section-card glass-panel" style="margin-top: 15px; margin-bottom: 20px; border: 1px solid var(--accent-orange, #ff5e00);">
+          <div class="section-title-wrapper" style="margin-bottom: 8px;">
+            <h3 style="color: var(--accent-orange, #ff5e00); display: flex; align-items: center; gap: 6px;">
+              🔥 Desafio Freaky Diário
+            </h3>
+            <span id="daily-challenge-badge" class="badge" style="background: var(--accent-orange, #ff5e00); color: #000; font-size: 0.65rem; font-weight: 800;">ATIVO</span>
+          </div>
+          <div class="challenge-body">
+            <h4 id="daily-challenge-title" style="font-size: 0.9rem; margin-bottom: 4px; color: #fff;">Carregando Desafio...</h4>
+            <p id="daily-challenge-desc" style="font-size: 0.72rem; color: var(--text-secondary); margin-bottom: 10px; line-height: 1.3;">Complete a meta de hoje para ganhar bônus mutante.</p>
+            <div class="challenge-progress-container" style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+              <div class="xp-bar" style="flex-grow: 1; height: 8px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden; border: 1px solid rgba(255,255,255,0.03);">
+                <div id="daily-challenge-progress-fill" style="width: 0%; height: 100%; background: linear-gradient(90deg, #ff5e00, #ffb703); border-radius: 4px; transition: width 0.3s ease; box-shadow: 0 0 8px rgba(255, 94, 0, 0.4);"></div>
+              </div>
+              <span id="daily-challenge-progress-text" style="font-size: 0.72rem; font-weight: 700; min-width: 45px; text-align: right; color: var(--accent-orange, #ff5e00);">0 / 0</span>
+            </div>
+            <div class="challenge-reward-row" style="display: flex; justify-content: space-between; align-items: center;">
+              <span id="daily-challenge-reward" style="font-size: 0.68rem; color: #ffb703; font-weight: 700;">Recompensa: +100 XP Mutante 👑</span>
+              <button id="btn-claim-challenge" class="btn btn-sm btn-accent ripple hidden" style="background: var(--accent-orange, #ff5e00); color: #000; border: none; font-size: 0.68rem; padding: 4px 10px; font-weight: 800; border-radius: 4px;">RESGATAR RECOMPENSA</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Missões Diárias (Daily Quests) -->
+        <div class="daily-quests-section">
+          <div class="section-title-wrapper">
+            <h3>⚔️ Missões Diárias (Quests)</h3>
+            <span id="quests-completed-badge" class="badge">0/3</span>
+          </div>
+          
+          <div id="daily-quests-list" class="quests-list">
+            <!-- Dynamically populated by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: TREINOS (WORKOUTS) -->
+      <div id="tab-workouts" class="tab-content">
+        <div class="workout-header-bar">
+          <div class="workout-title-row">
+            <h3>🏋️‍♂️ Arena de Treino</h3>
+            <!-- STANDARD VS CUSTOM TOGGLE -->
+            <div class="workout-type-toggle">
+              <button id="toggle-workout-std" class="toggle-btn active">Ficha Mentor</button>
+              <button id="toggle-workout-cust" class="toggle-btn">Ficha Custom</button>
+            </div>
+          </div>
+
+          <div class="workout-division-selector">
+            <button class="workout-div-btn active" data-div="A">Treino A</button>
+            <button class="workout-div-btn" data-div="B">Treino B</button>
+            <button class="workout-div-btn" data-div="C">Treino C</button>
+          </div>
+        </div>
+
+        <div id="current-workout-box" class="current-workout-box">
+          <div class="workout-info-card glass-panel">
+            <div class="workout-info-header">
+              <h2 id="workout-title">Treino A - Peito e Tríceps</h2>
+              <span id="workout-category-badge" class="badge">Estilo Rock Lee</span>
+            </div>
+            <p id="workout-description">Foque no controle de movimento e explosão!</p>
+            <p id="workout-today-progress" class="workout-progress-label">0/0 séries hoje (0%)</p>
+
+            <!-- Configurações Rápidas de Descanso -->
+            <div class="workout-rest-quick-settings" style="margin-top: 10px; padding-top: 8px; border-top: 1px dashed rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; width: 100%;">
+              <label style="display: flex; align-items: center; gap: 6px; font-size: 0.7rem; color: var(--text-secondary); cursor: pointer; user-select: none;">
+                <input type="checkbox" id="quick-rest-enable" checked style="width: 14px; height: 14px; accent-color: var(--color-primary);">
+                ⏱️ Descanso Automático
+              </label>
+              
+              <div id="quick-rest-time-wrap" style="display: flex; align-items: center; gap: 4px;">
+                <span style="font-size: 0.65rem; color: var(--text-muted);">Tempo:</span>
+                <input type="number" id="quick-rest-time" value="90" min="10" max="99" step="5" style="width: 50px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-glass); border-radius: 4px; color: #fff; font-size: 0.7rem; text-align: center; padding: 2px 4px;">
+                <span style="font-size: 0.65rem; color: var(--text-muted);">seg</span>
+              </div>
+            </div>
+            
+            <!-- Add Custom Exercise Button (Visible only in custom mode) -->
+            <button id="btn-open-add-exercise-modal" class="btn btn-sm btn-accent hidden" style="margin-top: 8px; align-self: flex-start;">
+              ➕ Adicionar Exercício
+            </button>
+          </div>
+
+          <!-- Exercises List -->
+          <div id="exercises-list" class="exercises-list">
+            <!-- Dynamically populated exercises cards -->
+          </div>
+
+          <!-- Complete Workout Button -->
+          <button id="btn-finish-workout" class="btn btn-primary btn-block btn-lg btn-finish-workout ripple">
+            ⚔️ FINALIZAR TREINO (+50 XP)
+          </button>
+        </div>
+      </div>
+
+      <!-- TAB 3: DIETA (ALIMENTAÇÃO) [NEW TAB] -->
+      <div id="tab-diet" class="tab-content">
+        <div class="section-title-wrapper">
+          <h3>🍎 Alimentação & Dieta RPG</h3>
+          <p class="subtitle">Cadastre suas refeições para preencher as metas de macros diárias!</p>
+        </div>
+
+        <!-- Daily Nutritional Dashboard — HUD Triplo Anel -->
+        <div class="diet-hud-card glass-panel">
+          <div class="dhud-header">
+            <h4>⚡ Combustível Diário</h4>
+          </div>
+
+          <div class="dhud-rings-row">
+            <!-- Anel Proteína (lateral esquerda) -->
+            <div class="dhud-ring-wrap dhud-side">
+              <div class="dhud-ring-circle-container">
+                <svg class="dhud-ring-svg" width="74" height="74">
+                  <circle class="dhud-ring-track" stroke-width="6" r="28" cx="37" cy="37"/>
+                  <circle id="diet-prot-ring-fill" class="dhud-ring-fill" stroke-width="6" stroke="var(--color-primary)" r="28" cx="37" cy="37"
+                    style="stroke-dasharray:175.93; stroke-dashoffset:175.93;"/>
+                </svg>
+                <div class="dhud-ring-overlay">
+                  <span class="dhud-ring-val" id="diet-prot-val" style="color:var(--color-primary)">0</span>
+                  <span class="dhud-ring-unit">g PROT</span>
+                </div>
+              </div>
+              <span class="dhud-ring-lbl">Proteína</span>
+              <span class="dhud-ring-target" id="diet-prot-summary">0 / 150 g</span>
+            </div>
+
+            <!-- Anel Kcal (central, maior) -->
+            <div class="dhud-ring-wrap dhud-main">
+              <div class="dhud-ring-circle-container">
+                <svg class="dhud-ring-svg" width="110" height="110">
+                  <circle class="dhud-ring-track" stroke-width="8" r="44" cx="55" cy="55"/>
+                  <circle id="diet-kcal-ring-fill" class="dhud-ring-fill" stroke-width="8" stroke="var(--color-accent)" r="44" cx="55" cy="55"
+                    style="stroke-dasharray:276.46; stroke-dashoffset:276.46;"/>
+                </svg>
+                <div class="dhud-ring-overlay">
+                  <span class="dhud-ring-val" id="diet-kcal-percent">0%</span>
+                  <span class="dhud-ring-unit">KCAL</span>
+                </div>
+              </div>
+              <span class="dhud-ring-lbl">Calorias</span>
+              <span class="dhud-ring-target" id="diet-kcal-summary">0 / 2500 kcal</span>
+            </div>
+
+            <!-- Anel Fibras (lateral direita) -->
+            <div class="dhud-ring-wrap dhud-side">
+              <div class="dhud-ring-circle-container">
+                <svg class="dhud-ring-svg" width="74" height="74">
+                  <circle class="dhud-ring-track" stroke-width="6" r="28" cx="37" cy="37"/>
+                  <circle id="diet-fiber-ring-fill" class="dhud-ring-fill" stroke-width="6" stroke="#4ea8de" r="28" cx="37" cy="37"
+                    style="stroke-dasharray:175.93; stroke-dashoffset:175.93;"/>
+                </svg>
+                <div class="dhud-ring-overlay">
+                  <span class="dhud-ring-val" id="diet-fiber-val" style="color:#4ea8de">0</span>
+                  <span class="dhud-ring-unit">g FIB</span>
+                </div>
+              </div>
+              <span class="dhud-ring-lbl">Fibras</span>
+              <span class="dhud-ring-target" id="diet-fiber-summary">0 / 25 g</span>
+            </div>
+          </div>
+
+          <div class="dhud-status-row">
+            <span class="dhud-goal-badge" id="diet-calorie-status">Manter Peso</span>
+          </div>
+        </div>
+
+        <!-- Status Buffs metabólicos ativos -->
+        <div id="diet-active-buffs-card" class="glass-panel hidden" style="padding: 12px; display: flex; flex-direction: column; gap: 6px;">
+          <h4 style="font-family: var(--font-display); font-size: 0.85rem; font-weight: 800; display: flex; align-items: center; gap: 6px;">🧬 Status Ativos do Shape</h4>
+          <div id="diet-active-buffs-list" class="diet-active-buffs-container">
+            <!-- Dynamically populated via JS -->
+          </div>
+        </div>
+
+        <!-- RPG Inventory Quick Log Section -->
+        <div class="rpg-inventory-card glass-panel" style="padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+          <h4 style="font-family: var(--font-display); font-size: 0.85rem; font-weight: 800; display: flex; align-items: center; gap: 6px;">🎒 Inventário RPG (Refeições Rápidas)</h4>
+          <div class="inventory-quick-logs-grid">
+            <div id="btn-quick-marmita" class="inventory-slot marmita" title="Consumir Marmita Monstro">
+              <span class="item-emoji">🍗</span>
+              <span class="item-name">Marmita Monstro</span>
+              <span class="item-desc">+450 Kcal | +35g P</span>
+            </div>
+            <div id="btn-quick-whey" class="inventory-slot whey" title="Consumir Elixir de Whey">
+              <span class="item-emoji">⚡</span>
+              <span class="item-name">Elixir de Whey</span>
+              <span class="item-desc">+140 Kcal | +26g P</span>
+            </div>
+            <div id="btn-quick-fibra" class="inventory-slot fibra" title="Consumir Ração de Fibra">
+              <span class="item-emoji">🥗</span>
+              <span class="item-name">Ração de Fibra</span>
+              <span class="item-desc">+80 Kcal | +8g F</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add Food Form (Compact Custom Input) -->
+        <div class="diet-add-food-card glass-panel">
+          <h4>🍖 Registrar Alimento Customizado</h4>
+          
+          <form id="diet-food-form" class="diet-form-inputs">
+            <div class="form-row-2">
+              <div class="input-group">
+                <label for="diet-select-food">Alimento</label>
+                <select id="diet-select-food">
+                  <option value="frango">Peito de Frango Grelhado</option>
+                  <option value="arroz">Arroz Branco Cozido</option>
+                  <option value="ovos">Ovos Inteiros Cozidos</option>
+                  <option value="whey">Whey Protein Isolado</option>
+                  <option value="banana">Banana Prata</option>
+                  <option value="batatadoce">Batata Doce Cozida</option>
+                  <option value="aveia">Aveia em Flocos</option>
+                  <option value="feijao">Feijão Carioca Cozido</option>
+                </select>
+              </div>
+              
+              <div class="input-group" style="max-width: 100px;">
+                <label for="diet-food-weight">Porção (g)</label>
+                <input type="number" id="diet-food-weight" value="100" min="5" max="2000" step="5" required>
+              </div>
+            </div>
+ 
+            <div class="diet-form-actions">
+              <button type="submit" class="btn btn-sm btn-primary">Adicionar Custom</button>
+              <button type="button" id="btn-open-custom-food-modal" class="btn btn-sm btn-outline">➕ Criar Alimento</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Logged Foods History -->
+        <div class="diet-history-card glass-panel">
+          <div class="section-title-wrapper" style="border-bottom: 1px solid var(--border-glass); padding-bottom: 8px;">
+            <h4>📋 Registro de Hoje</h4>
+          </div>
+          <div id="diet-history-list" class="diet-history-list">
+            <!-- Dynamically populated meal log list -->
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: EQUIPAMENTOS [NEW TAB] -->
+      <div id="tab-equipment" class="tab-content">
+        <div class="section-title-wrapper">
+          <h3>🛡️ Equipamentos & Arsenal</h3>
+          <p class="subtitle">Equipe acessórios conquistados para ganhar bônus de atributos e mudar seu visual!</p>
+        </div>
+
+        <!-- Character Status Silhouette & Slots Panel -->
+        <div class="equipment-layout-container glass-panel">
+          
+          <div class="equipment-character-hud">
+            <!-- Left Column: Head and Arms -->
+            <div class="equipment-slots-side">
+              <div class="equip-slot-box" id="equip-slot-head" title="Cabeça">
+                <!-- Slot Cabeça -->
+              </div>
+              <div class="equip-slot-box" id="equip-slot-arms" title="Braços">
+                <!-- Slot Braços -->
+              </div>
+            </div>
+
+            <!-- Center: Character Silhouette Preview -->
+            <div class="equipment-silhouette-preview">
+              <div class="character-glow-aura" id="eq-preview-aura" aria-hidden="true"></div>
+              <img src="rocklee.png" alt="Silhouette" class="eq-silhouette-img" id="eq-silhouette-pic">
+              <div class="eq-silhouette-overlay"></div>
+            </div>
+
+            <!-- Right Column: Waist and Aura/Costas -->
+            <div class="equipment-slots-side">
+              <div class="equip-slot-box" id="equip-slot-waist" title="Cintura">
+                <!-- Slot Cintura -->
+              </div>
+              <div class="equip-slot-box" id="equip-slot-aura" title="Aura/Costas">
+                <!-- Slot Aura -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Attributes Summary -->
+          <div class="equipment-attributes-box">
+            <h4>📊 Atributos Atuais (Base + Bônus)</h4>
+            <div id="equipment-attributes-summary" class="equipment-attributes-summary-list">
+              <!-- Dynamically populated via JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Inventory Grid -->
+        <div class="equipment-inventory-section">
+          <div class="section-title-wrapper" style="border-bottom: 1px solid var(--border-glass); padding-bottom: 8px; margin-bottom: 12px;">
+            <h4>🎒 Seu Baú de Equipamentos</h4>
+          </div>
+          <div id="equipment-inventory-grid" class="equipment-inventory-grid">
+            <!-- Dynamically populated via JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: MENTORES (BASES) -->
+      <div id="tab-mentors" class="tab-content">
+
+        <!-- Header fixo da aba -->
+        <div class="mentors-tab-header">
+          <div class="mentors-tab-title-row">
+            <h3>⚔️ Mentores</h3>
+            <button id="btn-open-custom-mentor-modal" class="btn btn-sm btn-accent">➕ Criar</button>
+          </div>
+          <p class="subtitle" style="margin-bottom:10px">Seu mentor define o tema visual e concede bônus de treino. Suba de nível para desbloquear recompensas!</p>
+
+          <!-- ── Filtro por Universo ── -->
+          <div class="mentor-universe-filter" id="mentor-universe-filter">
+            <button class="muf-btn active" data-filter="all">Todos</button>
+            <button class="muf-btn" data-filter="Dragon Ball" title="Dragon Ball">🐉 DB</button>
+            <button class="muf-btn" data-filter="Naruto" title="Naruto">🥷 NRT</button>
+            <button class="muf-btn" data-filter="One Punch Man" title="One Punch Man">👊 OPM</button>
+            <button class="muf-btn" data-filter="Fisiculturistas" title="Fisiculturistas Reais">💪 REAL</button>
+            <button class="muf-btn" data-filter="Personalizados" title="Mentores Personalizados">⚙️ MEU</button>
+          </div>
+
+          <!-- ── Banner do mentor ativo ── -->
+          <div class="active-mentor-bar glass-panel" id="active-mentor-bar">
+            <div class="amb-avatar-wrap">
+              <img id="amb-img" src="" alt="Mentor ativo" onerror="this.style.opacity='0'">
+            </div>
+            <div class="amb-info">
+              <span class="amb-label">MENTOR ATIVO</span>
+              <span class="amb-name" id="amb-name">—</span>
+              <span class="amb-universe" id="amb-universe">—</span>
+            </div>
+            <div class="amb-right">
+              <span class="amb-lvl" id="amb-lvl">Nv 1</span>
+              <span class="amb-rank" id="amb-rank">APRENDIZ</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="mentors-list-container" class="mentors-grid">
+          <!-- Preenchido dinamicamente por renderMentorsList() -->
+        </div>
+      </div>
+
+      <!-- TAB 5: RPG STATUS & ATRIBUTOS -->
+      <div id="tab-status" class="tab-content">
+        <div class="rpg-profile-card glass-panel">
+          <div class="profile-big-avatar">
+            <img id="status-avatar" src="rocklee.png" alt="Avatar Grande">
+            <div class="status-class-title">
+              <span id="status-subclass">FIT 🤡</span>
+              <span id="status-class">Bodybuilder</span>
+            </div>
+          </div>
+          
+          <div class="stats-overview">
+            <div class="stat-box">
+              <span class="stat-number" id="stats-total-workouts">0</span>
+              <span class="stat-label">Treinos Concluídos</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-number" id="stats-level-num">1</span>
+              <span class="stat-label">Nível Geral</span>
+            </div>
+            <div class="stat-box font-accent">
+              <span class="stat-number" id="stats-rank-tier">E</span>
+              <span class="stat-label">Rank Hunter</span>
+            </div>
+          </div>
+
+          <div class="rank-tier-progress-container" style="margin-top: 15px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.05); width: 100%;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.6rem; color: var(--text-secondary); margin-bottom: 3px;">
+              <span id="rank-tier-progress-label">Evolução para Próximo Rank</span>
+              <span id="rank-tier-progress-val">0%</span>
+            </div>
+            <div class="rank-progress-bar-bg" style="height: 6px; background: rgba(255,255,255,0.07); border-radius: 4px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05);">
+              <div id="rank-tier-progress-fill" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--color-accent), #9b5de5); transition: width 0.3s ease;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card de Lore de Subclasse -->
+        <div id="subclass-lore-card" class="subclass-lore-card glass-panel" style="margin-top: 12px; padding: 12px;">
+          <h4 style="color: var(--color-accent); font-size: 0.75rem; font-weight: 800; margin: 0 0 4px 0; display: flex; align-items: center; gap: 4px;">
+            📜 Registro de Subclasse: <span id="lore-subclass-title">FIT 🤡</span>
+          </h4>
+          <p id="lore-subclass-desc" style="font-size: 0.65rem; color: var(--text-secondary); line-height: 1.35; margin: 0; font-style: italic;">
+            Um recruta iniciante que acabou de pisar na academia. Seu shape é uma tela em branco. Força e foco trarão redenção!
+          </p>
+        </div>
+
+        <!-- Gráfico de Evolução (SVG minimalista) -->
+        <div class="chart-card glass-panel" style="margin-top: 15px; margin-bottom: 15px; padding: 16px;">
+          <h3 style="color: var(--color-primary); font-size: 0.95rem; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+            📈 Histórico de Evolução
+          </h3>
+          <p style="font-size: 0.65rem; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.3;">
+            Acompanhe sua carga de força estimada e o peso ao longo dos seus treinos. Clique nos pontos do gráfico para detalhes!
+          </p>
+          <div class="chart-container" style="position: relative; width: 100%; height: 160px; background: rgba(0,0,0,0.3); border-radius: 8px; border: 1px solid var(--border-glass-glow); padding: 12px; display: flex; align-items: flex-end; box-shadow: inset 0 0 10px rgba(0,0,0,0.5);">
+            <svg id="evolution-svg" viewBox="0 0 400 150" style="width: 100%; height: 100%; overflow: visible;">
+              <!-- Dynamic lines and glow are drawn by JS -->
+            </svg>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 0.6rem; color: var(--text-secondary); margin-top: 6px; padding: 0 4px;">
+            <span>Início (Treino 1)</span>
+            <span>Hoje (Recente)</span>
+          </div>
+        </div>
+
+        <!-- Attributes Distribution Section -->
+        <div class="attributes-card glass-panel">
+          <div class="attributes-header">
+            <h3>📊 Atributos do Caçador</h3>
+            <div id="attr-points-box" class="attr-points-badge hidden">
+              <span id="attr-points-value">5</span> pontos disponíveis
+            </div>
+          </div>
+
+          <div class="attributes-list">
+            <!-- Attribute: FORÇA -->
+            <div class="attribute-item" style="position: relative;">
+              <div class="attr-info">
+                <span class="attr-icon">✊</span>
+                <div class="attr-name-desc">
+                  <h4 style="display: flex; align-items: center; gap: 6px;">
+                    Força (FOR)
+                    <span class="attr-help-badge" onclick="showAttributeHelp('for')" style="cursor: pointer; opacity: 0.7; font-size: 0.65rem; background: rgba(255,255,255,0.08); border-radius: 50%; width: 14px; height: 14px; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; border: 1px solid rgba(255,255,255,0.15);" title="Ver mais informações">?</span>
+                  </h4>
+                  <p>Aumenta a carga de pesos</p>
+                </div>
+              </div>
+              <div class="attr-controls">
+                <span class="attr-value" id="val-for">10</span>
+                <button class="btn-attr-add hidden" data-attr="for">+</button>
+              </div>
+            </div>
+
+            <!-- Attribute: RESISTÊNCIA -->
+            <div class="attribute-item" style="position: relative;">
+              <div class="attr-info">
+                <span class="attr-icon">🫁</span>
+                <div class="attr-name-desc">
+                  <h4 style="display: flex; align-items: center; gap: 6px;">
+                    Resistência (RES)
+                    <span class="attr-help-badge" onclick="showAttributeHelp('res')" style="cursor: pointer; opacity: 0.7; font-size: 0.65rem; background: rgba(255,255,255,0.08); border-radius: 50%; width: 14px; height: 14px; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; border: 1px solid rgba(255,255,255,0.15);" title="Ver mais informações">?</span>
+                  </h4>
+                  <p>Aumenta o volume e cardio</p>
+                </div>
+              </div>
+              <div class="attr-controls">
+                <span class="attr-value" id="val-res">10</span>
+                <button class="btn-attr-add hidden" data-attr="res">+</button>
+              </div>
+            </div>
+
+            <!-- Attribute: AGILIDADE -->
+            <div class="attribute-item" style="position: relative;">
+              <div class="attr-info">
+                <span class="attr-icon">⚡</span>
+                <div class="attr-name-desc">
+                  <h4 style="display: flex; align-items: center; gap: 6px;">
+                    Agilidade (AGI)
+                    <span class="attr-help-badge" onclick="showAttributeHelp('agi')" style="cursor: pointer; opacity: 0.7; font-size: 0.65rem; background: rgba(255,255,255,0.08); border-radius: 50%; width: 14px; height: 14px; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; border: 1px solid rgba(255,255,255,0.15);" title="Ver mais informações">?</span>
+                  </h4>
+                  <p>Aumenta XP ganho em treinos</p>
+                </div>
+              </div>
+              <div class="attr-controls">
+                <span class="attr-value" id="val-agi">10</span>
+                <button class="btn-attr-add hidden" data-attr="agi">+</button>
+              </div>
+            </div>
+
+            <!-- Attribute: VIGOR -->
+            <div class="attribute-item" style="position: relative;">
+              <div class="attr-info">
+                <span class="attr-icon">❤️</span>
+                <div class="attr-name-desc">
+                  <h4 style="display: flex; align-items: center; gap: 6px;">
+                    Vigor (VIG)
+                    <span class="attr-help-badge" onclick="showAttributeHelp('vig')" style="cursor: pointer; opacity: 0.7; font-size: 0.65rem; background: rgba(255,255,255,0.08); border-radius: 50%; width: 14px; height: 14px; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; border: 1px solid rgba(255,255,255,0.15);" title="Ver mais informações">?</span>
+                  </h4>
+                  <p>Aumenta XP ganho ao beber água</p>
+                </div>
+              </div>
+              <div class="attr-controls">
+                <span class="attr-value" id="val-vig">10</span>
+                <button class="btn-attr-add hidden" data-attr="vig">+</button>
+              </div>
+            </div>
+
+            <!-- Attribute: FOCO -->
+            <div class="attribute-item" style="position: relative;">
+              <div class="attr-info">
+                <span class="attr-icon">🎯</span>
+                <div class="attr-name-desc">
+                  <h4 style="display: flex; align-items: center; gap: 6px;">
+                    Foco (FOC)
+                    <span class="attr-help-badge" onclick="showAttributeHelp('foc')" style="cursor: pointer; opacity: 0.7; font-size: 0.65rem; background: rgba(255,255,255,0.08); border-radius: 50%; width: 14px; height: 14px; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; border: 1px solid rgba(255,255,255,0.15);" title="Ver mais informações">?</span>
+                  </h4>
+                  <p>Aumenta a precisão das metas</p>
+                </div>
+              </div>
+              <div class="attr-controls">
+                <span class="attr-value" id="val-foc">10</span>
+                <button class="btn-attr-add hidden" data-attr="foc">+</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Showcase Section -->
+        <div class="showcase-section glass-panel" style="margin-bottom: 12px; padding: 12px;">
+          <h3 style="display: flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 800; font-family: var(--font-display); border-bottom: 1px solid var(--border-glass); padding-bottom: 6px; margin-bottom: 8px;">
+            🏆 Vitrine de Conquistas <span style="font-size: 0.65rem; opacity: 0.6; font-weight: normal; margin-left: auto;">(Máx. 3 Destaques)</span>
+          </h3>
+          <div id="showcase-slots" class="showcase-grid">
+            <!-- 3 slots dinâmicos -->
+          </div>
+        </div>
+
+        <!-- Inventory / Virtual Trophies -->
+        <div class="inventory-section glass-panel">
+          <h3>🎒 Coleção de Conquistas <span style="font-size: 0.65rem; opacity: 0.6; font-weight: normal; margin-left: auto;">(Toque nas liberadas para destacar)</span></h3>
+          <div id="trophies-list" class="trophies-grid">
+            <!-- Grade das conquistas -->
+          </div>
+        </div>
+
+        <!-- Reset Button -->
+        <div class="settings-reset-wrapper">
+          <button id="btn-open-settings" class="btn btn-primary btn-block" style="margin-bottom: 8px;">⚙️ Editar Perfil & Metas</button>
+          <button id="btn-reset-data" class="btn btn-outline btn-block">Reiniciar Todo o Progresso</button>
+        </div>
+      </div>
+
+      <!-- TAB 6: TRIBUTO (HOMENAGEM A BEBEZINHO) [NEW TAB] -->
+      <div id="tab-tribute" class="tab-content">
+        <div class="tribute-hero-card glass-panel text-center">
+          <div class="tribute-photo-wrapper">
+            <img src="bebezinho_tribute.png" alt="Gabriel Ganley Bebezinho">
+            <div class="tribute-photo-ring"></div>
+          </div>
+          <span class="tribute-mentor-tag">🔥 Mentor Eterno do FreakyQuest</span>
+          <h2 class="tribute-name">Gabriel Ganley</h2>
+          <span class="tribute-nickname">"Bebezinho"</span>
+          <p class="tribute-dates">2003 - 2026 · Atleta Classe Open</p>
+          <div class="tribute-divider"></div>
+          <p class="tribute-quote-main">"Eterno Caçador do Shape Freaky. Seu legado continuará em cada barra pesada que levantarmos."</p>
+          
+          <div class="eternal-flame-container" onclick="triggerEternalFlameSpark()" title="Chama Eterna: clique para homenagear" style="margin-top: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 20px; background: rgba(155, 93, 229, 0.08); border: 1px solid rgba(155, 93, 229, 0.25); transition: all 0.2s ease;">
+            <span class="flame-emoji" style="font-size: 1.1rem; filter: drop-shadow(0 0 5px #ff9f1c); display: inline-block; animation: flame-flutter 1.5s ease-in-out infinite alternate;">🕯️</span>
+            <span class="flame-text" style="font-size: 0.6rem; color: #ffb703; font-weight: bold; letter-spacing: 0.5px;">CHAMA ETERNA (TOQUE PARA ILUMINAR)</span>
+          </div>
+          <div id="eternal-flame-count" style="font-size: 0.65rem; color: #a5a5a5; margin-top: 6px; font-weight: 600; text-shadow: 0 0 4px rgba(255, 183, 3, 0.1);">0 toques de respeito</div>
+        </div>
+
+        <!-- Sobre o Bebezinho -->
+        <div class="tribute-section-card glass-panel">
+          <h3>👤 Quem foi o Bebezinho</h3>
+          <p class="tribute-bio-text">
+            Carioca, Gabriel conquistou a comunidade fitness brasileira com uma combinação rara: disciplina implacável de atleta de elite e um carisma que transformava qualquer treino pesado em motivo de sorriso. Antes de virar referência no fisiculturismo, já mostrava o espírito competitivo como campeão de Pokémon TCG. Acumulou milhões de seguidores compartilhando sua rotina, sua energia contagiante e frases que entraram no vocabulário das academias por todo o Brasil.
+          </p>
+        </div>
+
+        <!-- Frases que Ficaram (sem áudio — apenas tributo visual) -->
+        <div class="tribute-section-card glass-panel">
+          <h3>🗣️ Frases que Ficaram</h3>
+          <p class="tribute-section-sub">Os bordões que se tornaram parte da cultura fitness brasileira.</p>
+          <div class="tribute-quotes-grid">
+            <div class="tribute-quote-card" onclick="celebrateTributeQuote(this)">
+              <span class="tq-emoji">🕊️</span>
+              <span class="tq-title">WAKE WAKE</span>
+              <span class="tq-sub">Chamado pra acordar e treinar</span>
+            </div>
+            <div class="tribute-quote-card" onclick="celebrateTributeQuote(this)">
+              <span class="tq-emoji">🦁</span>
+              <span class="tq-title">HOJE É ALL DAY</span>
+              <span class="tq-sub">Disciplina old school</span>
+            </div>
+            <div class="tribute-quote-card" onclick="celebrateTributeQuote(this)">
+              <span class="tq-emoji">👀</span>
+              <span class="tq-title">ABRE O OLHO BIG</span>
+              <span class="tq-sub">Alerta máximo no treino</span>
+            </div>
+            <div class="tribute-quote-card" onclick="celebrateTributeQuote(this)">
+              <span class="tq-emoji">😈</span>
+              <span class="tq-title">FICA FREAKY</span>
+              <span class="tq-sub">Mutação ativada</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Marcos da Trajetória -->
+        <div class="tribute-section-card glass-panel">
+          <h3>🏆 Conquistas & Marcos</h3>
+          <p style="font-size: 0.65rem; color: var(--text-secondary); margin-bottom: 12px;">Clique em cada marco para ler a história completa do Bebezinho.</p>
+          <div class="milestones-timeline">
+            <div class="milestone-item" onclick="showTributeMilestoneHelp('inicio')" style="cursor: pointer; transition: all 0.2s ease;">
+              <span class="milestone-emoji">🌟</span>
+              <div class="milestone-text">
+                <h4>Início de tudo</h4>
+                <p>Nascido in 2003, começou jovem no esporte e conquistou o carinho da comunidade fitness pelo carisma e disciplina.</p>
+              </div>
+            </div>
+            <div class="milestone-item" onclick="showTributeMilestoneHelp('pokemon')" style="cursor: pointer; transition: all 0.2s ease;">
+              <span class="milestone-emoji">🎮</span>
+              <div class="milestone-text">
+                <h4>Campeão de Pokémon TCG</h4>
+                <p>Representou o Brasil em campeonatos mundiais do jogo de cartas colecionáveis do Pokémon.</p>
+              </div>
+            </div>
+            <div class="milestone-item" onclick="showTributeMilestoneHelp('legpress')" style="cursor: pointer; transition: all 0.2s ease;">
+              <span class="milestone-emoji">🏋️‍♂️</span>
+              <div class="milestone-text">
+                <h4>Leg Press de 500kg</h4>
+                <p>Viralizou mundialmente na internet ao realizar o exercício de Leg Press com incríveis 500kg.</p>
+              </div>
+            </div>
+            <div class="milestone-item" onclick="showTributeMilestoneHelp('despedida')" style="cursor: pointer; transition: all 0.2s ease;">
+              <span class="milestone-emoji">🕊️</span>
+              <div class="milestone-text">
+                <h4>Despedida precoce</h4>
+                <p>Faleceu em 23 de maio de 2026, deixando uma saudade imensa e um legado de superação.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Os Mentores que o Formaram -->
+        <div class="tribute-section-card glass-panel">
+          <h3>🛡️ Os Mentores que o Formaram</h3>
+          <p class="tribute-section-sub">Dois treinadores marcaram a jornada de Bebezinho no fisiculturismo.</p>
+
+          <div class="tribute-mentors-grid">
+            <div class="tribute-mentor-card">
+              <div class="tmc-header">
+                <span class="tmc-icon">🦾</span>
+                <span class="tmc-badge">LENDA OLD SCHOOL</span>
+              </div>
+              <h4 class="tmc-name">Jorlan Vieira</h4>
+              <p class="tmc-desc">
+                O primeiro grande mentor de Bebezinho. Pioneiro do fisiculturismo old-school no Brasil, Jorlan introduziu a filosofia <strong>"All Day"</strong> — treinar todos os dias com disciplina inabalável — que se tornou a assinatura de Bebezinho dentro e fora dos palcos.
+              </p>
+              <div class="tmc-quote-box">
+                <p>"All Day não é só sobre puxar ferro. É uma filosofia de vida, constância e disciplina inabalável."</p>
+                <cite>— Jorlan Vieira</cite>
+              </div>
+            </div>
+
+            <div class="tribute-mentor-card">
+              <div class="tmc-header">
+                <span class="tmc-icon">⚔️</span>
+                <span class="tmc-badge">PREPARADOR FINAL</span>
+              </div>
+              <h4 class="tmc-name">Marcelo Cruz</h4>
+              <p class="tmc-desc">
+                Assumiu a preparação de Bebezinho na fase final da carreira, conduzindo treino e dieta durante a reta final para o Musclecontest Brasil. A parceria entre os dois foi descrita por Cruz como uma amizade que ia muito além da relação treinador-atleta, marcada por sonhos e metas compartilhados.
+              </p>
+              <div class="tmc-quote-box">
+                <p>Ele foi uma pessoa que me mostrou o caminho da força de vontade, do querer vencer e da resiliência.</p>
+                <cite>— Marcelo Cruz</cite>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================== -->
+      <!-- BOTTOM NAVIGATION BAR (5 TABS SYSTEM)      -->
+      <!-- ========================================== -->
+      <nav class="bottom-nav glass-panel-nav">
+        <button class="nav-item active" data-tab="dashboard">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="9"></rect>
+            <rect x="14" y="3" width="7" height="5"></rect>
+            <rect x="14" y="12" width="7" height="9"></rect>
+            <rect x="3" y="16" width="7" height="5"></rect>
+          </svg>
+          <span>Painel</span>
+        </button>
+
+        <button class="nav-item" data-tab="workouts">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 3h12M12 3v18M8 21h8M4 7h16M4 17h16"></path>
+          </svg>
+          <span>Treinos</span>
+        </button>
+
+        <!-- DIET BOTTOM NAV TAB (NEW) -->
+        <button class="nav-item" data-tab="diet">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M2 12c0 5.5 4.5 10 10 10s10-4.5 10-10H2z"></path>
+            <path d="M12 2v10"></path>
+            <path d="M7 6c1.5-1.5 3.5-2 5-2s3.5.5 5 2"></path>
+          </svg>
+          <span>Dieta</span>
+        </button>
+
+        <!-- EQUIPAMENTOS BOTTOM NAV TAB -->
+        <button class="nav-item" data-tab="equipment">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          </svg>
+          <span>Itens</span>
+        </button>
+
+        <button class="nav-item" data-tab="mentors">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+          <span>Mentores</span>
+        </button>
+
+        <button class="nav-item" data-tab="status">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+          </svg>
+          <span>Status</span>
+        </button>
+
+        <button class="nav-item" data-tab="tribute">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="fill: transparent; stroke: currentColor;">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path>
+          </svg>
+          <span>Tributo</span>
+        </button>
+      </nav>
+
+    </div> <!-- End Main App -->
+
+    <!-- ========================================== -->
+    <!-- MODAL: SETTINGS / EDIT PROFILE             -->
+    <!-- ========================================== -->
+    <div id="settings-modal" class="modal-overlay hidden">
+      <div class="custom-modal-card glass-panel fade-in">
+        <h3>⚙️ Editar Perfil & Metas</h3>
+        <form id="settings-form" class="form-container">
+          <div class="input-group" style="margin-bottom: 12px;">
+            <label for="settings-profile-pic" style="font-size: 0.8rem; margin-bottom: 4px; display: block; color: var(--text-secondary);">Foto de Perfil</label>
+            <input type="file" id="settings-profile-pic" accept="image/*" style="font-size: 0.8rem; background: rgba(255,255,255,0.05); border: 1px dashed rgba(255,255,255,0.15); border-radius: 6px; padding: 6px; width: 100%;">
+            <div id="settings-profile-pic-preview-container" style="margin-top: 5px; display: flex; align-items: center; gap: 8px;">
+              <img id="settings-profile-pic-preview" src="" alt="Preview" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1px solid var(--color-primary); display: none;">
+              <button type="button" id="btn-remove-profile-pic" class="btn btn-sm btn-outline hidden" style="padding: 2px 8px; font-size: 0.7rem;">Remover Foto</button>
+            </div>
+          </div>
+          <div class="form-row-2">
+            <div class="input-group">
+              <label for="settings-weight">Peso atual (kg)</label>
+              <input type="number" id="settings-weight" min="30" max="250" step="0.1" required>
+            </div>
+            <div class="input-group">
+              <label for="settings-target-weight">Peso meta (kg)</label>
+              <input type="number" id="settings-target-weight" min="30" max="250" step="0.1" required>
+            </div>
+          </div>
+          <div class="form-row" style="margin-bottom: 12px;">
+            <div class="input-group">
+              <label>Dias de Treino na Semana</label>
+              <div class="settings-days-selector">
+                <button type="button" class="settings-day-btn" data-day="Seg">Seg</button>
+                <button type="button" class="settings-day-btn" data-day="Ter">Ter</button>
+                <button type="button" class="settings-day-btn" data-day="Qua">Qua</button>
+                <button type="button" class="settings-day-btn" data-day="Qui">Qui</button>
+                <button type="button" class="settings-day-btn" data-day="Sex">Sex</button>
+                <button type="button" class="settings-day-btn" data-day="Sab">Sab</button>
+                <button type="button" class="settings-day-btn" data-day="Dom">Dom</button>
+              </div>
+              <div style="display: none;">
+                <input type="number" id="settings-weekly-days" min="1" max="7" required>
+              </div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="input-group">
+              <label for="settings-injury">Lesão / Dor</label>
+              <select id="settings-injury">
+                <option value="Nenhum">Nenhum</option>
+                <option value="Joelho">Joelho</option>
+                <option value="Quadril">Quadril</option>
+                <option value="Costas">Costas</option>
+                <option value="Pulso">Pulso</option>
+                <option value="Ombro">Ombro</option>
+                <option value="Cotovelo">Cotovelo</option>
+              </select>
+            </div>
+          </div>
+          <div class="notification-picker-box">
+            <label style="display:flex; align-items:center; gap:8px; font-size:0.75rem; cursor:pointer;">
+              <input type="checkbox" id="settings-notif-enable" checked style="width:16px; height:16px; accent-color:var(--color-primary);">
+              Lembretes de treino
+            </label>
+            <input type="time" id="settings-notif-time" value="18:00" class="time-input-styled">
+          </div>
+
+          <!-- Rest Timer Global Settings -->
+          <div class="notification-picker-box" style="margin-top: 10px; display: flex; flex-direction: column; align-items: flex-start; gap: 6px;">
+            <label style="display:flex; align-items:center; gap:8px; font-size:0.75rem; cursor:pointer; width: 100%;">
+              <input type="checkbox" id="settings-rest-enable" checked style="width:16px; height:16px; accent-color:var(--color-primary);">
+              Habilitar temporizador de descanso
+            </label>
+            <div id="settings-rest-time-container" style="display: flex; align-items: center; gap: 8px; width: 100%; margin-top: 4px;">
+              <label for="settings-rest-time" style="font-size: 0.7rem; color: var(--text-secondary);">Tempo padrão:</label>
+              <input type="number" id="settings-rest-time" value="90" min="10" max="99" step="5" class="time-input-styled" style="width: 70px; text-align: center; padding: 4px; font-size: 0.75rem;">
+              <span style="font-size: 0.7rem; color: var(--text-secondary);">segundos</span>
+            </div>
+          </div>
+          <div class="btn-group-row">
+            <button type="submit" class="btn btn-primary ripple">Salvar</button>
+            <button type="button" id="btn-close-settings-modal" class="btn btn-outline">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL: ADD CUSTOM EXERCISE (FOR CUSTOM TAB)-->
+    <!-- ========================================== -->
+    <div id="add-exercise-modal" class="modal-overlay hidden">
+      <div class="custom-modal-card glass-panel fade-in">
+        <h3>➕ Adicionar Exercício</h3>
+        <form id="add-exercise-form" class="form-container">
+          <div class="input-group">
+            <label for="cust-ex-name">Nome do Exercício</label>
+            <input type="text" id="cust-ex-name" placeholder="Nome do exercício (ex: Supino 30°)" required>
+          </div>
+
+          <button type="button" id="btn-open-arsenal" class="btn btn-sm btn-accent" style="margin-bottom: 10px; align-self: flex-start;">📖 Abrir Arsenal</button>
+
+          <div id="arsenal-panel" class="hidden" style="width: 100%; margin-bottom: 12px;">
+            <!-- Filtro de Tipo de Exercício -->
+            <div class="arsenal-filter-row" style="display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap;">
+              <button type="button" class="btn-arsenal-filter active" data-filter="all">Todos</button>
+              <button type="button" class="btn-arsenal-filter" data-filter="livre">🏋️ Livres</button>
+              <button type="button" class="btn-arsenal-filter" data-filter="maquina">⚙️ Máquinas/Polias</button>
+            </div>
+
+            <!-- Peito -->
+            <div class="arsenal-group">
+              <h4 class="arsenal-group-title">🫁 Peito</h4>
+              <div class="arsenal-items-row">
+                <button type="button" class="arsenal-item" data-name="Supino Reto (Barra)" data-muscle="Peito" data-type="livre">Supino Reto (Barra)</button>
+                <button type="button" class="arsenal-item" data-name="Supino Inclinado (Halteres)" data-muscle="Peito" data-type="livre">Supino Inclinado (Halteres)</button>
+                <button type="button" class="arsenal-item" data-name="Supino Declinado" data-muscle="Peito" data-type="livre">Supino Declinado</button>
+                <button type="button" class="arsenal-item" data-name="Crossover no Pulley" data-muscle="Peito" data-type="maquina">Crossover no Pulley</button>
+                <button type="button" class="arsenal-item" data-name="Crucifixo com Halteres" data-muscle="Peito" data-type="livre">Crucifixo com Halteres</button>
+                <button type="button" class="arsenal-item" data-name="Peck Deck (Voador)" data-muscle="Peito" data-type="maquina">Peck Deck (Voador)</button>
+                <button type="button" class="arsenal-item" data-name="Supino Inclinado Articulado" data-muscle="Peito" data-type="maquina">Supino Inclinado Articulado</button>
+                <button type="button" class="arsenal-item" data-name="Flexão de Braço" data-muscle="Peito" data-type="livre">Flexão de Braço</button>
+                <button type="button" class="arsenal-item" data-name="Supino Reto (Halteres)" data-muscle="Peito" data-type="livre">Supino Reto (Halteres)</button>
+                <button type="button" class="arsenal-item" data-name="Crossover Baixo para Cima" data-muscle="Peito" data-type="maquina">Crossover Baixo para Cima</button>
+              </div>
+            </div>
+            <!-- Costas -->
+            <div class="arsenal-group">
+              <h4 class="arsenal-group-title">🦴 Costas</h4>
+              <div class="arsenal-items-row">
+                <button type="button" class="arsenal-item" data-name="Puxada Alta (Pulley)" data-muscle="Costas" data-type="maquina">Puxada Alta (Pulley)</button>
+                <button type="button" class="arsenal-item" data-name="Remada Curvada (Barra)" data-muscle="Costas" data-type="livre">Remada Curvada (Barra)</button>
+                <button type="button" class="arsenal-item" data-name="Remada Unilateral" data-muscle="Costas" data-type="livre">Remada Unilateral</button>
+                <button type="button" class="arsenal-item" data-name="Pulldown" data-muscle="Costas" data-type="maquina">Pulldown</button>
+                <button type="button" class="arsenal-item" data-name="Barra Fixa" data-muscle="Costas" data-type="livre">Barra Fixa</button>
+                <button type="button" class="arsenal-item" data-name="Remada Baixa (Triângulo)" data-muscle="Costas" data-type="maquina">Remada Baixa (Triângulo)</button>
+                <button type="button" class="arsenal-item" data-name="Levantamento Terra" data-muscle="Costas" data-type="livre">Levantamento Terra</button>
+                <button type="button" class="arsenal-item" data-name="Remada Articulada" data-muscle="Costas" data-type="maquina">Remada Articulada</button>
+                <button type="button" class="arsenal-item" data-name="Crucifixo Invertido (Halt.)" data-muscle="Costas" data-type="livre">Crucifixo Invertido (Halt.)</button>
+                <button type="button" class="arsenal-item" data-name="Puxada Pegada Supinada" data-muscle="Costas" data-type="maquina">Puxada Pegada Supinada</button>
+              </div>
+            </div>
+            <!-- Pernas -->
+            <div class="arsenal-group">
+              <h4 class="arsenal-group-title">🦵 Pernas</h4>
+              <div class="arsenal-items-row">
+                <button type="button" class="arsenal-item" data-name="Agachamento Livre" data-muscle="Pernas" data-type="livre">Agachamento Livre</button>
+                <button type="button" class="arsenal-item" data-name="Leg Press 45°" data-muscle="Pernas" data-type="maquina">Leg Press 45°</button>
+                <button type="button" class="arsenal-item" data-name="Cadeira Extensora" data-muscle="Pernas" data-type="maquina">Cadeira Extensora</button>
+                <button type="button" class="arsenal-item" data-name="Cadeira Flexora" data-muscle="Pernas" data-type="maquina">Cadeira Flexora</button>
+                <button type="button" class="arsenal-item" data-name="Stiff" data-muscle="Pernas" data-type="livre">Stiff</button>
+                <button type="button" class="arsenal-item" data-name="Panturrilha" data-muscle="Pernas" data-type="maquina">Panturrilha</button>
+                <button type="button" class="arsenal-item" data-name="Cadeira Adutora" data-muscle="Pernas" data-type="maquina">Cadeira Adutora</button>
+                <button type="button" class="arsenal-item" data-name="Cadeira Abdutora" data-muscle="Pernas" data-type="maquina">Cadeira Abdutora</button>
+                <button type="button" class="arsenal-item" data-name="Agachamento Búlgaro" data-muscle="Pernas" data-type="livre">Agachamento Búlgaro</button>
+                <button type="button" class="arsenal-item" data-name="Elevação Pélvica" data-muscle="Pernas" data-type="livre">Elevação Pélvica</button>
+                <button type="button" class="arsenal-item" data-name="Hack Machine" data-muscle="Pernas" data-type="maquina">Hack Machine</button>
+                <button type="button" class="arsenal-item" data-name="Panturrilha Sentado" data-muscle="Pernas" data-type="maquina">Panturrilha Sentado</button>
+                <button type="button" class="arsenal-item" data-name="Panturrilha em Pé (Smith)" data-muscle="Pernas" data-type="maquina">Panturrilha em Pé (Smith)</button>
+              </div>
+            </div>
+            <!-- Ombros -->
+            <div class="arsenal-group">
+              <h4 class="arsenal-group-title">💪 Ombros</h4>
+              <div class="arsenal-items-row">
+                <button type="button" class="arsenal-item" data-name="Desenvolvimento com Halteres" data-muscle="Ombros" data-type="livre">Desenvolvimento com Halteres</button>
+                <button type="button" class="arsenal-item" data-name="Elevação Lateral" data-muscle="Ombros" data-type="livre">Elevação Lateral</button>
+                <button type="button" class="arsenal-item" data-name="Elevação Frontal" data-muscle="Ombros" data-type="livre">Elevação Frontal</button>
+                <button type="button" class="arsenal-item" data-name="Desenvolvimento Militar (OHP)" data-muscle="Ombros" data-type="livre">Desenvolvimento Militar (OHP)</button>
+                <button type="button" class="arsenal-item" data-name="Face Pull" data-muscle="Ombros" data-type="maquina">Face Pull</button>
+                <button type="button" class="arsenal-item" data-name="Elevação Lateral no Cabo" data-muscle="Ombros" data-type="maquina">Elevação Lateral no Cabo</button>
+                <button type="button" class="arsenal-item" data-name="Desenvolvimento na Máquina" data-muscle="Ombros" data-type="maquina">Desenvolvimento na Máquina</button>
+                <button type="button" class="arsenal-item" data-name="Encolhimento com Halteres" data-muscle="Ombros" data-type="livre">Encolhimento com Halteres</button>
+              </div>
+            </div>
+            <!-- Braços -->
+            <div class="arsenal-group">
+              <h4 class="arsenal-group-title">💪 Braços</h4>
+              <div class="arsenal-items-row">
+                <button type="button" class="arsenal-item" data-name="Rosca Direta" data-muscle="Braços" data-type="livre">Rosca Direta</button>
+                <button type="button" class="arsenal-item" data-name="Rosca Martelo" data-muscle="Braços" data-type="livre">Rosca Martelo</button>
+                <button type="button" class="arsenal-item" data-name="Tríceps Testa" data-muscle="Braços" data-type="livre">Tríceps Testa</button>
+                <button type="button" class="arsenal-item" data-name="Tríceps Corda" data-muscle="Braços" data-type="maquina">Tríceps Corda</button>
+                <button type="button" class="arsenal-item" data-name="Rosca Concentrada" data-muscle="Braços" data-type="livre">Rosca Concentrada</button>
+                <button type="button" class="arsenal-item" data-name="Tríceps Pulley (Barra)" data-muscle="Braços" data-type="maquina">Tríceps Pulley (Barra)</button>
+                <button type="button" class="arsenal-item" data-name="Rosca Scott (Barra W)" data-muscle="Braços" data-type="livre">Rosca Scott (Barra W)</button>
+                <button type="button" class="arsenal-item" data-name="Rosca Inversa (Barra)" data-muscle="Braços" data-type="livre">Rosca Inversa (Barra)</button>
+                <button type="button" class="arsenal-item" data-name="Tríceps Coice (Halter)" data-muscle="Braços" data-type="livre">Tríceps Coice (Halter)</button>
+                <button type="button" class="arsenal-item" data-name="Tríceps Francês (Halter)" data-muscle="Braços" data-type="livre">Tríceps Francês (Halter)</button>
+                <button type="button" class="arsenal-item" data-name="Rosca Alternada" data-muscle="Braços" data-type="livre">Rosca Alternada</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="input-group">
+              <label for="cust-ex-muscle">Grupo Muscular</label>
+              <select id="cust-ex-muscle">
+                <option value="Peito">Peito</option>
+                <option value="Costas">Costas</option>
+                <option value="Pernas">Pernas</option>
+                <option value="Ombros">Ombros</option>
+                <option value="Braços">Braços/Bíceps/Tríceps</option>
+                <option value="Cardio">Cardio</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label for="cust-ex-sets">Séries</label>
+              <input type="number" id="cust-ex-sets" value="4" min="1" max="10" required>
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="input-group">
+              <label for="cust-ex-reps">Repetições Alvo</label>
+              <input type="text" id="cust-ex-reps" value="8-12" required>
+            </div>
+            <div class="input-group">
+              <label for="cust-ex-weight">Carga Inicial (kg)</label>
+              <input type="number" id="cust-ex-weight" value="10" min="0" required>
+            </div>
+          </div>
+
+          <div class="btn-group-row">
+            <button type="submit" class="btn btn-primary ripple">Criar Exercício</button>
+            <button type="button" id="btn-close-exercise-modal" class="btn btn-outline">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL: ADD CUSTOM FOOD (DIET)              -->
+    <!-- ========================================== -->
+    <div id="add-custom-food-modal" class="modal-overlay hidden">
+      <div class="custom-modal-card glass-panel fade-in">
+        <h3>➕ Cadastrar Novo Alimento</h3>
+        <form id="add-custom-food-form" class="form-container">
+          <div class="input-group">
+            <label for="cust-food-name">Nome do Alimento</label>
+            <input type="text" id="cust-food-name" placeholder="Ex: Tapioca com Queijo" required>
+          </div>
+          
+          <div class="form-row-3">
+            <div class="input-group">
+              <label for="cust-food-kcal">Kcal (por 100g)</label>
+              <input type="number" id="cust-food-kcal" value="150" min="0" required>
+            </div>
+            <div class="input-group">
+              <label for="cust-food-prot">Prot (g por 100g)</label>
+              <input type="number" id="cust-food-prot" value="10" min="0" step="0.1" required>
+            </div>
+            <div class="input-group">
+              <label for="cust-food-fiber">Fibra (g por 100g)</label>
+              <input type="number" id="cust-food-fiber" value="2" min="0" step="0.1" required>
+            </div>
+          </div>
+
+          <div class="btn-group-row">
+            <button type="submit" class="btn btn-primary ripple">Salvar Alimento</button>
+            <button type="button" id="btn-close-custom-food-modal" class="btn btn-outline">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL: CREATE CUSTOM MENTOR (NOW DEV CONTACT NOTICE) -->
+    <!-- ========================================== -->
+    <div id="add-custom-mentor-modal" class="modal-overlay hidden">
+      <div class="custom-modal-card glass-panel fade-in" style="max-width: 380px; text-align: center; padding: 24px;">
+        <span style="font-size: 3rem; display: block; margin-bottom: 12px;">🛠️</span>
+        <h3 style="margin-bottom: 10px; font-family: var(--font-display); font-weight: 800;">Quer adicionar um novo Mentor?</h3>
+        <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 20px;">
+          Para solicitar a inclusão de um novo mentor com tema visual exclusivo, buffs e imagem personalizada, entre em contato direto com o desenvolvedor pelo WhatsApp:<br>
+          <strong style="color: var(--color-primary); font-size: 1.1rem; display: block; margin-top: 10px;">📲 (11) 98495-5770</strong>
+        </p>
+        <div class="btn-group-row" style="justify-content: center;">
+          <button type="button" id="btn-close-custom-mentor-modal" class="btn btn-primary ripple" style="padding: 10px 24px;">Fechar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- LEVEL UP CELEBRATION MODAL OVERLAY         -->
+    <!-- ========================================== -->
+    <div id="level-up-modal" class="modal-overlay hidden">
+      <div class="level-up-card glass-panel fade-in">
+        <div class="level-up-particles">✨ 🔥 ⭐ ⚡</div>
+        <span class="level-up-subtitle">QUEST COMPLETA!</span>
+        <h1 class="level-up-title animate-bounce">LEVEL <span id="modal-level-val">2</span></h1>
+        <div class="level-up-class-badge" id="modal-subclass-val">FIT 🤡</div>
+        <p class="level-up-desc">Você superou seus limites físicos! Recebeu +5 Pontos de Atributos para alocar na aba de Status.</p>
+        <button id="btn-close-level-up" class="btn btn-accent btn-block ripple">REIVINDICAR FORÇA</button>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- CONGRATULATIONS ITEM ACQUIRED MODAL        -->
+    <!-- ========================================== -->
+    <div id="item-acquired-modal" class="modal-overlay hidden">
+      <div class="item-acquired-card glass-panel fade-in">
+        <span class="item-subtitle">NOVO ITEM ENCONTRADO</span>
+        <div class="item-glow-container">
+          <div class="item-badge-icon" id="modal-item-icon">🏆</div>
+        </div>
+        <h2 id="modal-item-name">Faixa do Rock Lee</h2>
+        <p id="modal-item-desc">Aumenta seu vigor e foco em treinos pesados!</p>
+        <button id="btn-close-item-modal" class="btn btn-accent ripple">EQUIPAR NO SHAPE</button>
+      </div>
+    </div>
+
+    <!-- RPE ARCADE END-WORKOUT MODAL -->
+    <div id="rpe-modal" class="modal-overlay hidden">
+      <div class="rpe-modal-card glass-panel fade-in">
+        <div class="rpe-modal-header">
+          <span class="rpe-badge-label">⚔️ COMO FOI O TREINO?</span>
+          <h2>Avaliação de Intensidade</h2>
+        </div>
+        <div class="rpe-options-grid">
+          <button class="rpe-option-card rpe-fofo" data-rpe="fofo" data-xp="10">
+            <span class="rpe-emoji">😴</span>
+            <h4>Treino Fofo</h4>
+            <span class="rpe-xp-tag">+10 XP</span>
+            <p class="rpe-desc">"Dava para ter colocado mais peso."</p>
+          </button>
+          <button class="rpe-option-card rpe-intenso" data-rpe="intenso" data-xp="30">
+            <span class="rpe-emoji">🔥</span>
+            <h4>Treino Intenso</h4>
+            <span class="rpe-xp-tag">+30 XP</span>
+            <p class="rpe-desc">"Bati as metas com sangue nos olhos."</p>
+          </button>
+          <button class="rpe-option-card rpe-freaky" data-rpe="freaky" data-xp="50">
+            <span class="rpe-emoji">😈</span>
+            <h4>Modo FREAKY!</h4>
+            <span class="rpe-xp-tag">+50 XP</span>
+            <p class="rpe-desc">"Quase fui ver o Bebezinho no céu."</p>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- FLOATING REST TIMER BANNER (novo design circular)  -->
+    <!-- ========================================== -->
+    <div id="rest-timer-banner" class="rest-timer-toast hidden">
+      <div class="rest-timer-content">
+        <div class="rest-timer-circle-wrap">
+          <svg class="rest-timer-svg" viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg">
+            <circle class="rest-timer-track" cx="48" cy="48" r="42"/>
+            <circle class="rest-timer-fill" id="rest-timer-fill-circle" cx="48" cy="48" r="42" stroke-dasharray="264" stroke-dashoffset="0"/>
+          </svg>
+          <div class="rest-timer-num" id="rest-timer-countdown">90</div>
+        </div>
+        <div class="rest-timer-lbl">DESCANSO</div>
+        <div class="rest-timer-actions">
+          <button type="button" id="btn-add-rest" class="btn">+15s</button>
+          <button type="button" id="btn-skip-rest" class="btn">⚡ PULAR</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TUTORIAL STEP-BY-STEP OVERLAY MODAL       -->
+    <!-- ========================================== -->
+    <div id="tutorial-overlay" class="modal-overlay hidden">
+      <div class="tutorial-card glass-panel fade-in">
+        <div id="tutorial-card-content" style="transition: all 0.25s ease; display: flex; flex-direction: column; gap: 16px; width: 100%;">
+          <div class="tutorial-header">
+            <span class="tutorial-title-badge">TUTORIAL DE RECRUTA</span>
+            <h2 id="tutorial-step-title">Bem-vindo, Caçador! ⚔️</h2>
+          </div>
+          <div class="tutorial-body">
+            <div id="tutorial-step-illustration" class="tutorial-illustration">🎯</div>
+            <p id="tutorial-step-text">Este é o FreakyQuest. Aqui você deixa o estado de frango para trás através do treino e da constância.</p>
+          </div>
+        </div>
+        <div class="tutorial-footer">
+          <div class="tutorial-steps-dots">
+            <span class="dot active" data-step="0"></span>
+            <span class="dot" data-step="1"></span>
+            <span class="dot" data-step="2"></span>
+            <span class="dot" data-step="3"></span>
+            <span class="dot" data-step="4"></span>
+          </div>
+          <div class="tutorial-actions-row">
+            <button type="button" id="btn-tutorial-skip" class="btn btn-sm btn-outline">PULAR</button>
+            <button type="button" id="btn-tutorial-next" class="btn btn-sm btn-primary">AVANÇAR</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TRAINING ALARM MODAL OVERLAY (NATIVE-LIKE) -->
+    <!-- ========================================== -->
+    <div id="training-alarm-modal" class="modal-overlay hidden" style="z-index: 500;">
+      <div class="alarm-modal-card glass-panel fade-in" style="max-width: 380px; text-align: center; padding: 24px; border: 2px solid var(--color-accent); box-shadow: 0 0 25px rgba(var(--color-accent-rgb), 0.3);">
+        <div class="alarm-pulsing-circle" style="font-size: 3.5rem; animation: alarm-ring-anim 1s infinite alternate; display: inline-block; margin-bottom: 12px;">🔔</div>
+        <span class="alarm-badge-label" style="display: block; font-size: 0.7rem; font-weight: 800; color: var(--color-accent); letter-spacing: 1.5px; margin-bottom: 6px; text-transform: uppercase;">🚨 ALERTA DE TREINO!</span>
+        <h2 id="alarm-title" class="alarm-title" style="font-family: var(--font-display); font-weight: 900; font-size: 1.8rem; margin-bottom: 10px; color: #ff3333; transition: color 0.3s ease;">Freaky Season</h2>
+        <p id="alarm-desc" class="alarm-desc" style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.45; margin-bottom: 20px;">E aí, caçador! Chegou o horário do seu lembrete de treino. Hora de ir buscar sua dose diária de dopamina e bater o shape! 💪</p>
+        <button id="btn-alarm-go-train" class="btn btn-accent btn-block ripple alarm-btn-go" style="background: var(--color-accent); color: #000; font-family: var(--font-display); font-weight: 900; font-size: 1rem; padding: 12px; border-radius: 8px; border: none; cursor: pointer; width: 100%; box-shadow: 0 0 15px rgba(255,183,3,0.4);">IR TREINAR</button>
+      </div>
+    </div>
+
+    <!-- Celebration Canvas for Confetti -->
+    <canvas id="celebration-canvas" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 9999;"></canvas>
+
+  </div> <!-- End App Container -->
+
+  <script src="app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>

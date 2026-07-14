@@ -1,0 +1,19 @@
+{
+  "name": "FreakyQuest - RPG de Academia",
+  "short_name": "FreakyQuest",
+  "description": "Treinos gamificados, dieta, XP e mentores fitness.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0a0b10",
+  "theme_color": "#0a0b10",
+  "orientation": "portrait",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "logo.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+.vercel
+__pycache__/
+.tmp.driveupload/
+.DS_Store
+Thumbs.db
+*.log
