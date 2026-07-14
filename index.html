@@ -2197,6 +2197,14 @@
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('sw.js').catch(() => {});
       });
+      // Recarrega quando um novo SW assume o controle apos um deploy,
+      // para aplicar os assets novos sem janela de cache obsoleto.
+      let reloadOnUpdate = false;
+      if (navigator.serviceWorker.controller) reloadOnUpdate = true;
+      navigator.serviceWorker.addEventListener('updatefound', () => { reloadOnUpdate = true; });
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (reloadOnUpdate) window.location.reload();
+      });
     }
   </script>
 </body>

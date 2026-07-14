@@ -1,6 +1,11 @@
 .vercel
 __pycache__/
 .tmp.driveupload/
+.tmp.drivedownload/
 .DS_Store
 Thumbs.db
 *.log
+backup_original/
+scratch/temp_test_system/
+scratch/temp_zip_extract_new/
+scratch/new_update/

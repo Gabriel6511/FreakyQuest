@@ -25,7 +25,9 @@ Requer Playwright: `pip install playwright && playwright install chromium`
 ## Deploy
 
 Deploy automático via Vercel a partir do GitHub (Gabriel6511/FreakyQuest, branch `main`).
-A cada `git push` para `main`, a Vercel publica em produção automaticamente. Não é mais necessário rodar `vercel --prod` manualmente.
+A cada `git push` para `main`, a Vercel publica em produção automaticamente.
+
+> **Depreciado:** não rode mais `vercel --prod` manualmente. O CLI ainda funciona, mas cria um deploy de produção redundante e fora do controle do Git. O fluxo oficial é `git push`.
 
 ## Funcionalidades principais
 
