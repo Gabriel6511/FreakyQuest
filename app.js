@@ -2,6 +2,13 @@
    FREAKYQUEST - RPG FITNESS STATE & LOGIC ENGINE (UPGRADED VERSION)
    ========================================================================== */
 
+// Escapa texto vindo do usuário (nomes de exercício/comida custom) antes de injetar via innerHTML
+function escapeHtml(str) {
+  return String(str ?? '').replace(/[&<>"']/g, (c) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+}
+
 // 1. SUB-CLASSES PROGRESSION SYSTEM (RANKS) - UPDATED LEVEL 1 TO "FIT 🤡"
 const SUB_CLASSES = {
   bodybuilder: [
@@ -764,7 +771,8 @@ const TROPHIES = [
   { id: 'overload_champion', name: 'Rei do Overload', icon: '✊', desc: 'Progrediu carga pela primeira vez!' },
   { id: 'saitama_blessing', name: 'Bênção do Saitama', icon: '👊', desc: 'Selecionou o homem mais forte do mundo como mentor.' },
   { id: 'mind_shield', name: 'Mente Blindada', icon: '🎯', desc: 'Concluiu todas as quests diárias do dia.' },
-  { id: 'gym_legend', name: 'Lenda do Ginásio', icon: '🔥', desc: 'Completou 10 treinos no total.' }
+  { id: 'gym_legend', name: 'Lenda do Ginásio', icon: '🔥', desc: 'Completou 10 treinos no total.' },
+  { id: 'insignia_mutante', name: 'Insígnia Mutante', icon: '🔥', desc: 'Resgatou a recompensa do Desafio Diário.' }
 ];
 
 
@@ -1080,7 +1088,8 @@ function getResolvedWorkoutTemplate() {
 
   const divMap = ['A', 'B', 'C'];
   const divLetter = divMap[activeIdx % 3] || 'A';
-  const raw = WORKOUT_TEMPLATES[state.charClass][divLetter];
+  const classKey = WORKOUT_TEMPLATES[state.charClass] ? state.charClass : 'bodybuilder';
+  const raw = WORKOUT_TEMPLATES[classKey][divLetter];
   const expCfg = EXP_SCALE[state.charExp] || EXP_SCALE.rato;
   const exercises = raw.exercises.map((ex) => {
     const defaultSets = Math.max(2, Math.min(6, ex.sets + expCfg.sets));
@@ -2099,7 +2108,7 @@ function claimDailyChallengeReward() {
   const xpReward = challenge.rewardXP;
   addXP(xpReward);
 
-  unlockTrophy('overload_champion');
+  unlockTrophy('insignia_mutante');
 
   playSound('levelup');
   showItemAcquiredModal('🔥', 'RECOMPENSA RESGATADA!', `Você ganhou +${xpReward} XP e a Insígnia Mutante para seu Shape!`);
@@ -3559,7 +3568,7 @@ function renderWorkoutRoutine() {
         <div class="exc-name-area">
           <div class="exc-number">${exNum}</div>
           <div class="exc-info">
-            <h4 class="exc-name">${ex.name}</h4>
+            <h4 class="exc-name">${escapeHtml(ex.name)}</h4>
             <span class="exc-muscle">${ex.muscle}${rival ? ` · 🎯 Rival: ${rival.name} (${rival.weight}kg)` : ''}</span>
           </div>
         </div>
@@ -5130,7 +5139,7 @@ function renderMealLogs() {
     card.innerHTML = `
       <div class="dfc-icon">${getFoodIcon(m.name)}</div>
       <div class="dfc-info">
-        <div class="dfc-name">${m.name}</div>
+        <div class="dfc-name">${escapeHtml(m.name)}</div>
         <div class="dfc-weight">${m.weight}g consumidos</div>
       </div>
       <div class="dfc-macros">
@@ -5501,14 +5510,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Aplica o tamanho de fonte salvo (escala o rem base do documento)
   document.documentElement.style.setProperty('--font-scale', (typeof state.fontScale === 'number' && !isNaN(state.fontScale)) ? state.fontScale : 1);
-
-  // Impede zoom acidental: pinch (iOS) e Ctrl +/-/0 (desktop)
-  document.addEventListener('gesturestart', (e) => e.preventDefault());
-  document.addEventListener('keydown', (e) => {
-    if (e.ctrlKey && (e.key === '+' || e.key === '=' || e.key === '-' || e.key === '0')) {
-      e.preventDefault();
-    }
-  });
 
   // Wire tutorial buttons (always, regardless of save state)
   document.getElementById('btn-tutorial-next').addEventListener('click', () => {
@@ -6665,10 +6666,11 @@ document.addEventListener('DOMContentLoaded', () => {
       playSound('click');
       const targetTab = item.getAttribute('data-tab');
 
-      navItems.forEach(i => i.classList.remove('active'));
+      navItems.forEach(i => { i.classList.remove('active'); i.setAttribute('aria-selected', 'false'); });
       tabContents.forEach(t => t.classList.remove('active'));
 
       item.classList.add('active');
+      item.setAttribute('aria-selected', 'true');
       const target = document.getElementById(`tab-${targetTab}`);
       if (target) target.classList.add('active');
 
@@ -6915,11 +6917,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const rpeOptions = document.querySelectorAll('.rpe-option-card');
   rpeOptions.forEach(card => {
     card.addEventListener('click', () => {
+      const rpeModal = document.getElementById('rpe-modal');
+      if (rpeModal.classList.contains('hidden')) return; // já processado (evita XP duplicado em duplo clique/toque)
+
       const rpeType = card.getAttribute('data-rpe');
       const rpeXp = parseInt(card.getAttribute('data-xp')) || 10;
 
       // Close RPE Modal
-      document.getElementById('rpe-modal').classList.add('hidden');
+      rpeModal.classList.add('hidden');
 
       // Mentor XP based on RPE submission rating selected
       let affinityXP = 15;

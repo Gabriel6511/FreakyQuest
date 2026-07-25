@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#0a0b10">
   <meta name="description" content="FreakyQuest - RPG de Academia. Treinos, dieta, XP e mentores fitness.">
   <link rel="manifest" href="manifest.json">
@@ -103,7 +103,7 @@
               <img class="onboarding-avatar-preview hidden" id="wiz-avatar-preview" src="" alt="Avatar Preview" style="width: 80px; height: 80px; border-radius: 50%; z-index: 2; position: relative; object-fit: cover;">
             </div>
             <div class="input-group" style="margin-top: 20px;">
-              <input type="text" id="wiz-name" placeholder="Ex: Ramonzinho" required maxlength="15" style="text-align: center; font-size: 1.1rem; padding: 14px;">
+              <input type="text" id="wiz-name" aria-label="Seu nome ou codinome" placeholder="Ex: Ramonzinho" required maxlength="15" style="text-align: center; font-size: 1.1rem; padding: 14px;">
             </div>
             <div class="input-group" style="margin-top: 15px; text-align: center;">
               <label for="wiz-profile-pic" style="font-size: 0.8rem; margin-bottom: 4px; display: block; color: var(--text-secondary);">Foto de Perfil (Opcional)</label>
@@ -497,7 +497,7 @@
               </div>
               <button type="button" class="numeric-btn" id="btn-inc-age">+</button>
             </div>
-            <input type="range" id="slider-age" min="7" max="90" value="25" style="width: 80%; margin: 0 auto; accent-color: var(--color-primary);">
+            <input type="range" id="slider-age" aria-label="Idade em anos" aria-labelledby="display-age" min="7" max="90" value="25" style="width: 80%; margin: 0 auto; accent-color: var(--color-primary);">
           </div>
 
           <!-- STEP 9A: HEIGHT -->
@@ -513,7 +513,7 @@
               <button type="button" class="numeric-btn" id="btn-inc-height">+</button>
             </div>
             <!-- Range slider for micro-adjustment -->
-            <input type="range" id="slider-height" min="120" max="220" value="175" style="width: 80%; margin: 0 auto; accent-color: var(--color-primary);">
+            <input type="range" id="slider-height" aria-label="Altura em centímetros" aria-labelledby="display-height" min="120" max="220" value="175" style="width: 80%; margin: 0 auto; accent-color: var(--color-primary);">
           </div>
 
           <!-- STEP 9B: WEIGHT -->
@@ -528,7 +528,7 @@
               </div>
               <button type="button" class="numeric-btn" id="btn-inc-weight">+</button>
             </div>
-            <input type="range" id="slider-weight" min="200" max="2000" value="750" style="width: 80%; margin: 0 auto; accent-color: var(--color-primary);">
+            <input type="range" id="slider-weight" aria-label="Peso atual em quilos" aria-labelledby="display-weight" min="200" max="2000" value="750" style="width: 80%; margin: 0 auto; accent-color: var(--color-primary);">
           </div>
 
           <!-- STEP 9C: TARGET WEIGHT -->
@@ -543,7 +543,7 @@
               </div>
               <button type="button" class="numeric-btn" id="btn-inc-tweight">+</button>
             </div>
-            <input type="range" id="slider-tweight" min="400" max="1800" value="750" style="width: 80%; margin: 0 auto; accent-color: var(--color-primary);">
+            <input type="range" id="slider-tweight" aria-label="Peso meta em quilos" aria-labelledby="display-tweight" min="400" max="1800" value="750" style="width: 80%; margin: 0 auto; accent-color: var(--color-primary);">
           </div>
 
           <!-- STEP 10: INJURIES / PAIN -->
@@ -663,7 +663,7 @@
             <h2 class="step-question-title">Qual o seu nome?</h2>
             <p class="step-question-subtitle">Como quer ser chamado no app?</p>
             <div class="input-group" style="margin-top: 14px;">
-              <input type="text" id="simple-wiz-name" placeholder="Ex: Mariana" required maxlength="20" style="text-align: center; font-size: 1.05rem; padding: 12px;">
+              <input type="text" id="simple-wiz-name" aria-label="Seu nome" placeholder="Ex: Mariana" required maxlength="20" style="text-align: center; font-size: 1.05rem; padding: 12px;">
             </div>
           </div>
           <div class="onboarding-step" data-step="s2">
@@ -702,19 +702,19 @@
               <div class="numeric-display"><span id="simple-display-height" class="numeric-value">170</span><span class="numeric-unit">CM</span></div>
               <button type="button" class="numeric-btn" id="simple-btn-inc-height">+</button>
             </div>
-            <input type="range" id="simple-slider-height" min="120" max="220" value="170" style="width: 80%; margin: 0 auto; accent-color: var(--color-primary);">
+            <input type="range" id="simple-slider-height" aria-label="Altura em centímetros" aria-labelledby="simple-display-height" min="120" max="220" value="170" style="width: 80%; margin: 0 auto; accent-color: var(--color-primary);">
             <div class="wizard-numeric-control" style="margin-top: 10px;">
               <button type="button" class="numeric-btn" id="simple-btn-dec-weight">-</button>
               <div class="numeric-display"><span id="simple-display-weight" class="numeric-value">70.0</span><span class="numeric-unit">KG</span></div>
               <button type="button" class="numeric-btn" id="simple-btn-inc-weight">+</button>
             </div>
-            <input type="range" id="simple-slider-weight" min="200" max="2000" value="700" style="width: 80%; margin: 6px auto 0; accent-color: var(--color-primary);">
+            <input type="range" id="simple-slider-weight" aria-label="Peso atual em quilos" aria-labelledby="simple-display-weight" min="200" max="2000" value="700" style="width: 80%; margin: 6px auto 0; accent-color: var(--color-primary);">
             <div class="wizard-numeric-control" style="margin-top: 10px;">
               <button type="button" class="numeric-btn" id="simple-btn-dec-tweight">-</button>
               <div class="numeric-display"><span id="simple-display-tweight" class="numeric-value">70.0</span><span class="numeric-unit">META KG</span></div>
               <button type="button" class="numeric-btn" id="simple-btn-inc-tweight">+</button>
             </div>
-            <input type="range" id="simple-slider-tweight" min="400" max="1800" value="700" style="width: 80%; margin: 6px auto 0; accent-color: var(--color-primary);">
+            <input type="range" id="simple-slider-tweight" aria-label="Peso meta em quilos" aria-labelledby="simple-display-tweight" min="400" max="1800" value="700" style="width: 80%; margin: 6px auto 0; accent-color: var(--color-primary);">
           </div>
           <div class="onboarding-step" data-step="s6">
             <h2 class="step-question-title">Dias de treino e lembretes</h2>
@@ -785,7 +785,7 @@
       </header>
 
       <!-- TAB 1: DASHBOARD (HOME) -->
-      <div id="tab-dashboard" class="tab-content active">
+      <div id="tab-dashboard" class="tab-content active" role="tabpanel" aria-labelledby="navtab-dashboard">
 
         <!-- ══════════════════════════════════════
              HERO DO MENTOR — HUD Cinemático
@@ -1014,7 +1014,7 @@
       </div>
 
       <!-- TAB 2: TREINOS (WORKOUTS) -->
-      <div id="tab-workouts" class="tab-content">
+      <div id="tab-workouts" class="tab-content" role="tabpanel" aria-labelledby="navtab-workouts">
         <div class="workout-header-bar">
           <div class="workout-title-row">
             <h3>🏋️‍♂️ Arena de Treino</h3>
@@ -1074,7 +1074,7 @@
       </div>
 
       <!-- TAB 3: DIETA (ALIMENTAÇÃO) [NEW TAB] -->
-      <div id="tab-diet" class="tab-content">
+      <div id="tab-diet" class="tab-content" role="tabpanel" aria-labelledby="navtab-diet">
         <div class="section-title-wrapper">
           <h3>🍎 Alimentação & Dieta RPG</h3>
           <p class="subtitle">Cadastre suas refeições para preencher as metas de macros diárias!</p>
@@ -1219,7 +1219,7 @@
       </div>
 
       <!-- TAB: EQUIPAMENTOS [NEW TAB] -->
-      <div id="tab-equipment" class="tab-content">
+      <div id="tab-equipment" class="tab-content" role="tabpanel" aria-labelledby="navtab-equipment">
         <div class="section-title-wrapper">
           <h3>🛡️ Equipamentos & Arsenal</h3>
           <p class="subtitle">Equipe acessórios conquistados para ganhar bônus de atributos e mudar seu visual!</p>
@@ -1278,7 +1278,7 @@
       </div>
 
       <!-- TAB 4: MENTORES (BASES) -->
-      <div id="tab-mentors" class="tab-content">
+      <div id="tab-mentors" class="tab-content" role="tabpanel" aria-labelledby="navtab-mentors">
 
         <!-- Header fixo da aba -->
         <div class="mentors-tab-header">
@@ -1321,7 +1321,7 @@
       </div>
 
       <!-- TAB 5: RPG STATUS & ATRIBUTOS -->
-      <div id="tab-status" class="tab-content">
+      <div id="tab-status" class="tab-content" role="tabpanel" aria-labelledby="navtab-status">
         <button type="button" id="btn-open-profile-card" class="btn-open-profile-card-trigger">
           <span class="bopc-icon">🪪</span>
           <span class="bopc-text">
@@ -1548,8 +1548,8 @@
       <!-- ========================================== -->
       <!-- BOTTOM NAVIGATION BAR (5 TABS SYSTEM)      -->
       <!-- ========================================== -->
-      <nav class="bottom-nav glass-panel-nav">
-        <button class="nav-item active" data-tab="dashboard">
+      <nav class="bottom-nav glass-panel-nav" role="tablist">
+        <button class="nav-item active" data-tab="dashboard" role="tab" id="navtab-dashboard" aria-selected="true" aria-controls="tab-dashboard">
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="3" y="3" width="7" height="9"></rect>
             <rect x="14" y="3" width="7" height="5"></rect>
@@ -1559,7 +1559,7 @@
           <span>Painel</span>
         </button>
 
-        <button class="nav-item" data-tab="workouts">
+        <button class="nav-item" data-tab="workouts" role="tab" id="navtab-workouts" aria-selected="false" aria-controls="tab-workouts">
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M6 3h12M12 3v18M8 21h8M4 7h16M4 17h16"></path>
           </svg>
@@ -1567,7 +1567,7 @@
         </button>
 
         <!-- DIET BOTTOM NAV TAB (NEW) -->
-        <button class="nav-item" data-tab="diet">
+        <button class="nav-item" data-tab="diet" role="tab" id="navtab-diet" aria-selected="false" aria-controls="tab-diet">
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M2 12c0 5.5 4.5 10 10 10s10-4.5 10-10H2z"></path>
             <path d="M12 2v10"></path>
@@ -1577,14 +1577,14 @@
         </button>
 
         <!-- EQUIPAMENTOS BOTTOM NAV TAB -->
-        <button class="nav-item" data-tab="equipment">
+        <button class="nav-item" data-tab="equipment" role="tab" id="navtab-equipment" aria-selected="false" aria-controls="tab-equipment">
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
           </svg>
           <span>Itens</span>
         </button>
 
-        <button class="nav-item" data-tab="mentors">
+        <button class="nav-item" data-tab="mentors" role="tab" id="navtab-mentors" aria-selected="false" aria-controls="tab-mentors">
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
             <circle cx="9" cy="7" r="4"></circle>
@@ -1594,14 +1594,14 @@
           <span>Mentores</span>
         </button>
 
-        <button class="nav-item" data-tab="status">
+        <button class="nav-item" data-tab="status" role="tab" id="navtab-status" aria-selected="false" aria-controls="tab-status">
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
           </svg>
           <span>Status</span>
         </button>
 
-        <button class="nav-item" data-tab="settings">
+        <button class="nav-item" data-tab="settings" role="tab" id="navtab-settings" aria-selected="false" aria-controls="tab-settings">
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="3"></circle>
             <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
@@ -1610,7 +1610,7 @@
         </button>
       </nav>
 
-      <div id="tab-settings" class="tab-content">
+      <div id="tab-settings" class="tab-content" role="tabpanel" aria-labelledby="navtab-settings">
         <div class="glass-panel" style="padding: 12px;">
           <h3 style="margin-bottom: 10px;">⚙️ Ajustes</h3>
 
@@ -1675,7 +1675,7 @@
     <!-- ========================================== -->
     <!-- CARTÃO DE CAÇADOR — Perfil do Jogador        -->
     <!-- ========================================== -->
-    <div id="profile-card-modal" class="modal-overlay hidden">
+    <div id="profile-card-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
       <div class="custom-modal-card glass-panel fade-in pcm-card">
         <div class="pcm-header">
           <h3>🪪 Cartão de Caçador</h3>
@@ -1742,7 +1742,7 @@
     <!-- ========================================== -->
     <!-- MODAL: PAINEL DETALHADO (DETALHES DE ATIVIDADE) -->
     <!-- ========================================== -->
-    <div id="activity-details-modal" class="modal-overlay hidden">
+    <div id="activity-details-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
       <div class="custom-modal-card glass-panel fade-in pcm-card" style="max-width: 390px;">
         <div class="pcm-header">
           <h3>📅 Detalhes da Atividade</h3>
@@ -1773,7 +1773,7 @@
       </div>
     </div>
 
-    <div id="settings-modal" class="modal-overlay hidden">
+    <div id="settings-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
       <div class="custom-modal-card glass-panel fade-in">
         <h3>⚙️ Editar Perfil & Metas</h3>
         <form id="settings-form" class="form-container">
@@ -1866,7 +1866,7 @@
     <!-- ========================================== -->
     <!-- MODAL: ADD CUSTOM EXERCISE (FOR CUSTOM TAB)-->
     <!-- ========================================== -->
-    <div id="add-exercise-modal" class="modal-overlay hidden">
+    <div id="add-exercise-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
       <div class="custom-modal-card glass-panel fade-in">
         <h3>➕ Adicionar Exercício</h3>
         <form id="add-exercise-form" class="form-container">
@@ -2009,7 +2009,7 @@
     <!-- ========================================== -->
     <!-- MODAL: ADD CUSTOM FOOD (DIET)              -->
     <!-- ========================================== -->
-    <div id="add-custom-food-modal" class="modal-overlay hidden">
+    <div id="add-custom-food-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
       <div class="custom-modal-card glass-panel fade-in">
         <h3>➕ Cadastrar Novo Alimento</h3>
         <form id="add-custom-food-form" class="form-container">
@@ -2044,7 +2044,7 @@
     <!-- ========================================== -->
     <!-- MODAL: CREATE CUSTOM MENTOR (NOW DEV CONTACT NOTICE) -->
     <!-- ========================================== -->
-    <div id="add-custom-mentor-modal" class="modal-overlay hidden">
+    <div id="add-custom-mentor-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
       <div class="custom-modal-card glass-panel fade-in" style="max-width: 380px; text-align: center; padding: 24px;">
         <span style="font-size: 3rem; display: block; margin-bottom: 12px;">🛠️</span>
         <h3 style="margin-bottom: 10px; font-family: var(--font-display); font-weight: 800;">Quer adicionar um novo Mentor?</h3>
@@ -2061,7 +2061,7 @@
     <!-- ========================================== -->
     <!-- LEVEL UP CELEBRATION MODAL OVERLAY         -->
     <!-- ========================================== -->
-    <div id="level-up-modal" class="modal-overlay hidden">
+    <div id="level-up-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
       <div class="level-up-card glass-panel fade-in">
         <div class="level-up-particles">✨ 🔥 ⭐ ⚡</div>
         <span class="level-up-subtitle">QUEST COMPLETA!</span>
@@ -2075,7 +2075,7 @@
     <!-- ========================================== -->
     <!-- CONGRATULATIONS ITEM ACQUIRED MODAL        -->
     <!-- ========================================== -->
-    <div id="item-acquired-modal" class="modal-overlay hidden">
+    <div id="item-acquired-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
       <div class="item-acquired-card glass-panel fade-in">
         <span class="item-subtitle">NOVO ITEM ENCONTRADO</span>
         <div class="item-glow-container">
@@ -2088,7 +2088,7 @@
     </div>
 
     <!-- RPE ARCADE END-WORKOUT MODAL -->
-    <div id="rpe-modal" class="modal-overlay hidden">
+    <div id="rpe-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
       <div class="rpe-modal-card glass-panel fade-in">
         <div class="rpe-modal-header">
           <span class="rpe-badge-label">⚔️ COMO FOI O TREINO?</span>
@@ -2140,7 +2140,7 @@
     <!-- ========================================== -->
     <!-- TUTORIAL STEP-BY-STEP OVERLAY MODAL       -->
     <!-- ========================================== -->
-    <div id="tutorial-overlay" class="modal-overlay hidden">
+    <div id="tutorial-overlay" class="modal-overlay hidden" role="dialog" aria-modal="true">
       <div class="tutorial-card glass-panel fade-in">
         <div id="tutorial-card-content" style="transition: all 0.25s ease; display: flex; flex-direction: column; gap: 16px; width: 100%;">
           <div class="tutorial-header">
@@ -2176,7 +2176,7 @@
     <!-- ========================================== -->
     <!-- TRAINING ALARM MODAL OVERLAY (NATIVE-LIKE) -->
     <!-- ========================================== -->
-    <div id="training-alarm-modal" class="modal-overlay hidden" style="z-index: 500;">
+    <div id="training-alarm-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" style="z-index: 500;">
       <div class="alarm-modal-card glass-panel fade-in" style="max-width: 380px; text-align: center; padding: 24px; border: 2px solid var(--color-accent); box-shadow: 0 0 25px rgba(var(--color-accent-rgb), 0.3);">
         <div class="alarm-pulsing-circle" style="font-size: 3.5rem; animation: alarm-ring-anim 1s infinite alternate; display: inline-block; margin-bottom: 12px;">🔔</div>
         <span class="alarm-badge-label" style="display: block; font-size: 0.7rem; font-weight: 800; color: var(--color-accent); letter-spacing: 1.5px; margin-bottom: 6px; text-transform: uppercase;">🚨 ALERTA DE TREINO!</span>
