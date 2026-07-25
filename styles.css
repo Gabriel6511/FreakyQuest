@@ -478,6 +478,13 @@ button, input, select, textarea, a,
   font-size: 0.8rem;
   border-radius: 6px;
 }
+
+/* Alvos de toque compactos identificados na auditoria P3 (>= 44px) */
+#add-water-btn,
+#go-to-diet-btn,
+#btn-edit-measures-shortcut {
+  min-height: 44px;
+}
 .btn-block {
   width: 100%;
 }
@@ -1886,6 +1893,9 @@ body.mode-simple .option-select-card.active {
   font-family: var(--font-display);
   letter-spacing: 0.04em;
   white-space: nowrap;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
 }
 .muf-btn:hover {
   background: rgba(255,255,255,0.08);
@@ -2345,6 +2355,7 @@ body.mode-simple .option-select-card.active {
   cursor: pointer;
   transition: all 0.18s ease;
   letter-spacing: 0.04em;
+  min-height: 44px;
 }
 .toggle-btn.active {
   background: var(--color-primary);
@@ -6037,6 +6048,18 @@ body.screen-shake::after {
 .attr-help-badge {
   transition: all 0.2s ease;
   user-select: none;
+  position: relative;
+}
+
+/* Alvo de toque ampliado (44x44) sem alterar o tamanho visual do badge (14x14) */
+.attr-help-badge::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 44px;
+  height: 44px;
 }
 
 .attr-help-badge:hover {
@@ -6456,6 +6479,7 @@ body.screen-shake::after {
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   user-select: none;
   min-width: 44px;
+  min-height: 44px;
   text-align: center;
 }
 .day-toggle-btn:hover, .settings-day-btn:hover {
