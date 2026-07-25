@@ -1,4 +1,5 @@
 import re
+import sys
 from pathlib import Path
 import collections
 
@@ -8,3 +9,6 @@ counter = collections.Counter(ids)
 dups = [i for i, c in counter.items() if c > 1]
 print('Total IDs:', len(ids))
 print('IDs duplicados:', dups)
+
+if dups:
+    sys.exit(1)

@@ -1,12 +1,14 @@
 import sys
 
+ok = True
+
 # CSS balance check
 css = open('styles.css', 'r', encoding='utf-8').read()
 css_braces = css.count('{') - css.count('}')
 css_parens = css.count('(') - css.count(')')
 print(f'CSS: braces balance={css_braces}, parens balance={css_parens}')
-if css_braces != 0: print('  !! CSS BRACE MISMATCH !!')
-if css_parens != 0: print('  !! CSS PAREN MISMATCH !!')
+if css_braces != 0: print('  !! CSS BRACE MISMATCH !!'); ok = False
+if css_parens != 0: print('  !! CSS PAREN MISMATCH !!'); ok = False
 
 # JS balance check
 js = open('app.js', 'r', encoding='utf-8').read()
@@ -14,9 +16,9 @@ js_braces = js.count('{') - js.count('}')
 js_parens = js.count('(') - js.count(')')
 js_brackets = js.count('[') - js.count(']')
 print(f'JS: braces={js_braces}, parens={js_parens}, brackets={js_brackets}')
-if js_braces != 0: print('  !! JS BRACE MISMATCH !!')
-if js_parens != 0: print('  !! JS PAREN MISMATCH !!')
-if js_brackets != 0: print('  !! JS BRACKET MISMATCH !!')
+if js_braces != 0: print('  !! JS BRACE MISMATCH !!'); ok = False
+if js_parens != 0: print('  !! JS PAREN MISMATCH !!'); ok = False
+if js_brackets != 0: print('  !! JS BRACKET MISMATCH !!'); ok = False
 
 # HTML ID check
 html = open('index.html', 'r', encoding='utf-8').read()
@@ -43,6 +45,7 @@ ids_needed = [
 missing = [i for i in ids_needed if f'id="{i}"' not in html]
 if missing:
     print(f'MISSING IDs: {missing}')
+    ok = False
 else:
     print(f'All {len(ids_needed)} required HTML IDs found OK')
 
@@ -52,5 +55,10 @@ imgs = ['logo.webp','rocklee.webp','goku.webp','arnold.webp','saitama.webp','ram
 for img in imgs:
     exists = os.path.exists(img)
     print(f'  {img}: {"OK" if exists else "MISSING!"}')
+    if not exists: ok = False
 
-print('Validation complete.')
+if ok:
+    print('Validation complete.')
+else:
+    print('Validation FAILED.')
+    sys.exit(1)
