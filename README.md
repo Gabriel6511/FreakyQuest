@@ -14,10 +14,21 @@ Acesse `http://localhost:8080`.
 
 ## Testes
 
+Ferramentas reexecutáveis de QA (ver detalhes em `QA_PLAN.md`):
+
 ```bash
-python validate.py
+python validate.py                # balanceamento JS/CSS, IDs obrigatórios, imagens
+python check_duplicate_ids.py     # detecta IDs duplicados no HTML
 python test_app.py
 python test_complete_system.py
+```
+
+Com o app servido em `http://localhost:8099` (`python -m http.server 8099`), também é possível rodar a auditoria estática/runtime mais completa:
+
+```bash
+python scratch/static_audit.py    # cruza getElementById/onclick com IDs/funções, imagens, temas, localStorage
+python scratch/runtime_qa.py      # matriz de 12 dispositivos, captura de exceções e overflow
+python scratch/verify_fixes.py    # verificação isolada pós-correção
 ```
 
 Requer Playwright: `pip install playwright && playwright install chromium`

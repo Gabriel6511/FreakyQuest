@@ -72,7 +72,7 @@ Filtro por universo (carrossel horizontal), seleção/ativação de mentor, reco
 Modo do app, medidas (peso/altura), objetivo, meta semanal, lembretes/horário, reset de progresso, salvar (persistência).
 
 ### H. PWA / Infra
-`manifest.json`, `sw.js` (cache v10, estratégia stale-while-revalidate), pausa de animações em background, prevenção de zoom acidental.
+`manifest.json`, `sw.js` (cache v12, estratégia stale-while-revalidate), pausa de animações em background.
 
 ## 6. Critérios de Aprovação
 - **0** exceções JS (`pageerror`) e **0** `console.error` reais em todos os dispositivos
