@@ -89,7 +89,7 @@ const OFFICIAL_MENTORS = [
     primaryStat: 'for',
     levelReq: 1,
     theme: 'theme-goku',
-    avatar: 'goku.png',
+    avatar: 'goku.webp',
     filterCSS: 'contrast(1.5) saturate(2.0) brightness(0.88)',
     quote: '"Oi, eu sou o Goku! Treinar na gravidade 100x vai te deixar insano. Vamos superar nossos limites hoje?"',
     buff: '+15% Força & +5% Foco',
@@ -106,7 +106,7 @@ const OFFICIAL_MENTORS = [
     primaryStat: 'for',
     levelReq: 1,
     theme: 'theme-brolyz',
-    avatar: 'brolyz.png',
+    avatar: 'brolyz.webp',
     filterCSS: 'contrast(1.6) saturate(1.8) brightness(0.85) hue-rotate(5deg)',
     quote: '"O meu poder é máximo! Kakarotooooo!"',
     buff: '+25% Força & +10% Resistência (Poder Supremo)',
@@ -124,7 +124,7 @@ const OFFICIAL_MENTORS = [
     primaryStat: 'agi',
     levelReq: 1,
     theme: 'theme-rocklee',
-    avatar: 'rocklee.png',
+    avatar: 'rocklee.webp',
     filterCSS: 'contrast(1.4) saturate(1.9) brightness(0.9)',
     quote: '"O trabalho duro vence o talento natural quando o talento natural não trabalha duro!"',
     buff: '+10% Agilidade & +10% Vigor',
@@ -142,7 +142,7 @@ const OFFICIAL_MENTORS = [
     primaryStat: 'res',
     levelReq: 1,
     theme: 'theme-saitama',
-    avatar: 'saitama.png',
+    avatar: 'saitama.webp',
     filterCSS: 'contrast(1.45) saturate(1.7) brightness(0.92)',
     quote: '"100 flexões, 100 agachamentos, 100 abdominais e 10 km de corrida todos os dias! Isso é tudo."',
     buff: '+30% Resistência & +30% Agilidade',
@@ -160,7 +160,7 @@ const OFFICIAL_MENTORS = [
     primaryStat: 'foc',
     levelReq: 1,
     theme: 'theme-bebezinho',
-    avatar: 'bebezinho_tribute.png',
+    avatar: 'bebezinho_tribute.webp',
     filterCSS: 'contrast(1.3) saturate(0.15) sepia(0.5) brightness(0.95)',
     quote: '"Wake wake! Abre o olho big! Freaky Season! All Day Neguin!"',
     buff: '+15% Força & +15% Foco (Tributo Especial)',
@@ -177,7 +177,7 @@ const OFFICIAL_MENTORS = [
     primaryStat: 'vig',
     levelReq: 1,
     theme: 'theme-ramondino',
-    avatar: 'ramondino.png',
+    avatar: 'ramondino.webp',
     filterCSS: 'contrast(1.35) saturate(0.2) sepia(0.4) brightness(0.92)',
     quote: '"Não tem segredo, irmão. É bater o peso certinho, treinar braço pesado e comer limpo! Acorda pro treino!"',
     buff: '+12% Vigor & +8% Força',
@@ -194,7 +194,7 @@ const OFFICIAL_MENTORS = [
     primaryStat: 'for',
     levelReq: 1,
     theme: 'theme-arnold',
-    avatar: 'arnold.png',
+    avatar: 'arnold.webp',
     filterCSS: 'contrast(1.3) saturate(0.1) sepia(0.55) brightness(0.9)',
     quote: '"Se você quer crescer, tem que passar pela dor. Sinta o pump e venha comigo se quiser ficar gigantesco!"',
     buff: '+20% Força e Hipertrofia Estética',
@@ -211,7 +211,7 @@ const OFFICIAL_MENTORS = [
     primaryStat: 'for',
     levelReq: 1,
     theme: 'theme-nickwalker',
-    avatar: 'nickwalker.png',
+    avatar: 'nickwalker.webp',
     filterCSS: 'contrast(1.35) saturate(0.18) sepia(0.45) brightness(0.88)',
     quote: '"Foque em progredir a carga, treine com intensidade bizarra de verdade e seja um Mutante no ginásio!"',
     buff: '+25% Força & +10% Vigor (Hipertrofia Extrema)',
@@ -2364,9 +2364,9 @@ function applyMentorVisualTheme(mentor) {
 // ==========================================
 // Helper to get avatar source URL (handles URLs, paths, and converts emojis to SVG data URLs)
 function getMentorAvatarSrc(mentor) {
-  if (!mentor) return 'rocklee.png';
+  if (!mentor) return 'rocklee.webp';
   const avatar = mentor.avatar;
-  if (!avatar) return 'rocklee.png';
+  if (!avatar) return 'rocklee.webp';
   
   if (avatar.startsWith('http') || avatar.startsWith('data:') || avatar.includes('.') || avatar.startsWith('/') || avatar.startsWith('assets/')) {
     return avatar;
@@ -7553,7 +7553,7 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         new Notification('⚔️ FREAKYQUEST: Hora do Treino!', {
           body: `E aí ${state.charName}! Hora de ir buscar sua dose diária de ferro e bater o shape! 💪`,
-          icon: 'logo.jpg'
+          icon: 'logo.webp'
         });
       } catch (e) {
         console.warn('Native notification failed', e);

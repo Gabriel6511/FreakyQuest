@@ -48,7 +48,7 @@ else:
 
 # Check image references
 import os
-imgs = ['logo.jpg','rocklee.png','goku.png','arnold.png','saitama.png','ramondino.png']
+imgs = ['logo.webp','rocklee.webp','goku.webp','arnold.webp','saitama.webp','ramondino.webp']
 for img in imgs:
     exists = os.path.exists(img)
     print(f'  {img}: {"OK" if exists else "MISSING!"}')
