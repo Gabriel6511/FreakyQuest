@@ -538,7 +538,7 @@ const EQUIPMENT_DATABASE = [
     id: 'item_faixa',
     name: 'Faixa do Rock Lee',
     slot: 'head',
-    icon: '🥋',
+    icon: 'faixa_lee_icon.webp',
     desc: 'Sua agilidade foi notada. Ganha uma borda verde neon no seu avatar.',
     stats: { agi: 5 },
     unlockDesc: 'Desbloqueia no Nível Geral 5 ou Mentor Rock Lee Nível 5.',
@@ -548,7 +548,7 @@ const EQUIPMENT_DATABASE = [
     id: 'item_bracelete',
     name: 'Braceletes de Aço',
     slot: 'arms',
-    icon: '🦾',
+    icon: 'braceletes_aco_icon.webp',
     desc: 'Braceletes de metal pesados equipados ao lado do seu nome.',
     stats: { res: 5 },
     unlockDesc: 'Desbloqueia no Nível Geral 10.',
@@ -558,7 +558,7 @@ const EQUIPMENT_DATABASE = [
     id: 'item_aura',
     name: 'Aura de Super Saiyajin',
     slot: 'aura',
-    icon: '⚡',
+    icon: 'aura_goku_icon.webp',
     desc: 'Uma aura de chamas douradas brilha ao redor do seu avatar.',
     stats: { for: 8, foc: 4 },
     unlockDesc: 'Desbloqueia no Nível Geral 20 ou Mentor Goku Nível 5.',
@@ -568,7 +568,7 @@ const EQUIPMENT_DATABASE = [
     id: 'item_cinturão',
     name: 'Cinturão de Ouro',
     slot: 'waist',
-    icon: '🥇',
+    icon: 'cinturao_ouro_icon.webp',
     desc: 'O Cinturão de Ouro de Arnold. Confere uma borda dourada nos seus cards.',
     stats: { for: 10 },
     equivalentIds: ['item_cinturão', 'has-item-cinturo', 'has-item-cinturão'],
@@ -578,7 +578,7 @@ const EQUIPMENT_DATABASE = [
     id: 'item_aurabroly',
     name: 'Aura Lendária de Broly Z',
     slot: 'aura',
-    icon: '🌋',
+    icon: 'aura_broly_icon.webp',
     desc: 'Uma aura colossal de chamas verde néon brilha no seu avatar.',
     stats: { for: 12, res: 6 },
     unlockDesc: 'Desbloqueia no Nível Geral 40 ou Mentor Broly Nível 5.',
@@ -588,7 +588,7 @@ const EQUIPMENT_DATABASE = [
     id: 'item_capa',
     name: 'Capa do Saitama',
     slot: 'aura',
-    icon: '🦸',
+    icon: 'capa_saitama_icon.webp',
     desc: 'A capa branca lendária flutua atrás do seu avatar.',
     stats: { res: 15, agi: 10 },
     unlockDesc: 'Desbloqueia no Nível Geral 50 ou Mentor Saitama Nível 5.',
@@ -1847,12 +1847,12 @@ function addXP(amount) {
 
 function checkLevelRewards(oldLvl, newLvl) {
   const rewards = [
-    { lvl: 5, id: 'item_faixa', name: 'Faixa do Rock Lee', icon: '🥋', desc: 'Sua agilidade foi notada. Você equipou a faixa do Rock Lee! Ganha uma borda verde neon no seu avatar.' },
-    { lvl: 10, id: 'item_bracelete', name: 'Braceletes de Aço', icon: '🦾', desc: 'Seus braços estão se tornando resistentes. Braceletes de metal equipados ao lado do seu nome!' },
-    { lvl: 20, id: 'item_aura', name: 'Aura de Super Saiyajin', icon: '⚡', desc: 'Seu Ki despertou! Uma aura de chamas douradas agora brilha ao redor do seu avatar!' },
-    { lvl: 30, id: 'item_cinturão', name: 'Cinturão de Ouro', icon: '🥇', desc: 'Estética inquestionável. O Cinturão de Ouro de Arnold foi equipado no fundo do seu Status!' },
-    { lvl: 40, id: 'item_aurabroly', name: 'Aura Lendária de Broly Z', icon: '🌋', desc: 'Seu poder é máximo! Uma aura colossal de chamas verde néon foi equipada no seu avatar!' },
-    { lvl: 50, id: 'item_capa', name: 'Capa do Saitama', icon: '🦸', desc: 'Treino concluído. Você destravou a Capa do Saitama, que flutua atrás do seu avatar!' }
+    { lvl: 5, id: 'item_faixa', name: 'Faixa do Rock Lee', icon: 'faixa_lee_icon.webp', desc: 'Sua agilidade foi notada. Você equipou a faixa do Rock Lee! Ganha uma borda verde neon no seu avatar.' },
+    { lvl: 10, id: 'item_bracelete', name: 'Braceletes de Aço', icon: 'braceletes_aco_icon.webp', desc: 'Seus braços estão se tornando resistentes. Braceletes de metal equipados ao lado do seu nome!' },
+    { lvl: 20, id: 'item_aura', name: 'Aura de Super Saiyajin', icon: 'aura_goku_icon.webp', desc: 'Seu Ki despertou! Uma aura de chamas douradas agora brilha ao redor do seu avatar!' },
+    { lvl: 30, id: 'item_cinturão', name: 'Cinturão de Ouro', icon: 'cinturao_ouro_icon.webp', desc: 'Estética inquestionável. O Cinturão de Ouro de Arnold foi equipado no fundo do seu Status!' },
+    { lvl: 40, id: 'item_aurabroly', name: 'Aura Lendária de Broly Z', icon: 'aura_broly_icon.webp', desc: 'Seu poder é máximo! Uma aura colossal de chamas verde néon foi equipada no seu avatar!' },
+    { lvl: 50, id: 'item_capa', name: 'Capa do Saitama', icon: 'capa_saitama_icon.webp', desc: 'Treino concluído. Você destravou a Capa do Saitama, que flutua atrás do seu avatar!' }
   ];
 
   if (!state.unlockedItems) state.unlockedItems = [];
@@ -5888,6 +5888,7 @@ document.addEventListener('DOMContentLoaded', () => {
     settingsResetBtn.addEventListener('click', () => {
       playSound('click');
       if (confirm('Isso vai apagar todo o seu progresso e voltar ao onboarding. Continuar?')) {
+        _isResetting = true; // impede que pagehide/beforeunload re-salvem o estado antigo antes do reload
         localStorage.removeItem('freakyquest_state_v2');
         localStorage.removeItem('freaky_quest_user');
         location.reload();
