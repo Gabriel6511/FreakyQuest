@@ -25,7 +25,7 @@ html = open('index.html', 'r', encoding='utf-8').read()
 ids_needed = [
     'screen-onboarding','onboarding-intro','onboarding-wizard',
     'wiz-btn-next','wiz-btn-back','onboarding-progress-fill',
-    'main-app','tab-dashboard','tab-workouts','tab-diet','tab-mentors','tab-status',
+    'main-app','tab-dashboard','tab-workouts','tab-diet','tab-mentors','tab-status','tab-tribute',
     'player-name','player-level-badge','xp-fill','xp-text',
     'eval-goal-badge','eval-weight','eval-height','eval-imc',
     'daily-quests-list','quests-completed-badge',

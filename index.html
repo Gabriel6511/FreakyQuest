@@ -1543,10 +1543,114 @@
         </div>
       </div>
 
+      <!-- TAB: TRIBUTO (HOMENAGEM A GABRIEL "BEBEZINHO" GANLEY) -->
+      <div id="tab-tribute" class="tab-content" role="tabpanel" aria-labelledby="navtab-tribute">
+        <div class="tribute-hero-card glass-panel">
+          <div class="tribute-photo-wrapper">
+            <img src="bebezinho_tribute.webp" alt="Gabriel Ganley, o Bebezinho">
+            <div class="tribute-photo-ring"></div>
+          </div>
+          <span class="tribute-mentor-tag">MENTOR NO APP</span>
+          <h2 class="tribute-name">Gabriel Ganley</h2>
+          <span class="tribute-nickname">"Bebezinho"</span>
+          <p class="tribute-dates">2003 — 2026</p>
+          <p class="tribute-bio-text">Fisiculturista, criador de conteúdo e uma das inspirações que deram origem ao FreakyQuest. Bebezinho carregava o ferro com humor, disciplina e uma energia que contagiava toda a comunidade fitness.</p>
+          <span class="tribute-dove-badge">🕊️</span>
+          <div class="tribute-divider"></div>
+          <p class="tribute-quote-main">"Eterno Caçador do Shape Freaky. Seu legado continuará em cada barra pesada que levantarmos."</p>
+
+          <div class="eternal-flame-container" onclick="triggerEternalFlameSpark()" title="Chama Eterna: toque para homenagear" style="margin-top: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 20px; background: rgba(155, 93, 229, 0.08); border: 1px solid rgba(155, 93, 229, 0.25); transition: all 0.2s ease;">
+            <span class="flame-emoji" style="font-size: 1.1rem; filter: drop-shadow(0 0 5px #ff9f1c); display: inline-block; animation: flame-flutter 1.5s ease-in-out infinite alternate;">🕯️</span>
+            <span class="flame-text" style="font-size: 0.6rem; color: #ffb703; font-weight: bold; letter-spacing: 0.5px;">CHAMA ETERNA (TOQUE PARA ILUMINAR)</span>
+          </div>
+          <span id="eternal-flame-count" style="font-size: 0.55rem; color: var(--text-secondary); margin-top: 4px;"></span>
+        </div>
+
+        <!-- Frases que Ficaram (cards visuais, sem áudio) -->
+        <div class="tribute-section-card glass-panel">
+          <h3>🗣️ Frases que Ficaram</h3>
+          <div class="tribute-quotes-grid">
+            <div class="tribute-quote-card" onclick="celebrateTributeQuote(this)">
+              <span class="tq-emoji">🕊️</span>
+              <span class="tq-title">WAKE WAKE</span>
+              <span class="tq-sub">Som de Conexão</span>
+            </div>
+            <div class="tribute-quote-card" onclick="celebrateTributeQuote(this)">
+              <span class="tq-emoji">🦁</span>
+              <span class="tq-title">HOJE É ALL DAY</span>
+              <span class="tq-sub">Old School Hardcore</span>
+            </div>
+            <div class="tribute-quote-card" onclick="celebrateTributeQuote(this)">
+              <span class="tq-emoji">👀</span>
+              <span class="tq-title">ABRE O OLHO BIG</span>
+              <span class="tq-sub">Alerta Máximo</span>
+            </div>
+            <div class="tribute-quote-card" onclick="celebrateTributeQuote(this)">
+              <span class="tq-emoji">😈</span>
+              <span class="tq-title">FICA FREAKY</span>
+              <span class="tq-sub">Mutação Ativa</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Marcos da Trajetória -->
+        <div class="tribute-section-card glass-panel">
+          <h3>🏆 Conquistas & Marcos</h3>
+          <p style="font-size: 0.65rem; color: var(--text-secondary); margin-bottom: 12px;">Toque em cada marco para ler a história completa do Bebezinho.</p>
+          <div class="milestones-timeline">
+            <div class="milestone-item" onclick="showTributeMilestoneHelp('inicio')">
+              <span class="milestone-emoji">🌟</span>
+              <div class="milestone-text">
+                <h4>Início de tudo</h4>
+                <p>Nascido em 2003, começou jovem no esporte e conquistou o carinho da comunidade fitness pelo carisma e disciplina.</p>
+              </div>
+            </div>
+            <div class="milestone-item" onclick="showTributeMilestoneHelp('pokemon')">
+              <span class="milestone-emoji">🎮</span>
+              <div class="milestone-text">
+                <h4>Campeão de Pokémon TCG</h4>
+                <p>Representou o Brasil em campeonatos mundiais do jogo de cartas colecionáveis do Pokémon.</p>
+              </div>
+            </div>
+            <div class="milestone-item" onclick="showTributeMilestoneHelp('legpress')">
+              <span class="milestone-emoji">🏋️‍♂️</span>
+              <div class="milestone-text">
+                <h4>Leg Press de 500kg</h4>
+                <p>Viralizou mundialmente na internet ao realizar o exercício de Leg Press com incríveis 500kg.</p>
+              </div>
+            </div>
+            <div class="milestone-item" onclick="showTributeMilestoneHelp('despedida')">
+              <span class="milestone-emoji">🕊️</span>
+              <div class="milestone-text">
+                <h4>Despedida precoce</h4>
+                <p>Faleceu em 23 de maio de 2026, deixando uma saudade imensa e um legado de superação.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mentores que o formaram -->
+        <div class="tribute-section-card glass-panel">
+          <h3>🛡️ Mentores que o Formaram</h3>
+          <div class="tribute-mentors-grid">
+            <div class="tribute-mentor-card">
+              <div class="tmc-header">
+                <span class="tmc-icon">🛡️</span>
+                <span class="tmc-badge">LENDA OLD SCHOOL</span>
+              </div>
+              <h4 class="tmc-name">Jorlan Vieira & "All Day"</h4>
+              <p class="tmc-desc">Jorlan Vieira foi o treinador que Bebezinho tanto admirava. Pioneiro do fisiculturismo no Brasil, Jorlan é o criador da mentalidade "All Day" (Treinar Todo Santo Dia), representando o mais puro estilo de treino hardcore e sem desculpas (Old School).</p>
+              <div class="tmc-quote-box">
+                <p>"All Day não é só sobre puxar ferro. É uma filosofia de vida, constância e disciplina inabalável."</p>
+                <cite>— Jorlan Vieira</cite>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- ========================================== -->
-      <!-- BOTTOM NAVIGATION BAR (5 TABS SYSTEM)      -->
-      <!-- ========================================== -->
-      <!-- BOTTOM NAVIGATION BAR (5 TABS SYSTEM)      -->
+      <!-- BOTTOM NAVIGATION BAR                       -->
       <!-- ========================================== -->
       <nav class="bottom-nav glass-panel-nav" role="tablist">
         <button class="nav-item active" data-tab="dashboard" role="tab" id="navtab-dashboard" aria-selected="true" aria-controls="tab-dashboard">
@@ -1599,6 +1703,13 @@
             <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
           </svg>
           <span>Status</span>
+        </button>
+
+        <button class="nav-item" data-tab="tribute" role="tab" id="navtab-tribute" aria-selected="false" aria-controls="tab-tribute">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path>
+          </svg>
+          <span>Tributo</span>
         </button>
 
         <button class="nav-item" data-tab="settings" role="tab" id="navtab-settings" aria-selected="false" aria-controls="tab-settings">
