@@ -786,9 +786,9 @@ let userProfile = {
   class: '',
   experienceLevel: '',
   activityLevel: '',
-  height: 170,
-  currentWeight: 70,
-  targetWeight: 70,
+  height: 175,
+  currentWeight: 75,
+  targetWeight: 75,
   jointPain: [],
   profilePic: '',
   workoutHistory: {},
@@ -3639,7 +3639,10 @@ function renderWorkoutRoutine() {
     });
     weightInput.addEventListener('change', () => {
       const w = parseFloat(weightInput.value) || 0;
-      if (w > 0) tryBreakPR(ex.name, w, prBadge);
+      ex.weight = w;
+      saveState();
+      // PR/XP só é concedido ao marcar uma série como concluída (toggleFunc),
+      // nunca só por digitar peso e sair do campo — evita farm de XP.
     });
 
     // ── Séries: header + controle de quantidade ──
@@ -4219,7 +4222,7 @@ function renderPinnedRecords() {
     if (exName && state.personalRecords[exName] !== undefined) {
       row.className = 'pcm-record-row filled';
       row.innerHTML = `
-        <span class="pcm-record-name">🏋️ ${exName}</span>
+        <span class="pcm-record-name">🏋️ ${escapeHtml(exName)}</span>
         <span class="pcm-record-val">${state.personalRecords[exName]} kg</span>
       `;
       row.title = 'Toque para remover este marco';
@@ -4269,7 +4272,7 @@ function openRecordPicker() {
     available.forEach(name => {
       const item = document.createElement('div');
       item.className = 'pcm-record-picker-item';
-      item.innerHTML = `<span>${name}</span><span style="color:var(--color-primary);font-weight:800;">${state.personalRecords[name]} kg</span>`;
+      item.innerHTML = `<span>${escapeHtml(name)}</span><span style="color:var(--color-primary);font-weight:800;">${state.personalRecords[name]} kg</span>`;
       item.addEventListener('click', () => {
         togglePinnedRecord(name);
         overlay.remove();
@@ -6002,6 +6005,19 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Acessibilidade de teclado: cards de seleção do onboarding (RPG e Simples)
+  // eram <div> só com onclick, sem role/tabindex nem resposta a Enter/Espaço.
+  document.querySelectorAll('.option-select-card').forEach(card => {
+    if (!card.hasAttribute('role')) card.setAttribute('role', 'button');
+    if (!card.hasAttribute('tabindex')) card.setAttribute('tabindex', '0');
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        card.click();
+      }
+    });
+  });
+
   // Custom Step 5: Multi-select Focus Area with Cybernetic SVG map sync
   const step5Cards = document.querySelectorAll('[data-step="5"] .option-select-card');
   const svgMuscleGroups = document.querySelectorAll('#body-focus-svg .muscle-group');
@@ -7083,7 +7099,7 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.removeItem('freakyquest_state_v2');
       localStorage.removeItem('freaky_quest_user');
       // Remove também o perfil em memória para garantir um cadastro 100% limpo
-      userProfile = { name: '', sex: '', mainObjective: '', motivation: '', focusArea: '', class: '', experienceLevel: '', activityLevel: '', height: 170, currentWeight: 70, targetWeight: 70, jointPain: [], profilePic: '', workoutHistory: {}, weeklyDaysGoal: 3, notificationsEnabled: true, notificationTime: '18:00', attributes: { FOR: 10, RES: 10, AGI: 10, VIG: 10, FOC: 10 } };
+      userProfile = { name: '', sex: '', mainObjective: '', motivation: '', focusArea: '', class: '', experienceLevel: '', activityLevel: '', height: 175, currentWeight: 75, targetWeight: 75, jointPain: [], profilePic: '', workoutHistory: {}, weeklyDaysGoal: 3, notificationsEnabled: true, notificationTime: '18:00', attributes: { FOR: 10, RES: 10, AGI: 10, VIG: 10, FOC: 10 } };
       location.reload();
     }
   });
