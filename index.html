@@ -1072,6 +1072,14 @@
             ⚔️ FINALIZAR TREINO (+50 XP)
           </button>
         </div>
+
+        <!-- Cardio (esteira, bike, corrida, etc.) — registro livre de duração -->
+        <div class="glass-panel" style="margin-top: 15px; padding: 14px;">
+          <h4 style="display:flex; align-items:center; gap:6px; margin-bottom: 4px;">🏃 Cardio</h4>
+          <p style="font-size:0.7rem; color:var(--text-secondary); margin-bottom:10px;">Esteira, bike, corrida, natação — registre o tempo e ganhe XP (escala com Resistência).</p>
+          <p style="font-size:0.7rem; color:var(--text-secondary); margin-bottom:10px;">Hoje: <strong id="cardio-minutes-today">0</strong> min</p>
+          <button type="button" id="btn-open-cardio-modal" class="btn btn-outline btn-block">➕ Registrar Cardio</button>
+        </div>
       </div>
 
       <!-- TAB 3: DIETA (ALIMENTAÇÃO) [NEW TAB] -->
@@ -1869,14 +1877,64 @@
           <div id="pcm-trophies-preview" class="pcm-trophies-preview-row"></div>
         </div>
 
-        <div class="pcm-compare-teaser" title="Em breve você vai poder comparar seu progresso com amigos">
+        <button type="button" id="btn-open-friends-modal" class="pcm-compare-teaser" style="cursor: pointer; border: none; width: 100%;">
           <span class="pcm-compare-icon">👥</span>
-          <span class="pcm-compare-text">Comparar com amigos</span>
-          <span class="pcm-compare-badge">Em breve</span>
+          <span class="pcm-compare-text">Amigos & Ranking</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL: AMIGOS & RANKING                     -->
+    <!-- ========================================== -->
+    <div id="friends-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+      <div class="custom-modal-card glass-panel fade-in pcm-card" style="max-width: 420px; max-height: 82vh; overflow-y: auto;">
+        <div class="pcm-header">
+          <h3>👥 Amigos & Ranking</h3>
+          <button type="button" id="btn-close-friends-modal" class="pcm-close-btn">✕</button>
+        </div>
+
+        <div id="friends-modal-logged-out">
+          <p style="font-size: 0.8rem; color: var(--text-secondary); text-align: center; padding: 24px 8px;">
+            Entre com sua conta (Ajustes → Conta) pra usar amigos e ranking.
+          </p>
+        </div>
+
+        <div id="friends-modal-logged-in" class="hidden">
+          <div class="settings-group" style="margin-bottom: 12px;">
+            <h4 style="font-size: 0.75rem;">Seu código de convite</h4>
+            <div style="display: flex; gap: 8px; align-items: center; margin-top: 6px;">
+              <code id="my-invite-code" style="flex: 1; background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 8px; font-size: 1rem; font-weight: 800; letter-spacing: 2px; text-align: center;">--------</code>
+              <button type="button" id="btn-copy-invite-code" class="btn btn-sm btn-outline">Código</button>
+            </div>
+            <button type="button" id="btn-copy-invite-link" class="btn btn-sm btn-accent" style="width: 100%; margin-top: 8px;">🔗 Copiar Link de Convite</button>
+            <p style="font-size: 0.6rem; color: var(--text-secondary); margin-top: 6px;">Manda esse link pra quem já usa ou nunca usou o app — assim que a pessoa logar, vocês já ficam amigos automaticamente.</p>
+          </div>
+
+          <div class="settings-group" style="margin-bottom: 12px;">
+            <h4 style="font-size: 0.75rem;">Adicionar amigo</h4>
+            <div style="display: flex; gap: 8px; margin-top: 6px;">
+              <input type="text" id="add-friend-code-input" placeholder="Código de 8 letras" maxlength="8" style="flex: 1; padding: 8px; border-radius: 8px; text-transform: uppercase;">
+              <button type="button" id="btn-add-friend" class="btn btn-sm btn-accent">Adicionar</button>
+            </div>
+            <p id="add-friend-status-msg" style="font-size: 0.65rem; margin-top: 6px; min-height: 1em;"></p>
+          </div>
+
+          <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+            <button type="button" id="friends-view-toggle-friends" class="toggle-btn active" style="flex: 1;">Amigos</button>
+            <button type="button" id="friends-view-toggle-ranking" class="toggle-btn" style="flex: 1;">Ranking Global</button>
+          </div>
+
+          <div id="friends-list-view">
+            <div id="friends-list-container" style="display: flex; flex-direction: column; gap: 8px;"></div>
+          </div>
+          <div id="ranking-list-view" class="hidden">
+            <div id="ranking-list-container" style="display: flex; flex-direction: column; gap: 8px;"></div>
+          </div>
         </div>
       </div>
     </div>
-    
+
     <!-- ========================================== -->
     <!-- MODAL: PAINEL DETALHADO (DETALHES DE ATIVIDADE) -->
     <!-- ========================================== -->
@@ -2230,6 +2288,34 @@
           <button type="button" id="early-login-send-btn" class="btn btn-primary ripple" style="width: 100%;">Enviar link mágico</button>
         </div>
         <button type="button" id="early-login-close-btn" class="btn btn-outline" style="width: 100%; margin-top: 8px;">Cancelar</button>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- CARDIO MODAL                                -->
+    <!-- ========================================== -->
+    <div id="cardio-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+      <div class="custom-modal-card glass-panel fade-in" style="max-width: 380px; padding: 24px;">
+        <h3 style="margin-bottom: 14px; text-align: center; font-family: var(--font-display); font-weight: 800;">🏃 Registrar Cardio</h3>
+        <div class="input-group" style="margin-bottom: 12px;">
+          <label for="cardio-type-select">Tipo de atividade</label>
+          <select id="cardio-type-select" style="width: 100%; padding: 10px; border-radius: 8px;">
+            <option value="esteira">🏃 Esteira / Corrida</option>
+            <option value="bike">🚴 Bike</option>
+            <option value="eliptico">🔄 Elíptico</option>
+            <option value="natacao">🏊 Natação</option>
+            <option value="outro">💨 Outro</option>
+          </select>
+        </div>
+        <div class="input-group" style="margin-bottom: 8px;">
+          <label for="cardio-duration-input">Duração (minutos)</label>
+          <input type="number" id="cardio-duration-input" min="1" max="300" value="30" style="width: 100%; padding: 10px; border-radius: 8px; text-align: center;">
+        </div>
+        <p id="cardio-modal-error" style="font-size: 0.65rem; color: var(--color-danger, #e63946); min-height: 1em; margin-bottom: 8px;"></p>
+        <div class="btn-group-row" style="justify-content: center;">
+          <button type="button" id="cardio-confirm-btn" class="btn btn-primary ripple" style="width: 100%;">Registrar</button>
+        </div>
+        <button type="button" id="cardio-close-btn" class="btn btn-outline" style="width: 100%; margin-top: 8px;">Cancelar</button>
       </div>
     </div>
 

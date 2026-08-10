@@ -65,6 +65,7 @@ async function onCloudLogin(user) {
   } else {
     cloudNickname = publicProfile.nickname;
     await pullStateFromCloud();
+    await consumePendingInvite();
   }
 }
 
@@ -129,6 +130,7 @@ window.confirmNickname = async function(nickname) {
   const modal = document.getElementById('nickname-modal');
   if (modal) modal.classList.add('hidden');
   await pushStateToCloud(true);
+  await consumePendingInvite();
 };
 
 async function pullStateFromCloud() {
@@ -227,6 +229,195 @@ function updateAccountUI() {
     loggedOutEl.classList.remove('hidden');
     loggedInEl.classList.add('hidden');
   }
+}
+
+// ==========================================
+// AMIGOS & RANKING (usa public_profiles + friendships do Supabase)
+// Código de convite = primeiros 8 caracteres do UUID do usuário (já é
+// único por natureza, sem precisar de coluna/gerador extra no banco).
+// ==========================================
+function getMyInviteCode() {
+  return cloudUser ? cloudUser.id.slice(0, 8).toUpperCase() : '';
+}
+
+function openFriendsModal() {
+  const modal = document.getElementById('friends-modal');
+  const loggedOutEl = document.getElementById('friends-modal-logged-out');
+  const loggedInEl = document.getElementById('friends-modal-logged-in');
+  if (!modal) return;
+
+  if (!cloudUser) {
+    loggedOutEl.classList.remove('hidden');
+    loggedInEl.classList.add('hidden');
+  } else {
+    loggedOutEl.classList.add('hidden');
+    loggedInEl.classList.remove('hidden');
+    document.getElementById('my-invite-code').innerText = getMyInviteCode();
+    showFriendsView('friends');
+    renderFriendsList();
+  }
+  modal.classList.remove('hidden');
+}
+
+function showFriendsView(view) {
+  const friendsBtn = document.getElementById('friends-view-toggle-friends');
+  const rankingBtn = document.getElementById('friends-view-toggle-ranking');
+  const friendsView = document.getElementById('friends-list-view');
+  const rankingView = document.getElementById('ranking-list-view');
+  const isFriends = view === 'friends';
+
+  friendsBtn.classList.toggle('active', isFriends);
+  rankingBtn.classList.toggle('active', !isFriends);
+  friendsView.classList.toggle('hidden', !isFriends);
+  rankingView.classList.toggle('hidden', isFriends);
+
+  if (isFriends) {
+    renderFriendsList();
+  } else {
+    renderRankingList();
+  }
+}
+
+function friendRowHTML(p, extra) {
+  const you = cloudUser && p.id === cloudUser.id;
+  const mentorName = p.active_mentor ? (OFFICIAL_MENTORS.find(m => m.id === p.active_mentor)?.name || p.active_mentor) : '—';
+  return `
+    <div class="glass-panel" style="padding: 10px 12px; display: flex; align-items: center; gap: 10px; ${you ? 'border: 1px solid var(--color-primary);' : ''}">
+      ${extra || ''}
+      <div style="flex: 1; min-width: 0;">
+        <div style="font-weight: 800; font-size: 0.8rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(p.nickname)}${you ? ' (você)' : ''}</div>
+        <div style="font-size: 0.6rem; color: var(--text-secondary);">Nv ${p.level || 1} · ${mentorName} · 🔥 ${p.current_streak || 0}</div>
+      </div>
+      <div style="font-weight: 800; font-size: 0.75rem; color: var(--color-primary); white-space: nowrap;">${p.xp || 0} XP</div>
+    </div>
+  `;
+}
+
+async function renderFriendsList() {
+  const container = document.getElementById('friends-list-container');
+  if (!container || !cloudUser) return;
+  container.innerHTML = '<p style="font-size:0.7rem; color:var(--text-secondary); text-align:center;">Carregando...</p>';
+
+  const { data: friendships, error: fErr } = await supabaseClient
+    .from('friendships')
+    .select('friend_id')
+    .eq('user_id', cloudUser.id);
+
+  if (fErr || !friendships || friendships.length === 0) {
+    container.innerHTML = '<p style="font-size:0.7rem; color:var(--text-secondary); text-align:center; padding: 12px 0;">Você ainda não adicionou nenhum amigo. Compartilha seu código!</p>';
+    return;
+  }
+
+  const friendIds = friendships.map(f => f.friend_id);
+  const { data: profiles } = await supabaseClient
+    .from('public_profiles')
+    .select('id, nickname, xp, level, active_mentor, current_streak')
+    .in('id', friendIds)
+    .order('xp', { ascending: false });
+
+  if (!profiles || profiles.length === 0) {
+    container.innerHTML = '<p style="font-size:0.7rem; color:var(--text-secondary); text-align:center; padding: 12px 0;">Você ainda não adicionou nenhum amigo. Compartilha seu código!</p>';
+    return;
+  }
+
+  container.innerHTML = profiles.map(p => friendRowHTML(p)).join('');
+}
+
+async function renderRankingList() {
+  const container = document.getElementById('ranking-list-container');
+  if (!container || !cloudUser) return;
+  container.innerHTML = '<p style="font-size:0.7rem; color:var(--text-secondary); text-align:center;">Carregando...</p>';
+
+  const { data: profiles, error } = await supabaseClient
+    .from('public_profiles')
+    .select('id, nickname, xp, level, active_mentor, current_streak')
+    .order('xp', { ascending: false })
+    .limit(50);
+
+  if (error || !profiles || profiles.length === 0) {
+    container.innerHTML = '<p style="font-size:0.7rem; color:var(--text-secondary); text-align:center; padding: 12px 0;">Ranking vazio por enquanto.</p>';
+    return;
+  }
+
+  container.innerHTML = profiles.map((p, i) => {
+    const badge = `<span style="font-weight:900; font-size:0.75rem; color:var(--text-secondary); width:20px; text-align:center;">${i + 1}º</span>`;
+    return friendRowHTML(p, badge);
+  }).join('');
+}
+
+// Lógica compartilhada entre o campo manual de código e o link de convite
+// automático. Retorna { ok, nickname, reason } sem tocar em UI nenhuma.
+async function tryAddFriend(code) {
+  const clean = (code || '').trim().toUpperCase();
+  if (clean.length !== 8) return { ok: false, reason: 'invalid' };
+  if (!cloudUser) return { ok: false, reason: 'not_logged_in' };
+  if (clean === getMyInviteCode()) return { ok: false, reason: 'self' };
+
+  const { data: matches, error } = await supabaseClient
+    .from('public_profiles')
+    .select('id, nickname')
+    .ilike('id', `${clean.toLowerCase()}%`);
+
+  if (error || !matches || matches.length === 0) return { ok: false, reason: 'not_found' };
+
+  const friend = matches[0];
+  const { error: insertError } = await supabaseClient
+    .from('friendships')
+    .upsert({ user_id: cloudUser.id, friend_id: friend.id }, { onConflict: 'user_id,friend_id' });
+
+  if (insertError) return { ok: false, reason: 'insert_failed' };
+  return { ok: true, nickname: friend.nickname };
+}
+
+async function addFriendByCode(code) {
+  const statusEl = document.getElementById('add-friend-status-msg');
+  statusEl.innerText = 'Procurando...';
+
+  const result = await tryAddFriend(code);
+  const messages = {
+    invalid: 'Código inválido — precisa ter 8 letras.',
+    self: 'Esse é o seu próprio código!',
+    not_found: 'Nenhum jogador encontrado com esse código.',
+    insert_failed: 'Não deu pra adicionar. Tenta de novo.',
+    not_logged_in: 'Você precisa estar logado.'
+  };
+
+  if (!result.ok) {
+    statusEl.innerText = messages[result.reason] || 'Não deu pra adicionar. Tenta de novo.';
+    return;
+  }
+
+  statusEl.innerText = `${result.nickname} adicionado! 🎉`;
+  document.getElementById('add-friend-code-input').value = '';
+  renderFriendsList();
+}
+
+// Convite por link (?invite=CODIGO): guarda o código no aparelho assim que
+// detectado e só processa depois que a pessoa efetivamente logar — ela pode
+// precisar passar pelo onboarding/cadastro de e-mail antes disso.
+const PENDING_INVITE_KEY = 'freakyquest_pending_invite';
+
+function capturePendingInviteFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('invite');
+  if (code) {
+    localStorage.setItem(PENDING_INVITE_KEY, code.toUpperCase());
+    params.delete('invite');
+    const cleanUrl = window.location.pathname + (params.toString() ? `?${params.toString()}` : '') + window.location.hash;
+    window.history.replaceState({}, '', cleanUrl);
+  }
+}
+
+async function consumePendingInvite() {
+  const code = localStorage.getItem(PENDING_INVITE_KEY);
+  if (!code || !cloudUser) return;
+  localStorage.removeItem(PENDING_INVITE_KEY); // consome uma única vez, mesmo se falhar
+
+  const result = await tryAddFriend(code);
+  if (result.ok) {
+    showItemAcquiredModal('🤝', 'AMIGO ADICIONADO!', `Você e ${result.nickname} agora podem comparar progresso e aparecer um pro outro na lista de amigos.`, { subtitle: 'CONVITE ACEITO', btnText: 'SHOW!' });
+  }
+  // reason 'self' ou 'not_found' etc. — falha silenciosa, não vale interromper o usuário com erro por um link.
 }
 
 // 1. SUB-CLASSES PROGRESSION SYSTEM (RANKS) - UPDATED LEVEL 1 TO "FIT 🤡"
@@ -1166,6 +1357,8 @@ let state = {
   waterIntake: 0, // LITRES E.g. 1, 2, 3
   waterDrank: 0,
   waterTarget: 3, // Target Litres
+  cardioMinutesToday: 0,
+  cardioMinutesTotal: 0,
   proteinIntake: 0, // gramas de proteína ingeridas hoje (recalculado na dieta)
   
   // Diet trackers
@@ -1610,6 +1803,7 @@ function checkDailyReset() {
     state.proteinIntake = 0;
     state.mealLogs = [];
     state.dailyMacros = { kcal: 0, prot: 0, fiber: 0, carbs: 0 };
+    state.cardioMinutesToday = 0;
     
     // Generate new randomized quests
     generateDailyQuests();
@@ -2027,6 +2221,8 @@ function loadState() {
         if (state.dailyMacros === undefined) state.dailyMacros = { kcal: 0, prot: 0, fiber: 0, carbs: 0 };
         if (state.restTimerEnabled === undefined) state.restTimerEnabled = true;
         if (state.dietTrackingEnabled === undefined) state.dietTrackingEnabled = true;
+        if (state.cardioMinutesToday === undefined) state.cardioMinutesToday = 0;
+        if (state.cardioMinutesTotal === undefined) state.cardioMinutesTotal = 0;
         if (state.baseRestTime === undefined) state.baseRestTime = 90;
         if (state.appMode === undefined) state.appMode = 'rpg';
         if (state.simpleModeSeen === undefined) state.simpleModeSeen = false;
@@ -3002,6 +3198,9 @@ function updateUI() {
     workoutProgressEl.innerText = `${workoutStats.completedSets}/${workoutStats.totalSets} séries hoje (${Math.round(workoutStats.percent)}%)`;
   }
 
+  const cardioTodayEl = document.getElementById('cardio-minutes-today');
+  if (cardioTodayEl) cardioTodayEl.innerText = state.cardioMinutesToday || 0;
+
   // Water bottles rendering (litre by litre!)
   document.getElementById('water-target-input').value = state.waterTarget;
   const bottlesContainer = document.getElementById('water-bottles-container');
@@ -3682,6 +3881,36 @@ function triggerPRSparkles(badgeEl) {
       s.remove();
     }, 850);
   }
+}
+
+const CARDIO_TYPE_LABELS = {
+  esteira: 'Esteira / Corrida',
+  bike: 'Bike',
+  eliptico: 'Elíptico',
+  natacao: 'Natação',
+  outro: 'Cardio'
+};
+
+// Registra uma sessão de cardio livre (esteira, bike, etc.) e concede XP
+// proporcional aos minutos, escalado pelo atributo RES (Resistência).
+function logCardioSession(type, minutes) {
+  const xpPerMinute = 1 + Math.max(0, (getEffectiveAttributes().res - 10) * 0.02);
+  const xpGained = Math.round(minutes * xpPerMinute);
+
+  addXP(xpGained);
+  state.cardioMinutesToday = (state.cardioMinutesToday || 0) + minutes;
+  state.cardioMinutesTotal = (state.cardioMinutesTotal || 0) + minutes;
+  saveState();
+  updateUI();
+
+  const label = CARDIO_TYPE_LABELS[type] || CARDIO_TYPE_LABELS.outro;
+  showItemAcquiredModal(
+    '🏃',
+    'CARDIO REGISTRADO!',
+    `${minutes} min de ${label}. +${xpGained} XP!`,
+    { subtitle: 'REGISTRO DE CARDIO', btnText: 'BORA MAIS!' }
+  );
+  playSound('quest');
 }
 
 function tryBreakPR(exName, inputWeight, prBadgeEl) {
@@ -5881,6 +6110,7 @@ function applyNumericSanitizer(selector, decimals) {
 document.addEventListener('DOMContentLoaded', () => {
 
   // Conta / sincronização na nuvem (Supabase)
+  capturePendingInviteFromURL();
   initCloudAuth();
 
   const magicLinkBtn = document.getElementById('account-send-magic-link');
@@ -5938,6 +6168,105 @@ document.addEventListener('DOMContentLoaded', () => {
       earlyLoginModal.classList.add('hidden');
     });
   }
+  const openFriendsBtn = document.getElementById('btn-open-friends-modal');
+  const friendsModal = document.getElementById('friends-modal');
+  if (openFriendsBtn && friendsModal) {
+    openFriendsBtn.addEventListener('click', () => {
+      playSound('click');
+      openFriendsModal();
+    });
+  }
+  const closeFriendsBtn = document.getElementById('btn-close-friends-modal');
+  if (closeFriendsBtn && friendsModal) {
+    closeFriendsBtn.addEventListener('click', () => {
+      playSound('click');
+      friendsModal.classList.add('hidden');
+    });
+  }
+  const copyInviteCodeBtn = document.getElementById('btn-copy-invite-code');
+  if (copyInviteCodeBtn) {
+    copyInviteCodeBtn.addEventListener('click', async () => {
+      playSound('click');
+      try {
+        await navigator.clipboard.writeText(getMyInviteCode());
+        copyInviteCodeBtn.innerText = 'Copiado!';
+        setTimeout(() => { copyInviteCodeBtn.innerText = 'Código'; }, 1500);
+      } catch (e) {
+        // clipboard API pode falhar em contexto não-seguro; ignora silenciosamente
+      }
+    });
+  }
+  const copyInviteLinkBtn = document.getElementById('btn-copy-invite-link');
+  if (copyInviteLinkBtn) {
+    copyInviteLinkBtn.addEventListener('click', async () => {
+      playSound('click');
+      const link = `${window.location.origin}${window.location.pathname}?invite=${getMyInviteCode()}`;
+      try {
+        await navigator.clipboard.writeText(link);
+        const original = copyInviteLinkBtn.innerText;
+        copyInviteLinkBtn.innerText = 'Link copiado!';
+        setTimeout(() => { copyInviteLinkBtn.innerText = original; }, 1500);
+      } catch (e) {
+        // clipboard API pode falhar em contexto não-seguro; ignora silenciosamente
+      }
+    });
+  }
+  const friendsViewFriendsBtn = document.getElementById('friends-view-toggle-friends');
+  if (friendsViewFriendsBtn) {
+    friendsViewFriendsBtn.addEventListener('click', () => {
+      playSound('click');
+      showFriendsView('friends');
+    });
+  }
+  const friendsViewRankingBtn = document.getElementById('friends-view-toggle-ranking');
+  if (friendsViewRankingBtn) {
+    friendsViewRankingBtn.addEventListener('click', () => {
+      playSound('click');
+      showFriendsView('ranking');
+    });
+  }
+  const addFriendBtn = document.getElementById('btn-add-friend');
+  if (addFriendBtn) {
+    addFriendBtn.addEventListener('click', () => {
+      playSound('click');
+      const input = document.getElementById('add-friend-code-input');
+      addFriendByCode(input?.value || '');
+    });
+  }
+
+  const openCardioBtn = document.getElementById('btn-open-cardio-modal');
+  const cardioModal = document.getElementById('cardio-modal');
+  if (openCardioBtn && cardioModal) {
+    openCardioBtn.addEventListener('click', () => {
+      playSound('click');
+      document.getElementById('cardio-modal-error').innerText = '';
+      cardioModal.classList.remove('hidden');
+    });
+  }
+  const cardioCloseBtn = document.getElementById('cardio-close-btn');
+  if (cardioCloseBtn && cardioModal) {
+    cardioCloseBtn.addEventListener('click', () => {
+      playSound('click');
+      cardioModal.classList.add('hidden');
+    });
+  }
+  const cardioConfirmBtn = document.getElementById('cardio-confirm-btn');
+  if (cardioConfirmBtn) {
+    cardioConfirmBtn.addEventListener('click', () => {
+      const errEl = document.getElementById('cardio-modal-error');
+      const type = document.getElementById('cardio-type-select').value;
+      const minutes = parseInt(document.getElementById('cardio-duration-input').value, 10);
+      if (!minutes || minutes <= 0 || minutes > 300) {
+        errEl.innerText = 'Digite uma duração válida (1 a 300 minutos).';
+        return;
+      }
+      playSound('click');
+      errEl.innerText = '';
+      cardioModal.classList.add('hidden');
+      logCardioSession(type, minutes);
+    });
+  }
+
   const earlyLoginSendBtn = document.getElementById('early-login-send-btn');
   if (earlyLoginSendBtn) {
     earlyLoginSendBtn.addEventListener('click', async () => {
