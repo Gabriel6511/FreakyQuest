@@ -1,4 +1,4 @@
-const CACHE_NAME = 'freakyquest-v19';
+const CACHE_NAME = 'freakyquest-v21';
 const ASSETS = [
   './',
   './index.html',
@@ -49,6 +49,9 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
   const url = event.request.url;
+  // Chamadas de API do Supabase (login/sync) sempre direto na rede — nunca
+  // cacheadas, senão o app poderia devolver progresso desatualizado.
+  if (url.includes('.supabase.co')) return;
   if (url.includes('fonts.googleapis.com') || url.includes('fonts.gstatic.com')) {
     event.respondWith(
       fetch(event.request)

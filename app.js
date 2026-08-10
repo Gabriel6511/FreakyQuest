@@ -9,6 +9,226 @@ function escapeHtml(str) {
   }[c]));
 }
 
+// ==========================================
+// CLOUD SYNC (SUPABASE) — login por magic link + sincronização de progresso
+// Login: e-mail sem senha. 1º login = sobe o progresso local atual pra nuvem.
+// Logins seguintes (outro aparelho/navegador) = puxa o progresso da nuvem
+// e substitui o local (a nuvem vira a fonte da verdade depois do 1º login).
+// ==========================================
+const SUPABASE_URL = 'https://mhzrmtxaoaipmjlpedvg.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_IF_vgdgV-aF9XOKkvE3Zng_Ym4Z4l7q';
+
+const supabaseClient = (typeof window !== 'undefined' && window.supabase && window.supabase.createClient)
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
+  : null;
+
+let cloudUser = null; // { id, email }
+let cloudNickname = null; // apelido salvo em public_profiles.nickname (null = ainda não definido)
+let cloudSyncTimer = null;
+let cloudSyncing = false;
+
+function isCloudEnabled() {
+  return !!supabaseClient;
+}
+
+async function initCloudAuth() {
+  if (!isCloudEnabled()) return;
+
+  const { data } = await supabaseClient.auth.getSession();
+  if (data && data.session && data.session.user) {
+    await onCloudLogin(data.session.user);
+  }
+
+  supabaseClient.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN' && session && session.user) {
+      onCloudLogin(session.user);
+    } else if (event === 'SIGNED_OUT') {
+      onCloudLogout();
+    }
+  });
+}
+
+async function onCloudLogin(user) {
+  cloudUser = { id: user.id, email: user.email };
+  updateAccountUI();
+
+  const { data: publicProfile } = await supabaseClient
+    .from('public_profiles')
+    .select('nickname')
+    .eq('id', cloudUser.id)
+    .maybeSingle();
+
+  if (!publicProfile) {
+    cloudNickname = null;
+    const modal = document.getElementById('nickname-modal');
+    if (modal) modal.classList.remove('hidden');
+  } else {
+    cloudNickname = publicProfile.nickname;
+    await pullStateFromCloud();
+  }
+}
+
+function onCloudLogout() {
+  cloudUser = null;
+  cloudNickname = null;
+  updateAccountUI();
+}
+
+async function sendMagicLink(email) {
+  if (!isCloudEnabled()) return { error: 'Sincronização indisponível no momento.' };
+  const redirectTo = window.location.origin + window.location.pathname;
+  const { error } = await supabaseClient.auth.signInWithOtp({
+    email,
+    options: { emailRedirectTo: redirectTo }
+  });
+  return { error: error ? error.message : null };
+}
+
+async function signOutCloud() {
+  if (!isCloudEnabled()) return;
+  await supabaseClient.auth.signOut();
+}
+
+// Apaga o progresso salvo na nuvem pra conta logada (usado pelo botão "Apagar
+// dados da nuvem" e pelo reset de progresso, pra não deixar lixo de conta de teste)
+async function deleteCloudData() {
+  if (!isCloudEnabled() || !cloudUser) return;
+  const id = cloudUser.id;
+  await supabaseClient.from('friendships').delete().eq('user_id', id);
+  await supabaseClient.from('public_profiles').delete().eq('id', id);
+  await supabaseClient.from('profiles').delete().eq('id', id);
+  await signOutCloud();
+}
+
+window.confirmNickname = async function(nickname) {
+  const errEl = document.getElementById('nickname-error-msg');
+  const clean = (nickname || '').trim();
+  if (clean.length < 2) {
+    if (errEl) errEl.innerText = 'Escolhe um apelido com pelo menos 2 letras.';
+    return;
+  }
+  if (!cloudUser) return;
+
+  const { error } = await supabaseClient.from('public_profiles').upsert({
+    id: cloudUser.id,
+    nickname: clean,
+    xp: state.xp || 0,
+    level: state.level || 1,
+    active_mentor: state.activeMentor || null,
+    current_streak: state.currentStreak || 0,
+    updated_at: new Date().toISOString()
+  });
+
+  if (error) {
+    if (errEl) errEl.innerText = 'Não deu pra salvar o apelido. Tenta de novo.';
+    return;
+  }
+
+  cloudNickname = clean;
+  errEl.innerText = '';
+  const modal = document.getElementById('nickname-modal');
+  if (modal) modal.classList.add('hidden');
+  await pushStateToCloud(true);
+};
+
+async function pullStateFromCloud() {
+  if (!isCloudEnabled() || !cloudUser) return;
+  const statusEl = document.getElementById('account-sync-status');
+  if (statusEl) statusEl.innerText = 'Sincronizando...';
+
+  const { data, error } = await supabaseClient
+    .from('profiles')
+    .select('state')
+    .eq('id', cloudUser.id)
+    .maybeSingle();
+
+  if (!error && data && data.state && Object.keys(data.state).length > 0) {
+    state = data.state;
+    saveState();
+    // Se essa conta já tem progresso salvo (veio de outro aparelho/sessão),
+    // pula o onboarding e vai direto pro app, mesmo que a tela local ainda
+    // esteja mostrando o onboarding (ex.: acabou de resetar o progresso local).
+    if (state.charName) {
+      const onboardingEl = document.getElementById('screen-onboarding');
+      const mainAppEl = document.getElementById('main-app');
+      if (onboardingEl) onboardingEl.classList.add('hidden');
+      if (mainAppEl) mainAppEl.classList.remove('hidden');
+      if (state.appMode === 'simple') document.body.classList.add('mode-simple');
+    }
+    updateUI();
+  }
+  if (statusEl) statusEl.innerText = 'Progresso sincronizado.';
+}
+
+function scheduleCloudSync() {
+  if (!isCloudEnabled() || !cloudUser) return;
+  clearTimeout(cloudSyncTimer);
+  cloudSyncTimer = setTimeout(() => pushStateToCloud(false), 4000);
+}
+
+async function pushStateToCloud(immediate) {
+  if (!isCloudEnabled() || !cloudUser || cloudSyncing) return;
+  cloudSyncing = true;
+  const statusEl = document.getElementById('account-sync-status');
+  if (statusEl && !immediate) statusEl.innerText = 'Sincronizando...';
+
+  const nowIso = new Date().toISOString();
+  await supabaseClient.from('profiles').upsert({
+    id: cloudUser.id,
+    state: state,
+    updated_at: nowIso
+  });
+
+  if (cloudNickname) {
+    await supabaseClient.from('public_profiles').upsert({
+      id: cloudUser.id,
+      nickname: cloudNickname,
+      xp: state.xp || 0,
+      level: state.level || 1,
+      active_mentor: state.activeMentor || null,
+      current_streak: state.currentStreak || 0,
+      updated_at: nowIso
+    });
+  }
+
+  cloudSyncing = false;
+  if (statusEl) {
+    const timeStr = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    statusEl.innerText = `Progresso sincronizado às ${timeStr}`;
+  }
+}
+
+// Confirma e executa o reset de progresso local. Se a conta estiver logada
+// na nuvem, avisa que o progresso salvo lá também some (senão o próximo
+// saveState() re-sincronizaria o estado zerado por cima do progresso real).
+async function confirmAndResetProgress() {
+  const msg = cloudUser
+    ? `Você está logado como ${cloudUser.email}. Reiniciar vai apagar o progresso local E o que estava salvo na nuvem dessa conta, e você será desconectado. Continuar?`
+    : 'Isso vai apagar todo o seu progresso e voltar ao onboarding. Continuar?';
+  if (!confirm(msg)) return false;
+
+  if (cloudUser) {
+    await deleteCloudData();
+  }
+  return true;
+}
+
+function updateAccountUI() {
+  const loggedOutEl = document.getElementById('account-logged-out');
+  const loggedInEl = document.getElementById('account-logged-in');
+  const emailEl = document.getElementById('account-user-email');
+  if (!loggedOutEl || !loggedInEl) return;
+
+  if (cloudUser) {
+    loggedOutEl.classList.add('hidden');
+    loggedInEl.classList.remove('hidden');
+    if (emailEl) emailEl.innerText = cloudUser.email;
+  } else {
+    loggedOutEl.classList.remove('hidden');
+    loggedInEl.classList.add('hidden');
+  }
+}
+
 // 1. SUB-CLASSES PROGRESSION SYSTEM (RANKS) - UPDATED LEVEL 1 TO "FIT 🤡"
 const SUB_CLASSES = {
   bodybuilder: [
@@ -1651,6 +1871,7 @@ function saveState() {
   } catch (e) {
     console.error("localStorage save blocked or failed", e);
   }
+  scheduleCloudSync();
 }
 
 function loadState() {
@@ -5659,6 +5880,85 @@ function applyNumericSanitizer(selector, decimals) {
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
 
+  // Conta / sincronização na nuvem (Supabase)
+  initCloudAuth();
+
+  const magicLinkBtn = document.getElementById('account-send-magic-link');
+  if (magicLinkBtn) {
+    magicLinkBtn.addEventListener('click', async () => {
+      const emailInput = document.getElementById('account-email-input');
+      const statusEl = document.getElementById('account-status-msg');
+      const email = (emailInput?.value || '').trim();
+      if (!email || !email.includes('@')) {
+        if (statusEl) statusEl.innerText = 'Digite um e-mail válido.';
+        return;
+      }
+      playSound('click');
+      magicLinkBtn.disabled = true;
+      if (statusEl) statusEl.innerText = 'Enviando link...';
+      const { error } = await sendMagicLink(email);
+      magicLinkBtn.disabled = false;
+      if (statusEl) {
+        statusEl.innerText = error ? `Erro: ${error}` : 'Link enviado! Confira seu e-mail (e o spam).';
+      }
+    });
+  }
+
+  const signOutBtn = document.getElementById('account-sign-out');
+  if (signOutBtn) {
+    signOutBtn.addEventListener('click', async () => {
+      playSound('click');
+      await signOutCloud();
+    });
+  }
+
+  const nicknameConfirmBtn = document.getElementById('nickname-confirm-btn');
+  if (nicknameConfirmBtn) {
+    nicknameConfirmBtn.addEventListener('click', () => {
+      playSound('click');
+      const input = document.getElementById('nickname-input');
+      confirmNickname(input?.value || '');
+    });
+  }
+
+  // Login antes do onboarding (tela inicial de seleção de modo) — pra quem
+  // já tem conta não precisar refazer o onboarding num aparelho novo.
+  const openEarlyLoginBtn = document.getElementById('btn-open-early-login');
+  const earlyLoginModal = document.getElementById('early-login-modal');
+  if (openEarlyLoginBtn && earlyLoginModal) {
+    openEarlyLoginBtn.addEventListener('click', () => {
+      playSound('click');
+      earlyLoginModal.classList.remove('hidden');
+    });
+  }
+  const earlyLoginCloseBtn = document.getElementById('early-login-close-btn');
+  if (earlyLoginCloseBtn && earlyLoginModal) {
+    earlyLoginCloseBtn.addEventListener('click', () => {
+      playSound('click');
+      earlyLoginModal.classList.add('hidden');
+    });
+  }
+  const earlyLoginSendBtn = document.getElementById('early-login-send-btn');
+  if (earlyLoginSendBtn) {
+    earlyLoginSendBtn.addEventListener('click', async () => {
+      const emailInput = document.getElementById('early-login-email-input');
+      const statusEl = document.getElementById('early-login-status-msg');
+      const email = (emailInput?.value || '').trim();
+      if (!email || !email.includes('@')) {
+        if (statusEl) statusEl.innerText = 'Digite um e-mail válido.';
+        return;
+      }
+      playSound('click');
+      earlyLoginSendBtn.disabled = true;
+      if (statusEl) statusEl.innerText = 'Enviando link...';
+      const { error } = await sendMagicLink(email);
+      earlyLoginSendBtn.disabled = false;
+      if (statusEl) {
+        statusEl.innerText = error ? `Erro: ${error}` : 'Link enviado! Confira seu e-mail (e o spam).';
+      }
+    });
+  }
+
   // Drag-to-scroll com mouse para carrosséis horizontais (filtro de universo
   // de mentor, tiles de série do treino) — no touch já rola por swipe nativo,
   // mas no desktop (sem touch) não tinha nenhum jeito de alcançar o conteúdo
@@ -6099,13 +6399,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const settingsResetBtn = document.getElementById('settings-reset-progress');
   if (settingsResetBtn) {
-    settingsResetBtn.addEventListener('click', () => {
+    settingsResetBtn.addEventListener('click', async () => {
       playSound('click');
-      if (confirm('Isso vai apagar todo o seu progresso e voltar ao onboarding. Continuar?')) {
+      const ok = await confirmAndResetProgress();
+      if (ok) {
         _isResetting = true; // impede que pagehide/beforeunload re-salvem o estado antigo antes do reload
         localStorage.removeItem('freakyquest_state_v2');
         localStorage.removeItem('freaky_quest_user');
         location.reload();
+      }
+    });
+  }
+
+  const deleteCloudBtn = document.getElementById('account-delete-cloud-data');
+  if (deleteCloudBtn) {
+    deleteCloudBtn.addEventListener('click', async () => {
+      playSound('click');
+      if (!cloudUser) return;
+      if (confirm(`Apagar o progresso salvo na nuvem pra ${cloudUser.email}? Isso não afeta o que está salvo só neste aparelho.`)) {
+        await deleteCloudData();
+        alert('Dados da nuvem apagados. Você foi desconectado.');
       }
     });
   }
@@ -7306,8 +7619,14 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // CLEAR DATA TRIGGER
-  document.getElementById('btn-reset-data').addEventListener('click', () => {
-    if (confirm("Você quer apagar todo o seu progresso? Isso limpará seus Ranks, Alimentos criados, Treinos customizados e Metas.")) {
+  document.getElementById('btn-reset-data').addEventListener('click', async () => {
+    const msg = cloudUser
+      ? `Você está logado como ${cloudUser.email}. Apagar vai limpar Ranks, Alimentos, Treinos e Metas locais E o progresso salvo na nuvem dessa conta, e você será desconectado. Continuar?`
+      : "Você quer apagar todo o seu progresso? Isso limpará seus Ranks, Alimentos criados, Treinos customizados e Metas.";
+    if (confirm(msg)) {
+      if (cloudUser) {
+        await deleteCloudData();
+      }
       _isResetting = true; // impede que pagehide/beforeunload re-salvem o estado
       localStorage.removeItem('freakyquest_state_v2');
       localStorage.removeItem('freaky_quest_user');

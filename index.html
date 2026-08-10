@@ -82,6 +82,7 @@
             <span class="mode-card-cta">ENTRAR</span>
           </button>
         </div>
+        <button type="button" id="btn-open-early-login" style="margin-top:18px; background:none; border:none; color:var(--text-secondary); font-size:0.75rem; text-decoration:underline; cursor:pointer;">Já tem uma conta? Entrar</button>
       </div>
 
       <!-- MULTI-STEP WIZARD -->
@@ -1725,7 +1726,24 @@
         <div class="glass-panel" style="padding: 12px;">
           <h3 style="margin-bottom: 10px;">⚙️ Ajustes</h3>
 
-          <div class="settings-group">
+          <div class="settings-group" id="account-section">
+            <h4>Conta (sincronizar progresso)</h4>
+            <div id="account-logged-out">
+              <p style="font-size: 0.65rem; color: var(--text-secondary); margin-bottom: 6px;">Entre com seu e-mail pra salvar o progresso na nuvem e acessar de outro aparelho.</p>
+              <input type="email" id="account-email-input" placeholder="seu@email.com" style="width: 100%; padding: 8px; border-radius: 8px; margin-bottom: 6px;">
+              <button type="button" id="account-send-magic-link" class="btn btn-outline" style="width: 100%;">Enviar link mágico</button>
+              <p id="account-status-msg" style="font-size: 0.65rem; margin-top: 6px;"></p>
+            </div>
+            <div id="account-logged-in" class="hidden">
+              <p style="font-size: 0.8rem;">Logado como <strong id="account-user-email"></strong></p>
+              <p id="account-sync-status" style="font-size: 0.65rem; color: var(--text-secondary); margin: 4px 0 10px;"></p>
+              <button type="button" id="account-sign-out" class="btn btn-outline" style="width: 100%;">Sair</button>
+              <button type="button" id="account-delete-cloud-data" class="btn btn-outline" style="width: 100%; margin-top: 8px; color: var(--color-danger, #e63946); border-color: var(--color-danger, #e63946);">Apagar dados da nuvem</button>
+              <p style="font-size: 0.6rem; color: var(--text-secondary); margin-top: 4px;">Apaga o progresso salvo dessa conta na nuvem e desconecta. O que estiver salvo só neste aparelho não é afetado.</p>
+            </div>
+          </div>
+
+          <div class="settings-group" style="margin-top: 10px;">
             <h4>Modo do app</h4>
             <select id="settings-app-mode" style="width: 100%; padding: 8px; border-radius: 8px;">
               <option value="simple">Modo Simples</option>
@@ -2179,6 +2197,43 @@
     </div>
 
     <!-- ========================================== -->
+    <!-- NICKNAME MODAL (primeiro login na conta)   -->
+    <!-- ========================================== -->
+    <div id="nickname-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+      <div class="custom-modal-card glass-panel fade-in" style="max-width: 380px; text-align: center; padding: 24px;">
+        <span style="font-size: 3rem; display: block; margin-bottom: 12px;">🏷️</span>
+        <h3 style="margin-bottom: 10px; font-family: var(--font-display); font-weight: 800;">Escolha seu apelido</h3>
+        <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 16px;">
+          Esse nome aparece no ranking e pros seus amigos. Não precisa ser seu nome real.
+        </p>
+        <input type="text" id="nickname-input" placeholder="Ex: Ramonzinho" maxlength="20" style="width: 100%; padding: 10px; border-radius: 8px; margin-bottom: 8px; text-align: center;">
+        <p id="nickname-error-msg" style="font-size: 0.65rem; color: var(--color-danger, #e63946); margin-bottom: 8px; min-height: 1em;"></p>
+        <div class="btn-group-row" style="justify-content: center;">
+          <button type="button" id="nickname-confirm-btn" class="btn btn-primary ripple" style="padding: 10px 24px; width: 100%;">Confirmar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- EARLY LOGIN MODAL (antes do onboarding)    -->
+    <!-- ========================================== -->
+    <div id="early-login-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+      <div class="custom-modal-card glass-panel fade-in" style="max-width: 380px; text-align: center; padding: 24px;">
+        <span style="font-size: 3rem; display: block; margin-bottom: 12px;">🔑</span>
+        <h3 style="margin-bottom: 10px; font-family: var(--font-display); font-weight: 800;">Entrar na sua conta</h3>
+        <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 16px;">
+          Digite o e-mail que você usou antes — mandamos um link mágico pra recuperar seu progresso.
+        </p>
+        <input type="email" id="early-login-email-input" placeholder="seu@email.com" style="width: 100%; padding: 10px; border-radius: 8px; margin-bottom: 8px; text-align: center;">
+        <p id="early-login-status-msg" style="font-size: 0.65rem; margin-bottom: 8px; min-height: 1em;"></p>
+        <div class="btn-group-row" style="justify-content: center;">
+          <button type="button" id="early-login-send-btn" class="btn btn-primary ripple" style="width: 100%;">Enviar link mágico</button>
+        </div>
+        <button type="button" id="early-login-close-btn" class="btn btn-outline" style="width: 100%; margin-top: 8px;">Cancelar</button>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
     <!-- LEVEL UP CELEBRATION MODAL OVERLAY         -->
     <!-- ========================================== -->
     <div id="level-up-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
@@ -2311,6 +2366,7 @@
 
   </div> <!-- End App Container -->
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="app.js"></script>
   <script>
     if ('serviceWorker' in navigator) {

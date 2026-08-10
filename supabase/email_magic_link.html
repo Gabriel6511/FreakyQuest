@@ -1,0 +1,42 @@
+<!--
+  Template do e-mail de LOGIN (Magic Link) — usado quando a conta já existe.
+  Colar em: Supabase → Authentication → Email Templates → "Magic Link"
+  Variável usada: {{ .ConfirmationURL }}
+-->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#0a0e0a; padding:32px 16px; font-family:Arial,Helvetica,sans-serif;">
+  <tr>
+    <td align="center">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:420px; background-color:#12171a; border:1px solid #22c55e33; border-radius:16px; overflow:hidden;">
+        <tr>
+          <td style="padding:32px 28px 8px; text-align:center;">
+            <div style="font-size:11px; letter-spacing:3px; color:#22c55e; font-weight:bold; text-transform:uppercase; margin-bottom:6px;">GYM RPG</div>
+            <div style="font-size:26px; font-weight:900; color:#ffffff; letter-spacing:1px;">FREAKY<span style="color:#22c55e;">QUEST</span></div>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:20px 28px 8px; text-align:center;">
+            <div style="font-size:40px; line-height:1;">🔑</div>
+            <h1 style="font-size:18px; color:#ffffff; margin:14px 0 8px;">Seu link de acesso chegou</h1>
+            <p style="font-size:13px; color:#9ca3af; line-height:1.6; margin:0 0 24px;">
+              Clique no botão abaixo pra entrar na sua conta e sincronizar seu progresso. Esse link expira em alguns minutos.
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:0 28px 28px; text-align:center;">
+            <a href="{{ .ConfirmationURL }}" style="display:inline-block; background-color:#22c55e; color:#0a0e0a; font-weight:800; font-size:14px; text-decoration:none; padding:14px 32px; border-radius:10px; letter-spacing:0.5px;">
+              ENTRAR NO FREAKYQUEST
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:0 28px 28px; text-align:center; border-top:1px solid #ffffff14; padding-top:20px;">
+            <p style="font-size:11px; color:#6b7280; line-height:1.6; margin:0;">
+              Não foi você? Pode ignorar esse e-mail com tranquilidade — sua conta continua segura.
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
