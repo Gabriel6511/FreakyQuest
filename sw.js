@@ -1,4 +1,4 @@
-const CACHE_NAME = 'freakyquest-v17';
+const CACHE_NAME = 'freakyquest-v19';
 const ASSETS = [
   './',
   './index.html',
@@ -25,7 +25,9 @@ const ASSETS = [
   './cinturao_ouro_icon.webp',
   './braceletes_aco_icon.webp',
   './faixa_lee_icon.webp',
-  './aura_goku_icon.webp'
+  './aura_goku_icon.webp',
+  './sorriso_jin_icon.webp',
+  './coroa_lider_icon.webp'
 ];
 
 self.addEventListener('install', (event) => {

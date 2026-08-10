@@ -673,7 +673,7 @@ const EQUIPMENT_DATABASE = [
     id: 'item_jin',
     name: 'Sorriso Worldwide Handsome',
     slot: 'aura',
-    icon: '✨',
+    icon: 'sorriso_jin_icon.webp',
     desc: 'Um brilho charmoso e confiante contorna seu avatar de perfil.',
     stats: { vig: 5 },
     unlockDesc: 'Desbloqueia no Mentor Jin Nível 5.',
@@ -683,7 +683,7 @@ const EQUIPMENT_DATABASE = [
     id: 'item_namjoon',
     name: 'Aura do Líder',
     slot: 'aura',
-    icon: '📖',
+    icon: 'coroa_lider_icon.webp',
     desc: 'Uma aura índigo serena e ponderada envolve seu avatar de perfil.',
     stats: { foc: 5 },
     unlockDesc: 'Desbloqueia no Mentor RM Nível 5.',
@@ -859,15 +859,17 @@ const WORKOUT_TEMPLATES = {
 // 4. TROPHIES DATABASE
 const TROPHIES = [
   { id: 'primeiro_passo', name: 'Primeiro Treino Concluído', icon: '🐣', desc: 'Saiu da inércia!' },
-  { id: 'monstro_agua', name: 'Hidratação Freaky', icon: '💧', desc: 'Bebeu mais de 3L em um dia.' },
-  { id: 'monstro_prot', name: 'Meta de Dieta Batida', icon: '🍗', desc: 'Bateu meta diária de proteínas.' },
+  { id: 'sequencia_ferro', name: 'Sequência de Ferro', icon: '🔥', desc: 'Treinou 7 dias seguidos.' },
+  { id: 'mes_disciplina', name: 'Um Mês de Disciplina', icon: '👑', desc: 'Treinou 30 dias seguidos.' },
+  { id: 'hidratacao_consistente', name: 'Hidratação Consistente', icon: '💧', desc: 'Bateu a meta de água 5 dias seguidos.' },
+  { id: 'superacao_pessoal', name: 'Superação Pessoal', icon: '📈', desc: 'Bateu seu primeiro recorde pessoal em um exercício.' },
+  { id: 'colecionador_recordes', name: 'Colecionador de Recordes', icon: '💎', desc: 'Bateu recorde pessoal em 5 exercícios diferentes.' },
   { id: 'limite_superado', name: 'Limite Superado', icon: '⚡', desc: 'Subiu para o Nível 5!' },
   { id: 'freaky_tier', name: 'Atingiu Shape Lendário', icon: '👑', desc: 'Chegou ao Nível 25!' },
-  { id: 'overload_champion', name: 'Rei do Overload', icon: '✊', desc: 'Progrediu carga pela primeira vez!' },
-  { id: 'saitama_blessing', name: 'Bênção do Saitama', icon: '👊', desc: 'Selecionou o homem mais forte do mundo como mentor.' },
   { id: 'mind_shield', name: 'Mente Blindada', icon: '🎯', desc: 'Concluiu todas as quests diárias do dia.' },
-  { id: 'gym_legend', name: 'Lenda do Ginásio', icon: '🔥', desc: 'Completou 10 treinos no total.' },
-  { id: 'insignia_mutante', name: 'Insígnia Mutante', icon: '🔥', desc: 'Resgatou a recompensa do Desafio Diário.' }
+  { id: 'gym_legend', name: 'Lenda do Ginásio', icon: '🔱', desc: 'Completou 25 treinos no total.' },
+  { id: 'insignia_mutante', name: 'Insígnia Mutante', icon: '🔥', desc: 'Resgatou a recompensa do Desafio Diário.' },
+  { id: 'vinculo_forte', name: 'Vínculo Forte', icon: '🌟', desc: 'Atingiu Nível 10 com algum mentor.' }
 ];
 
 
@@ -1993,12 +1995,14 @@ function addMentorXP(mentorId, amount) {
     // Sync to legacy keys
     state.mentorLevels[mentorId] = mData.level;
     state.mentorXP[mentorId] = mData.xp;
-    
+
     // Play level up sound for active mentor
     playSound('levelup');
-    
+
     // Check level achievements for active mentor
     checkMentorRewards(mentorId, oldLvl, mData.level);
+
+    if (mData.level >= 10) unlockTrophy('vinculo_forte');
   }
   
   // Sync to legacy keys
@@ -2039,7 +2043,8 @@ function checkMentorRewards(mentorId, oldLvl, newLvl) {
 
       // Trigger reward modal pop-up on screen
       setTimeout(() => {
-        showItemAcquiredModal(r.icon, r.name, `${r.desc} (Ganho ao subir nível do Mentor ${OFFICIAL_MENTORS.find(m => m.id === mentorId)?.name || mentorId}!)`);
+        const opts = r.type === 'css_class' ? undefined : { subtitle: 'RECOMPENSA DESBLOQUEADA', btnText: 'SHOW DE BOLA!' };
+        showItemAcquiredModal(r.icon, r.name, `${r.desc} (Ganho ao subir nível do Mentor ${OFFICIAL_MENTORS.find(m => m.id === mentorId)?.name || mentorId}!)`, opts);
       }, 1600);
     }
   });
@@ -2073,7 +2078,7 @@ function transcendMentor(mentorId) {
     triggerNeuralFlash(mentor);
   }
   playSound('levelup');
-  showItemAcquiredModal('⭐', 'ASCENSÃO TRANSCENDIDA!', `O mentor ${OFFICIAL_MENTORS.find(m => m.id === mentorId)?.name || mentorId} atingiu Prestige ${mData.prestige}! Seu bônus passivo Tier 3 (+15s de redução de descanso) foi baked permanentemente na sua conta!`);
+  showItemAcquiredModal('⭐', 'ASCENSÃO TRANSCENDIDA!', `O mentor ${OFFICIAL_MENTORS.find(m => m.id === mentorId)?.name || mentorId} atingiu Prestige ${mData.prestige}! Seu bônus passivo Tier 3 (+15s de redução de descanso) foi baked permanentemente na sua conta!`, { subtitle: 'PRESTÍGIO DESBLOQUEADO', btnText: 'MANDA VER!' });
   
   saveState();
   updateUI();
@@ -2214,7 +2219,7 @@ function claimDailyChallengeReward() {
   unlockTrophy('insignia_mutante');
 
   playSound('levelup');
-  showItemAcquiredModal('🔥', 'RECOMPENSA RESGATADA!', `Você ganhou +${xpReward} XP e a Insígnia Mutante para seu Shape!`);
+  showItemAcquiredModal('🔥', 'RECOMPENSA RESGATADA!', `Você ganhou +${xpReward} XP e a Insígnia Mutante para seu Shape!`, { subtitle: 'DESAFIO DIÁRIO', btnText: 'SHOW DE BOLA!' });
 
   triggerCelebrationConfetti();
 
@@ -3264,6 +3269,7 @@ function updateUI() {
   renderDailyChallenge();
   renderEvolutionChart();
   renderCalendarHistory();
+  if (getWaterStreak() >= 5) unlockTrophy('hidratacao_consistente');
   renderEquipment();
 
   // Update Eternal Flame Click Counter
@@ -3286,7 +3292,6 @@ function checkQuestRequirements() {
         addMentorXP(state.activeMentor, 15); // Water Goal met (+15 XP)
         playSound('quest');
         changed = true;
-        unlockTrophy('monstro_agua');
       }
       if (q.id === 'quest_protein' && state.proteinIntake >= (state.protTarget * 0.8)) {
         q.completed = true;
@@ -3295,7 +3300,6 @@ function checkQuestRequirements() {
         changed = true;
         if (state.proteinIntake >= state.protTarget) {
           addMentorXP(state.activeMentor, 20); // Protein Goal met (+20 XP)
-          unlockTrophy('monstro_prot');
         }
       }
       if (q.id === 'quest_volume') {
@@ -3471,7 +3475,7 @@ function tryBreakPR(exName, inputWeight, prBadgeEl) {
   // Award XP: +15 base, scaled by FOR attribute
   const forBonus = 15 + Math.round((getEffectiveAttributes().for || 10) * 0.5);
   addXP(forBonus);
-  unlockTrophy('overload_champion');
+  unlockTrophy('superacao_pessoal');
 
   if (isBetter) {
     // Show overload toast for weight increase
@@ -3480,6 +3484,10 @@ function tryBreakPR(exName, inputWeight, prBadgeEl) {
 
   // Persist the new record
   persistPR(exName, inputWeight);
+
+  if (Object.keys(state.personalRecords || {}).length >= 5) {
+    unlockTrophy('colecionador_recordes');
+  }
 
   // Animate the PR badge on the exercise card
   if (prBadgeEl) {
@@ -4044,7 +4052,6 @@ function renderMentorsList() {
 window.chooseMentor = function(mentorId) {
   playSound('levelup');
   state.activeMentor = mentorId;
-  if (mentorId === 'saitama') unlockTrophy('saitama_blessing');
   saveState();
   updateUI();
   const m = MENTORS_LIST_FULL().find(x => x.id === mentorId);
@@ -4109,7 +4116,8 @@ window.previewMentorMilestone = function(mentorId, targetLvl) {
     showItemAcquiredModal(
       exactReward.icon,
       prefix + exactReward.name,
-      exactReward.desc + (tier ? `\n\n📊 Tier: ${tier.name} (Nv ${tier.range[0]}–${tier.range[1]})` : '')
+      exactReward.desc + (tier ? `\n\n📊 Tier: ${tier.name} (Nv ${tier.range[0]}–${tier.range[1]})` : ''),
+      { subtitle: 'PRÉVIA DA RECOMPENSA', btnText: 'ENTENDI' }
     );
   } else {
     // Show closest reward above targetLvl
@@ -4118,10 +4126,11 @@ window.previewMentorMilestone = function(mentorId, targetLvl) {
       showItemAcquiredModal(
         nextAbove.icon,
         `Próxima recompensa: Nível ${nextAbove.lvl}`,
-        nextAbove.desc
+        nextAbove.desc,
+        { subtitle: 'PRÉVIA DA RECOMPENSA', btnText: 'ENTENDI' }
       );
     } else {
-      showItemAcquiredModal('🏆', `${mentorName} Masterizado!`, 'Você desbloqueou todas as recompensas deste mentor. Lendário!');
+      showItemAcquiredModal('🏆', `${mentorName} Masterizado!`, 'Você desbloqueou todas as recompensas deste mentor. Lendário!', { subtitle: 'PRÉVIA DA RECOMPENSA', btnText: 'SHOW!' });
     }
   }
 };
@@ -4159,7 +4168,7 @@ window.showTributeMilestoneHelp = function(milestoneId) {
   };
   
   const m = milestones[milestoneId] || { icon: '🕊️', name: 'Tributo ao Herói', desc: 'Sua lembrança vive em cada treino.' };
-  showItemAcquiredModal(m.icon, m.name, m.desc);
+  showItemAcquiredModal(m.icon, m.name, m.desc, { subtitle: 'TRIBUTO', btnText: 'ENTENDI' });
 };
 
 window.triggerEternalFlameSpark = function() {
@@ -4482,6 +4491,24 @@ function renderProfileTrophiesPreview() {
   });
 }
 
+// Conta dias seguidos (até hoje) em que a meta de água foi batida, usando o histórico do calendário
+function getWaterStreak() {
+  if (!state.dailyHistory) return 0;
+  let streak = 0;
+  const cursor = new Date();
+  for (let i = 0; i < 365; i++) {
+    const dateStr = `${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, '0')}-${String(cursor.getDate()).padStart(2, '0')}`;
+    const entry = state.dailyHistory[dateStr];
+    if (entry && entry.waterTarget > 0 && entry.water >= entry.waterTarget) {
+      streak++;
+      cursor.setDate(cursor.getDate() - 1);
+    } else {
+      break;
+    }
+  }
+  return streak;
+}
+
 function unlockTrophy(trophyId) {
   if (!state.unlockedTrophies) {
     state.unlockedTrophies = [];
@@ -4495,7 +4522,7 @@ function unlockTrophy(trophyId) {
     const trophy = TROPHIES.find(t => t.id === trophyId);
     if (trophy) {
       playSound('levelup');
-      showItemAcquiredModal(trophy.icon, `CONQUISTA DESBLOQUEADA!`, `${trophy.name}: ${trophy.desc}`);
+      showItemAcquiredModal(trophy.icon, `CONQUISTA DESBLOQUEADA!`, `${trophy.name}: ${trophy.desc}`, { subtitle: '🏆 TROFÉU', btnText: 'SHOW!' });
     }
   }
 }
@@ -4610,7 +4637,7 @@ function renderEvolutionChart() {
         • Categoria: ${typeLabel}
         • Valor alcançado: ${Math.round(p.val * 10) / 10} ${unit}
         • Registro: Armazenado com sucesso na Forja do Destino.`;
-        showItemAcquiredModal('📈', 'REGISTRO DE EVOLUÇÃO', desc);
+        showItemAcquiredModal('📈', 'REGISTRO DE EVOLUÇÃO', desc, { subtitle: 'HISTÓRICO', btnText: 'ENTENDI' });
       });
 
       svg.appendChild(circle);
@@ -5314,9 +5341,12 @@ function showLevelUpModal() {
   modal.classList.remove('hidden');
 }
 
-function showItemAcquiredModal(icon, name, desc) {
+function showItemAcquiredModal(icon, name, desc, opts) {
+  const { subtitle = 'NOVO ITEM ENCONTRADO', btnText = 'EQUIPAR NO SHAPE' } = opts || {};
   const modal = document.getElementById('item-acquired-modal');
   const iconEl = document.getElementById('modal-item-icon');
+  document.getElementById('modal-item-subtitle').innerText = subtitle;
+  document.getElementById('btn-close-item-modal').innerText = btnText;
   if (icon && (icon.endsWith('.png') || icon.endsWith('.jpg') || icon.endsWith('.webp'))) {
     iconEl.innerHTML = `<img src="${icon}" alt="${name}" style="width: 44px; height: 44px; object-fit: contain;" />`;
   } else {
@@ -5442,7 +5472,7 @@ window.showAttributeHelp = function(attrKey) {
   };
   
   const item = details[attrKey] || { icon: '❓', name: 'Atributo Desconhecido', desc: 'Atributo não cadastrado.' };
-  showItemAcquiredModal(item.icon, item.name, item.desc);
+  showItemAcquiredModal(item.icon, item.name, item.desc, { subtitle: 'INFORMAÇÕES DO ATRIBUTO', btnText: 'ENTENDI' });
 };
 
 function spawnAttrFloatingText(attrKey) {
@@ -7809,6 +7839,8 @@ function completeActiveWorkout(rpeBonusXp) {
     state.currentStreak = (prevWorkoutDateStr === yesterdayDateStr) ? state.currentStreak + 1 : 1;
   }
   state.bestStreak = Math.max(state.bestStreak || 0, state.currentStreak);
+  if (state.currentStreak >= 7) unlockTrophy('sequencia_ferro');
+  if (state.currentStreak >= 30) unlockTrophy('mes_disciplina');
 
   state.lastWorkoutDate = new Date().toISOString();
 
@@ -7837,7 +7869,7 @@ function completeActiveWorkout(rpeBonusXp) {
   addXP(xpGained);
   
   if (state.workoutsCompleted === 1) unlockTrophy('primeiro_passo');
-  if (state.workoutsCompleted >= 10) unlockTrophy('gym_legend');
+  if (state.workoutsCompleted >= 25) unlockTrophy('gym_legend');
 
   const classQuest = state.dailyQuests.find(q => q.id === 'quest_class');
   if (classQuest && !classQuest.completed && completion.percent >= 50) {
