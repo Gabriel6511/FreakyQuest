@@ -131,6 +131,24 @@ body.theme-nickwalker {
   --accent-light: 48%;
 }
 
+body.theme-jin {
+  --primary-hue: 345;
+  --primary-sat: 90%;
+  --primary-light: 70%;
+  --accent-hue: 38;
+  --accent-sat: 85%;
+  --accent-light: 55%;
+}
+
+body.theme-namjoon {
+  --primary-hue: 235;
+  --primary-sat: 55%;
+  --primary-light: 58%;
+  --accent-hue: 270;
+  --accent-sat: 60%;
+  --accent-light: 58%;
+}
+
 
 /* BASE RESET */
 *, *::before, *::after {
@@ -817,6 +835,13 @@ body.mode-simple #toggle-workout-cust {
 }
 body.mode-simple .option-select-card.active {
   box-shadow: 0 0 10px rgba(255,255,255,0.08), inset 0 0 6px rgba(255,255,255,0.08) !important;
+}
+
+/* DIET TRACKING DISABLED — toggle em Ajustes ("Rastrear dieta") */
+body.diet-disabled .nav-item[data-tab="diet"],
+body.diet-disabled #tab-diet,
+body.diet-disabled #dashboard-diet-card {
+  display: none !important;
 }
 
 /* WIZARD SLIDES STRUCTURE */
@@ -1879,8 +1904,13 @@ body.mode-simple .option-select-card.active {
   padding-bottom: 4px;
   scrollbar-width: none;
   margin-bottom: 10px;
+  cursor: grab;
 }
 .mentor-universe-filter::-webkit-scrollbar { display: none; }
+.mentor-universe-filter.drag-scrolling {
+  cursor: grabbing;
+  user-select: none;
+}
 .muf-btn {
   flex-shrink: 0;
   padding: 5px 12px;
@@ -2644,8 +2674,13 @@ body.mode-simple .option-select-card.active {
   padding: 0 12px 14px 16px;
   overflow-x: auto;
   scrollbar-width: none;
+  cursor: grab;
 }
 .exc-sets-row::-webkit-scrollbar { display: none; }
+.exc-sets-row.drag-scrolling {
+  cursor: grabbing;
+  user-select: none;
+}
 
 .exc-set-tile {
   flex-shrink: 0;
@@ -5480,6 +5515,14 @@ body.screen-shake::after {
   border-color: #ff5e00 !important;
   animation: aura-pulse-nickwalker 2s infinite alternate !important;
 }
+.player-avatar-wrapper.aura-jin {
+  border-color: #ff8fa3 !important;
+  animation: aura-pulse-jin 2s infinite alternate !important;
+}
+.player-avatar-wrapper.aura-namjoon {
+  border-color: #5b5f97 !important;
+  animation: aura-pulse-namjoon 2s infinite alternate !important;
+}
 .player-avatar-wrapper.aura-custom {
   border-color: var(--color-primary) !important;
   animation: aura-pulse-custom 2s infinite alternate !important;
@@ -5516,6 +5559,14 @@ body.screen-shake::after {
 @keyframes aura-pulse-nickwalker {
   0% { box-shadow: 0 0 5px rgba(255, 94, 0, 0.4), inset 0 0 3px rgba(255, 94, 0, 0.2); }
   100% { box-shadow: 0 0 15px rgba(255, 94, 0, 0.9), inset 0 0 8px rgba(255, 94, 0, 0.4); }
+}
+@keyframes aura-pulse-jin {
+  0% { box-shadow: 0 0 5px rgba(255, 143, 163, 0.4), inset 0 0 3px rgba(255, 143, 163, 0.2); }
+  100% { box-shadow: 0 0 15px rgba(255, 143, 163, 0.9), inset 0 0 8px rgba(255, 143, 163, 0.4); }
+}
+@keyframes aura-pulse-namjoon {
+  0% { box-shadow: 0 0 5px rgba(91, 95, 151, 0.4), inset 0 0 3px rgba(91, 95, 151, 0.2); }
+  100% { box-shadow: 0 0 15px rgba(91, 95, 151, 0.9), inset 0 0 8px rgba(91, 95, 151, 0.4); }
 }
 @keyframes aura-pulse-custom {
   0% { box-shadow: 0 0 5px var(--color-primary-glow), inset 0 0 3px var(--color-primary-glow); }

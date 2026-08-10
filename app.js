@@ -218,6 +218,41 @@ const OFFICIAL_MENTORS = [
     colorHex: '#ff5e00',
     particleType: 'embers',
     isCustom: false
+  },
+  // ══════════════ COREANINHOS ══════════════
+  {
+    id: 'jin',
+    name: 'Jin "Worldwide Handsome"',
+    universe: 'Coreaninhos',
+    category: 'real',
+    archetype: 'genetics',
+    primaryStat: 'vig',
+    levelReq: 1,
+    theme: 'theme-jin',
+    avatar: 'jin.webp',
+    filterCSS: 'contrast(1.3) saturate(0.15) sepia(0.45) brightness(0.92)',
+    quote: '"Bora treinar, gente linda! Aqui quem manda é o mais bonito do mundo — e olha que ele também é o mais disciplinado!"',
+    buff: '+15% Vigor & +10% Força',
+    colorHex: '#ff8fa3',
+    particleType: 'embers',
+    isCustom: false
+  },
+  {
+    id: 'namjoon',
+    name: 'RM "Namjoon"',
+    universe: 'Coreaninhos',
+    category: 'real',
+    archetype: 'wisdom',
+    primaryStat: 'foc',
+    levelReq: 1,
+    theme: 'theme-namjoon',
+    avatar: 'namjoon.webp',
+    filterCSS: 'contrast(1.32) saturate(0.18) sepia(0.5) brightness(0.9)',
+    quote: '"Treinar o corpo é treinar a mente. Cada série de hoje é um passo pra versão melhor de você amanhã."',
+    buff: '+15% Foco & +10% Vigor',
+    colorHex: '#5b5f97',
+    particleType: 'embers',
+    isCustom: false
   }
 ];
 
@@ -277,6 +312,20 @@ const MENTOR_DASHBOARD_QUOTES = {
     "Sem desculpas, coloque mais carga e esmague!",
     "Intensidade bizarra é o nosso padrão!",
     "Você quer ser comum ou quer ser um mutante?"
+  ],
+  jin: [
+    "Bora treinar, gente linda! Aqui quem manda é o mais bonito do mundo!",
+    "Disciplina é disciplina — treino não se pula, nem no serviço militar!",
+    "Um sorriso confiante e a série de hoje está no bolso!",
+    "Já treinou o suficiente pra ficar Worldwide Handsome hoje?",
+    "Constância com bom humor: essa é a receita!"
+  ],
+  namjoon: [
+    "Treinar o corpo é treinar a mente. Cada série é um passo à frente.",
+    "Reflita, respire e ataque a próxima série com propósito.",
+    "O crescimento de hoje é a sabedoria de amanhã.",
+    "Equilíbrio: corpo forte, mente tranquila.",
+    "Um bom líder também lidera o próprio treino."
   ]
 };
 
@@ -522,6 +571,32 @@ const MENTOR_REWARD_CONFIGS = {
     leaderboardTitle: 'Elite Mutante', finalTitle: 'MUTANTE SUPREMO',
     easterDesc: 'Um vídeo raro de bastidores do treino mutante de Nick Walker foi desbloqueado!'
   },
+  jin: {
+    shortcode: 'jin', shortName: 'Jin', name: 'Jin "Worldwide Handsome"', colorLabel: 'Rosa Elegante', particleLabel: 'Brilho charmoso',
+    primaryStat: 'vig', secondaryStat: 'for',
+    tier1: { type: 'css_class', value: 'has-item-jin', icon: '💪', name: 'Sorriso Worldwide Handsome',
+      desc: 'Um brilho charmoso e confiante contorna seu avatar de perfil!' },
+    tier2: { type: 'sound', value: 'worldwidehandsome', icon: '🎤', name: 'Risada Icônica',
+      desc: 'A risada icônica do Jin ao completar quests. Brilho rosa no card.' },
+    mission: { name: 'Disciplina de Sargento', desc: 'Missão semanal: complete todos os treinos da semana sem faltar um dia. Disciplina de quem passou pelo serviço militar!' },
+    tier4: { type: 'css_class', value: 'has-men-jin20', icon: '✨', name: 'Aura Worldwide + Badge',
+      desc: 'Brilho rosa elegante pulsando em toda a UI. Badge de elite no perfil.' },
+    leaderboardTitle: 'Elite Worldwide', finalTitle: 'MUNDIALMENTE BONITO',
+    easterDesc: 'Uma piada de pescaria do Jin foi resgatada dos bastidores — ele diria que essa foi a maior conquista de todas!'
+  },
+  namjoon: {
+    shortcode: 'nam', shortName: 'RM', name: 'RM "Namjoon"', colorLabel: 'Índigo Reflexivo', particleLabel: 'Brilho contemplativo',
+    primaryStat: 'foc', secondaryStat: 'vig',
+    tier1: { type: 'css_class', value: 'has-item-namjoon', icon: '📖', name: 'Aura do Líder',
+      desc: 'Uma aura índigo serena e ponderada envolve seu avatar de perfil!' },
+    tier2: { type: 'sound', value: 'selflove', icon: '🎤', name: 'Discurso Motivacional',
+      desc: 'Uma frase de reflexão do RM ao completar quests. Brilho índigo no card.' },
+    mission: { name: 'Corpo e Mente', desc: 'Missão semanal: registre uma reflexão e bata sua meta de água por 5 dias seguidos — equilíbrio entre corpo e mente.' },
+    tier4: { type: 'css_class', value: 'has-men-nam20', icon: '✨', name: 'Aura do Líder Suprema + Badge',
+      desc: 'Brilho índigo máximo pulsando em toda a UI. Badge de elite no perfil.' },
+    leaderboardTitle: 'Elite Líder', finalTitle: 'LÍDER ETERNO',
+    easterDesc: 'Uma citação inédita e filosófica do RM foi resgatada dos bastidores — puro autoconhecimento.'
+  },
 };
 
 // MENTOR_REWARDS é construído automaticamente a partir dos configs acima.
@@ -593,6 +668,26 @@ const EQUIPMENT_DATABASE = [
     stats: { res: 15, agi: 10 },
     unlockDesc: 'Desbloqueia no Nível Geral 50 ou Mentor Saitama Nível 5.',
     equivalentIds: ['item_capa', 'has-item-capa']
+  },
+  {
+    id: 'item_jin',
+    name: 'Sorriso Worldwide Handsome',
+    slot: 'aura',
+    icon: '✨',
+    desc: 'Um brilho charmoso e confiante contorna seu avatar de perfil.',
+    stats: { vig: 5 },
+    unlockDesc: 'Desbloqueia no Mentor Jin Nível 5.',
+    equivalentIds: ['item_jin', 'has-item-jin']
+  },
+  {
+    id: 'item_namjoon',
+    name: 'Aura do Líder',
+    slot: 'aura',
+    icon: '📖',
+    desc: 'Uma aura índigo serena e ponderada envolve seu avatar de perfil.',
+    stats: { foc: 5 },
+    unlockDesc: 'Desbloqueia no Mentor RM Nível 5.',
+    equivalentIds: ['item_namjoon', 'has-item-namjoon']
   }
 ];
 
@@ -827,6 +922,7 @@ let state = {
   notificationTime: '18:00',
   restTimerEnabled: true,
   baseRestTime: 90,
+  dietTrackingEnabled: true,
   workoutsThisWeek: 0,
   lastWorkoutDate: '',
   lastNotificationDate: '',
@@ -1671,12 +1767,12 @@ function loadState() {
 
         // Fallbacks for mentor progression state
         if (!state.mentorLevels) {
-          state.mentorLevels = { bebezinho: 1, rocklee: 1, goku: 1, arnold: 1, ramondino: 1, brolyz: 1, saitama: 1, nickwalker: 1 };
+          state.mentorLevels = { bebezinho: 1, rocklee: 1, goku: 1, arnold: 1, ramondino: 1, brolyz: 1, saitama: 1, nickwalker: 1, jin: 1, namjoon: 1 };
         } else if (state.mentorLevels.nickwalker === undefined) {
           state.mentorLevels.nickwalker = 1;
         }
         if (!state.mentorXP) {
-          state.mentorXP = { bebezinho: 0, rocklee: 0, goku: 0, arnold: 0, ramondino: 0, brolyz: 0, saitama: 0, nickwalker: 0 };
+          state.mentorXP = { bebezinho: 0, rocklee: 0, goku: 0, arnold: 0, ramondino: 0, brolyz: 0, saitama: 0, nickwalker: 0, jin: 0, namjoon: 0 };
         } else if (state.mentorXP.nickwalker === undefined) {
           state.mentorXP.nickwalker = 0;
         }
@@ -1707,6 +1803,7 @@ function loadState() {
         if (state.waterDrank === undefined) state.waterDrank = state.waterIntake || 0;
         if (state.dailyMacros === undefined) state.dailyMacros = { kcal: 0, prot: 0, fiber: 0, carbs: 0 };
         if (state.restTimerEnabled === undefined) state.restTimerEnabled = true;
+        if (state.dietTrackingEnabled === undefined) state.dietTrackingEnabled = true;
         if (state.baseRestTime === undefined) state.baseRestTime = 90;
         if (state.appMode === undefined) state.appMode = 'rpg';
         if (state.simpleModeSeen === undefined) state.simpleModeSeen = false;
@@ -1994,10 +2091,16 @@ const DAILY_CHALLENGES = [
 
 function initDailyChallenge() {
   const todayStr = new Date().toDateString();
-  
+
+  // Se dieta está desativada, tira os desafios de tipo 'protein' do sorteio —
+  // senão ficariam impossíveis de completar pra quem não registra refeições.
+  const eligibleChallenges = state.dietTrackingEnabled === false
+    ? DAILY_CHALLENGES.filter(c => c.type !== 'protein')
+    : DAILY_CHALLENGES;
+
   // Select a challenge based on the date so it changes daily
-  const dayIndex = Math.abs(todayStr.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)) % DAILY_CHALLENGES.length;
-  const challenge = DAILY_CHALLENGES[dayIndex];
+  const dayIndex = Math.abs(todayStr.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)) % eligibleChallenges.length;
+  const challenge = eligibleChallenges[dayIndex];
   
   if (!state.dailyChallenge || state.dailyChallenge.dateStr !== todayStr) {
     state.dailyChallenge = {
@@ -2227,21 +2330,38 @@ function generateDailyQuests() {
     completed: false
   });
 
-  // 2. Diet Quest Pool
-  const proteinPool = [
-    { name: 'Meta Nutricional', desc: `Bater pelo menos 80% da sua meta de proteínas (${Math.round(state.protTarget * 0.8)}g)`, xpReward: 25 },
-    { name: 'Hipertrofia Ativada', desc: `Consumir pelo menos 80% de proteínas hoje (${Math.round(state.protTarget * 0.8)}g) para anabolismo`, xpReward: 25 },
-    { name: 'Combustível Fibroso', desc: `Registrar pelo menos 80% da meta de proteínas (${Math.round(state.protTarget * 0.8)}g) nas refeições`, xpReward: 30 },
-    { name: 'Síntese de Caçador', desc: `Garantir aporte proteico diário de pelo menos (${Math.round(state.protTarget * 0.8)}g)`, xpReward: 25 }
-  ];
-  const proteinChoice = proteinPool[(seed + 1) % proteinPool.length];
-  quests.push({
-    id: 'quest_protein',
-    name: proteinChoice.name,
-    desc: proteinChoice.desc,
-    xpReward: proteinChoice.xpReward,
-    completed: false
-  });
+  // 2. Diet Quest Pool (ou missão de volume de treino, se dieta estiver desativada)
+  if (state.dietTrackingEnabled === false) {
+    const volumePool = [
+      { name: 'Volume de Ferro', desc: 'Completar pelo menos 12 séries de treino hoje', xpReward: 25 },
+      { name: 'Sequência Brutal', desc: 'Bater 12 séries concluídas na Arena de Treino hoje', xpReward: 25 },
+      { name: 'Maratona de Séries', desc: 'Concluir 12 séries de treino em um único dia', xpReward: 30 },
+      { name: 'Disciplina de Ferro', desc: 'Fechar pelo menos 12 séries de treino hoje', xpReward: 25 }
+    ];
+    const volumeChoice = volumePool[(seed + 1) % volumePool.length];
+    quests.push({
+      id: 'quest_volume',
+      name: volumeChoice.name,
+      desc: volumeChoice.desc,
+      xpReward: volumeChoice.xpReward,
+      completed: false
+    });
+  } else {
+    const proteinPool = [
+      { name: 'Meta Nutricional', desc: `Bater pelo menos 80% da sua meta de proteínas (${Math.round(state.protTarget * 0.8)}g)`, xpReward: 25 },
+      { name: 'Hipertrofia Ativada', desc: `Consumir pelo menos 80% de proteínas hoje (${Math.round(state.protTarget * 0.8)}g) para anabolismo`, xpReward: 25 },
+      { name: 'Combustível Fibroso', desc: `Registrar pelo menos 80% da meta de proteínas (${Math.round(state.protTarget * 0.8)}g) nas refeições`, xpReward: 30 },
+      { name: 'Síntese de Caçador', desc: `Garantir aporte proteico diário de pelo menos (${Math.round(state.protTarget * 0.8)}g)`, xpReward: 25 }
+    ];
+    const proteinChoice = proteinPool[(seed + 1) % proteinPool.length];
+    quests.push({
+      id: 'quest_protein',
+      name: proteinChoice.name,
+      desc: proteinChoice.desc,
+      xpReward: proteinChoice.xpReward,
+      completed: false
+    });
+  }
 
   // 3. Class Quest Pool
   let classPool = [];
@@ -2354,10 +2474,12 @@ function applyMentorVisualTheme(mentor) {
     `;
     
     const modeClass = (state.appMode === 'simple') ? 'mode-simple' : '';
-    document.body.className = modeClass ? `${modeClass} theme-custom-${mentor.id}` : `theme-custom-${mentor.id}`;
+    const dietClass = (state.dietTrackingEnabled === false) ? 'diet-disabled' : '';
+    document.body.className = [modeClass, dietClass, `theme-custom-${mentor.id}`].filter(Boolean).join(' ');
   } else {
     const modeClass = (state.appMode === 'simple') ? 'mode-simple' : '';
-    document.body.className = modeClass ? `${modeClass} ${mentor.theme}` : mentor.theme;
+    const dietClass = (state.dietTrackingEnabled === false) ? 'diet-disabled' : '';
+    document.body.className = [modeClass, dietClass, mentor.theme].filter(Boolean).join(' ');
   }
 }
 
@@ -2396,6 +2518,7 @@ function getUserAvatarSrc() {
 function updateUI() {
   checkDailyReset();
   recalculateMacrosTargets();
+  document.body.classList.toggle('diet-disabled', state.dietTrackingEnabled === false);
 
   const isSimple = state.appMode === 'simple';
   const playerNameEl = document.getElementById('player-name');
@@ -2739,9 +2862,13 @@ function updateUI() {
 
   // Render player active status badges based on macros
   const statusBadgesContainer = document.getElementById('player-status-badges');
-  if (statusBadgesContainer) {
+  if (statusBadgesContainer && state.dietTrackingEnabled === false) {
     statusBadgesContainer.innerHTML = '';
-    
+    state.anabolicActive = false;
+    state.catabolizandoActive = false;
+  } else if (statusBadgesContainer) {
+    statusBadgesContainer.innerHTML = '';
+
     // 🔥 Estado Anabólico Active check
     if (totalProt >= state.protTarget) {
       state.anabolicActive = true;
@@ -2762,8 +2889,10 @@ function updateUI() {
 
     // 💀 Catabolizando check
     const kcalPct = state.kcalTarget > 0 ? (totalKcal / state.kcalTarget) : 0;
-    // Neglected kcal or carbs (< 30% of target) while fiber is 0
-    if ((kcalPct < 0.3 || totalCarbs < 20) && totalFiber === 0) {
+    // Neglected kcal or carbs (< 30% of target) while fiber is 0 — só dispara se
+    // a pessoa já registrou algo hoje; sem nenhum registro não é "má alimentação",
+    // é só ausência de dados (não devia soar alarme pra quem ainda não logou nada).
+    if (state.mealLogs.length > 0 && (kcalPct < 0.3 || totalCarbs < 20) && totalFiber === 0) {
       state.catabolizandoActive = true;
       const b = document.createElement('span');
       b.className = 'badge';
@@ -2880,7 +3009,7 @@ function updateUI() {
       card.className = 'active-buff-card anabolic';
       const title = isSimple ? 'Proteína suficiente ✅' : 'Estado Anabólico Ativo';
       const desc = isSimple
-        ? 'Você atingiu a meta de proteínas de hoje.继续保持 o consumo para recuperação muscular.'
+        ? 'Você atingiu a meta de proteínas de hoje. Continue mantendo o consumo para recuperação muscular.'
         : 'Meta de proteínas batida! Receba <strong>+10% XP</strong> em todos os treinos finalizados hoje.';
       card.innerHTML = `
         <span class="buff-icon">${isSimple ? '🥩' : '🔥'}</span>
@@ -3167,6 +3296,15 @@ function checkQuestRequirements() {
         if (state.proteinIntake >= state.protTarget) {
           addMentorXP(state.activeMentor, 20); // Protein Goal met (+20 XP)
           unlockTrophy('monstro_prot');
+        }
+      }
+      if (q.id === 'quest_volume') {
+        const setsToday = Object.values(state.activeSetsTracker || {}).filter(isSetCompleted).length;
+        if (setsToday >= 12) {
+          q.completed = true;
+          addXP(Math.round(q.xpReward * focBonus));
+          playSound('quest');
+          changed = true;
         }
       }
     }
@@ -3705,6 +3843,7 @@ function renderWorkoutRoutine() {
         }
         tile.classList.toggle('est-done', next);
         playSound('click');
+        checkQuestRequirements();
         saveState();
       };
 
@@ -3724,12 +3863,13 @@ function renderWorkoutRoutine() {
 // Para adicionar um novo universo: basta incluir o 'universe'
 // no objeto do mentor em OFFICIAL_MENTORS — aparece automaticamente.
 // ─────────────────────────────────────────────────────────────
-const UNIVERSE_ORDER = ['Dragon Ball', 'Naruto', 'One Punch Man', 'Fisiculturistas', 'Personalizados'];
+const UNIVERSE_ORDER = ['Dragon Ball', 'Naruto', 'One Punch Man', 'Fisiculturistas', 'Coreaninhos', 'Personalizados'];
 const UNIVERSE_META = {
   'Dragon Ball':    { icon: '🐉', color: '#f97316', desc: 'O universo dos Saiyajins e do Ki infinito' },
   'Naruto':         { icon: '🥷', color: '#22c55e', desc: 'O caminho ninja do esforço e da garra' },
   'One Punch Man':  { icon: '👊', color: '#ef4444', desc: 'O herói que treinou até virar invencível' },
   'Fisiculturistas':{ icon: '💪', color: '#eab308', desc: 'Lendas reais do ferro e da disciplina' },
+  'Coreaninhos':    { icon: '🎤', color: '#ff8fa3', desc: 'Ídolos coreanos com disciplina de aço' },
   'Personalizados': { icon: '⚙️', color: '#8b5cf6', desc: 'Seus mentores criados por você' },
 };
 
@@ -5488,7 +5628,45 @@ function applyNumericSanitizer(selector, decimals) {
 // 21. EVENTS TRIGGERS AND FORM INITS
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
-  
+
+  // Drag-to-scroll com mouse para carrosséis horizontais (filtro de universo
+  // de mentor, tiles de série do treino) — no touch já rola por swipe nativo,
+  // mas no desktop (sem touch) não tinha nenhum jeito de alcançar o conteúdo
+  // fora da tela, já que a barra de rolagem é escondida por design.
+  (function setupDragScroll() {
+    const DRAG_SCROLL_SELECTOR = '.mentor-universe-filter, .exc-sets-row';
+    let drag = null;
+
+    document.addEventListener('mousedown', (e) => {
+      const container = e.target.closest(DRAG_SCROLL_SELECTOR);
+      if (!container) return;
+      drag = { container, startX: e.pageX, scrollLeft: container.scrollLeft, moved: false };
+      container.classList.add('drag-scrolling');
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (!drag) return;
+      const dx = e.pageX - drag.startX;
+      if (Math.abs(dx) > 3) drag.moved = true;
+      if (drag.moved) drag.container.scrollLeft = drag.scrollLeft - dx;
+    });
+
+    function endDrag() {
+      if (!drag) return;
+      const { container, moved } = drag;
+      container.classList.remove('drag-scrolling');
+      if (moved) {
+        // Suprime o click que viria logo em seguida, pra um arrasto não
+        // acabar selecionando o card/tile que está embaixo do cursor.
+        const suppressClick = (ev) => { ev.stopPropagation(); ev.preventDefault(); };
+        container.addEventListener('click', suppressClick, { capture: true, once: true });
+      }
+      drag = null;
+    }
+    document.addEventListener('mouseup', endDrag);
+    document.addEventListener('mouseleave', endDrag);
+  })();
+
   applyNumericSanitizer('#water-target-input', 1);
   applyNumericSanitizer('#settings-weight', 3);
   applyNumericSanitizer('#modal-settings-weight', 3);
@@ -5749,8 +5927,8 @@ document.addEventListener('DOMContentLoaded', () => {
     state.mealLogs = [];
     state.personalRecords = {};
     state.attributes = { for: 10, res: 10, agi: 10, vig: 10, foc: 10 };
-    state.mentorLevels = { bebezinho: 1, rocklee: 1, goku: 1, arnold: 1, ramondino: 1, brolyz: 1, saitama: 1, nickwalker: 1 };
-    state.mentorXP = { bebezinho: 0, rocklee: 0, goku: 0, arnold: 0, ramondino: 0, brolyz: 0, saitama: 0, nickwalker: 0 };
+    state.mentorLevels = { bebezinho: 1, rocklee: 1, goku: 1, arnold: 1, ramondino: 1, brolyz: 1, saitama: 1, nickwalker: 1, jin: 1, namjoon: 1 };
+    state.mentorXP = { bebezinho: 0, rocklee: 0, goku: 0, arnold: 0, ramondino: 0, brolyz: 0, saitama: 0, nickwalker: 0, jin: 0, namjoon: 0 };
     state.mentorXPNeeded = 100;
     state.unlockedItems = [];
     state.appMode = 'simple';
@@ -5851,6 +6029,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const notifEnable = document.getElementById('settings-notif-enable').checked;
       const notifTime = document.getElementById('settings-notif-time').value;
       const selectedMode = document.getElementById('settings-app-mode').value;
+      const dietCheckEl = document.getElementById('settings-diet-enable');
+      const dietEnable = dietCheckEl ? dietCheckEl.checked : true;
 
       if (!isNaN(weight) && weight > 0) {
         userProfile.currentWeight = weight;
@@ -5868,6 +6048,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       state.notificationEnabled = notifEnable;
       state.notificationTime = notifTime;
+      state.dietTrackingEnabled = dietEnable;
 
       const modeChanged = selectedMode !== state.appMode;
       state.appMode = selectedMode;
@@ -6676,6 +6857,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (notifCheck) notifCheck.checked = state.notificationEnabled !== false;
     const notifTime = document.getElementById('settings-notif-time');
     if (notifTime) notifTime.value = state.notificationTime || '18:00';
+    const dietCheck = document.getElementById('settings-diet-enable');
+    if (dietCheck) dietCheck.checked = state.dietTrackingEnabled !== false;
   }
 
   navItems.forEach(item => {

@@ -9,3 +9,9 @@ backup_original/
 scratch/temp_test_system/
 scratch/temp_zip_extract_new/
 scratch/new_update/
+graphify-out/
+.claude-flow/
+.swarm/
+ruvector.db
+.mcp.json
+.claude/settings.local.json
