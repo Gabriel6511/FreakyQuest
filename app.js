@@ -93,13 +93,13 @@ function onCloudLogout() {
 // que o salvamento "não funcionou". Com código, a sessão é criada na MESMA
 // aba onde a pessoa já está, e o progresso dela sobe certinho.
 async function sendLoginCode(email) {
-  if (!isCloudEnabled()) return { error: 'Sincronização indisponível no momento.' };
+  if (!isCloudEnabled()) return { error: 'Não foi possível carregar o login. Feche e abra o app de novo (ou puxe a tela pra baixo pra recarregar).' };
   const { error } = await supabaseClient.auth.signInWithOtp({ email });
   return { error: error ? error.message : null };
 }
 
 async function verifyLoginCode(email, token) {
-  if (!isCloudEnabled()) return { error: 'Sincronização indisponível no momento.' };
+  if (!isCloudEnabled()) return { error: 'Não foi possível carregar o login. Feche e abra o app de novo (ou puxe a tela pra baixo pra recarregar).' };
   const clean = (token || '').replace(/\D/g, '');
   if (clean.length !== 6) return { error: 'O código tem 6 dígitos.' };
   const { error } = await supabaseClient.auth.verifyOtp({ email, token: clean, type: 'email' });

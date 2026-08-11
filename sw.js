@@ -1,8 +1,9 @@
-const CACHE_NAME = 'freakyquest-v26';
+const CACHE_NAME = 'freakyquest-v27';
 const ASSETS = [
   './',
   './index.html',
   './app.js',
+  './vendor_supabase.js',
   './styles.css',
   './manifest.json',
   './logo.webp',
@@ -76,7 +77,17 @@ self.addEventListener('fetch', (event) => {
           }
           return response;
         })
-        .catch(() => cached || new Response('Offline', { status: 503, statusText: 'Offline' }));
+        .catch(() => {
+          if (cached) return cached;
+          // Só faz sentido devolver a página "Offline" para uma NAVEGAÇÃO.
+          // Para script/css/imagem, devolver esse texto fazia o navegador
+          // executar a string "Offline" no lugar do arquivo — foi assim que
+          // o supabase-js sumia e o login quebrava sem erro visível.
+          if (event.request.mode === 'navigate') {
+            return new Response('Offline', { status: 503, statusText: 'Offline' });
+          }
+          return Response.error();
+        });
       return cached || network;
     })
   );
