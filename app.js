@@ -10,7 +10,7 @@ function escapeHtml(str) {
 }
 
 // ==========================================
-// CLOUD SYNC (SUPABASE) — login por magic link + sincronização de progresso
+// CLOUD SYNC (SUPABASE) — login por código de 6 dígitos + sync de progresso
 // Login: e-mail sem senha. 1º login = sobe o progresso local atual pra nuvem.
 // Logins seguintes (outro aparelho/navegador) = puxa o progresso da nuvem
 // e substitui o local (a nuvem vira a fonte da verdade depois do 1º login).
@@ -26,6 +26,9 @@ let cloudUser = null; // { id, email }
 let cloudNickname = null; // apelido salvo em public_profiles.nickname (null = ainda não definido)
 let cloudSyncTimer = null;
 let cloudSyncing = false;
+let cloudSyncDirty = false;
+let cloudSyncFailures = 0;
+const CLOUD_SYNC_MAX_RETRIES = 4;
 
 function isCloudEnabled() {
   return !!supabaseClient;
@@ -50,6 +53,7 @@ async function initCloudAuth() {
 
 async function onCloudLogin(user) {
   cloudUser = { id: user.id, email: user.email };
+  cloudSyncFailures = 0; // sessão nova começa com o contador de falhas zerado
   updateAccountUI();
 
   const { data: publicProfile } = await supabaseClient
@@ -58,13 +62,19 @@ async function onCloudLogin(user) {
     .eq('id', cloudUser.id)
     .maybeSingle();
 
-  if (!publicProfile) {
-    cloudNickname = null;
+  cloudNickname = publicProfile ? publicProfile.nickname : null;
+
+  // Sincroniza SEMPRE (mesmo em conta nova): pullStateFromCloud sabe subir o
+  // progresso local quando a nuvem está vazia, puxar quando só a nuvem tem
+  // história, e perguntar quando os dois lados têm progresso diferente.
+  await pullStateFromCloud();
+
+  if (!cloudNickname) {
+    // Só depois de resolver o progresso é que pedimos o apelido, pra os dois
+    // modais não aparecerem empilhados.
     const modal = document.getElementById('nickname-modal');
     if (modal) modal.classList.remove('hidden');
   } else {
-    cloudNickname = publicProfile.nickname;
-    await pullStateFromCloud();
     await consumePendingInvite();
   }
 }
@@ -75,13 +85,24 @@ function onCloudLogout() {
   updateAccountUI();
 }
 
-async function sendMagicLink(email) {
+// Login por CÓDIGO de 6 dígitos, não por link.
+// Motivo: um link aberto a partir do e-mail costuma cair no navegador PADRÃO
+// do celular, que pode não ser o mesmo em que a pessoa estava jogando. Como o
+// progresso não sincronizado vive no localStorage (que é por navegador), ela
+// terminava logada num navegador diferente, com outro progresso — parecendo
+// que o salvamento "não funcionou". Com código, a sessão é criada na MESMA
+// aba onde a pessoa já está, e o progresso dela sobe certinho.
+async function sendLoginCode(email) {
   if (!isCloudEnabled()) return { error: 'Sincronização indisponível no momento.' };
-  const redirectTo = window.location.origin + window.location.pathname;
-  const { error } = await supabaseClient.auth.signInWithOtp({
-    email,
-    options: { emailRedirectTo: redirectTo }
-  });
+  const { error } = await supabaseClient.auth.signInWithOtp({ email });
+  return { error: error ? error.message : null };
+}
+
+async function verifyLoginCode(email, token) {
+  if (!isCloudEnabled()) return { error: 'Sincronização indisponível no momento.' };
+  const clean = (token || '').replace(/\D/g, '');
+  if (clean.length !== 6) return { error: 'O código tem 6 dígitos.' };
+  const { error } = await supabaseClient.auth.verifyOtp({ email, token: clean, type: 'email' });
   return { error: error ? error.message : null };
 }
 
@@ -101,11 +122,42 @@ async function deleteCloudData() {
   await signOutCloud();
 }
 
+// Filtro básico de apelido — o apelido aparece no ranking público pra todo
+// mundo, então vale barrar o óbvio. Não é moderação completa, só um primeiro
+// obstáculo (checa a versão sem acento/repetição pra pegar "pÔrrrra" etc.).
+const NICKNAME_BLOCKLIST = [
+  'caralho', 'porra', 'buceta', 'bucet', 'foder', 'fuder', 'fodase', 'puta', 'puta',
+  'viado', 'viadinho', 'bicha', 'cuzao', 'cuzinho', 'arrombado', 'corno', 'pinto',
+  'piroca', 'rola', 'xoxota', 'penis', 'vagina', 'merda', 'bosta', 'fdp', 'pqp',
+  'macaco', 'preto', 'nazi', 'nazista', 'hitler', 'estupr', 'pedofil', 'nigg',
+  'fuck', 'shit', 'bitch', 'cunt', 'dick', 'pussy', 'rape', 'admin', 'moderador'
+];
+
+const LEET_MAP = { '4': 'a', '@': 'a', '3': 'e', '1': 'i', '!': 'i', '0': 'o', '5': 's', '$': 's', '7': 't' };
+
+function nicknameLooksAbusive(nickname) {
+  const normalized = nickname
+    .toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')  // tira acentos
+    .replace(/[4@31!05$7]/g, (c) => LEET_MAP[c] || c)  // desfaz leetspeak básico
+    .replace(/[^a-z]/g, '')                            // tira o resto (números/símbolos)
+    .replace(/(.)\1+/g, '$1');                         // colapsa letras repetidas
+  return NICKNAME_BLOCKLIST.some(bad => normalized.includes(bad.replace(/(.)\1+/g, '$1')));
+}
+
 window.confirmNickname = async function(nickname) {
   const errEl = document.getElementById('nickname-error-msg');
-  const clean = (nickname || '').trim();
+  const clean = (nickname || '').trim().replace(/\s+/g, ' ');
   if (clean.length < 2) {
     if (errEl) errEl.innerText = 'Escolhe um apelido com pelo menos 2 letras.';
+    return;
+  }
+  if (clean.length > 20) {
+    if (errEl) errEl.innerText = 'Apelido muito longo (máximo 20 caracteres).';
+    return;
+  }
+  if (nicknameLooksAbusive(clean)) {
+    if (errEl) errEl.innerText = 'Escolhe outro apelido — esse não passa no filtro.';
     return;
   }
   if (!cloudUser) return;
@@ -133,6 +185,35 @@ window.confirmNickname = async function(nickname) {
   await consumePendingInvite();
 };
 
+// Um progresso é "relevante" quando a pessoa já jogou de verdade — só ter
+// passado pelo onboarding não conta como algo que valha a pena disputar.
+function progressIsMeaningful(s) {
+  if (!s || !s.charName) return false;
+  return (s.level || 1) > 1 || (s.xp || 0) > 0 || (s.workoutsCompleted || 0) > 0 ||
+         (s.cardioMinutesTotal || 0) > 0 || (s.unlockedTrophies || []).length > 0;
+}
+
+function describeProgress(s) {
+  if (!s) return '';
+  const nome = s.charName || 'Sem nome';
+  return `${nome} · Nv ${s.level || 1} · ${s.xp || 0} XP · ${s.workoutsCompleted || 0} treinos`;
+}
+
+// Aplica um estado vindo da nuvem na tela (inclusive saindo do onboarding, se
+// a conta já tiver personagem criado).
+function applyStateFromCloud(cloudState) {
+  state = normalizeStateShape(cloudState);
+  saveState();
+  if (state.charName) {
+    const onboardingEl = document.getElementById('screen-onboarding');
+    const mainAppEl = document.getElementById('main-app');
+    if (onboardingEl) onboardingEl.classList.add('hidden');
+    if (mainAppEl) mainAppEl.classList.remove('hidden');
+    document.body.classList.toggle('mode-simple', state.appMode === 'simple');
+  }
+  updateUI();
+}
+
 async function pullStateFromCloud() {
   if (!isCloudEnabled() || !cloudUser) return;
   const statusEl = document.getElementById('account-sync-status');
@@ -144,22 +225,61 @@ async function pullStateFromCloud() {
     .eq('id', cloudUser.id)
     .maybeSingle();
 
-  if (!error && data && data.state && Object.keys(data.state).length > 0) {
-    state = data.state;
-    saveState();
-    // Se essa conta já tem progresso salvo (veio de outro aparelho/sessão),
-    // pula o onboarding e vai direto pro app, mesmo que a tela local ainda
-    // esteja mostrando o onboarding (ex.: acabou de resetar o progresso local).
-    if (state.charName) {
-      const onboardingEl = document.getElementById('screen-onboarding');
-      const mainAppEl = document.getElementById('main-app');
-      if (onboardingEl) onboardingEl.classList.add('hidden');
-      if (mainAppEl) mainAppEl.classList.remove('hidden');
-      if (state.appMode === 'simple') document.body.classList.add('mode-simple');
-    }
-    updateUI();
+  const cloudState = (!error && data && data.state && Object.keys(data.state).length > 0) ? data.state : null;
+
+  if (!cloudState) {
+    // Conta sem progresso salvo: o que está no aparelho vira a fonte da verdade.
+    if (statusEl) statusEl.innerText = 'Progresso sincronizado.';
+    await pushStateToCloud(true);
+    return;
   }
-  if (statusEl) statusEl.innerText = 'Progresso sincronizado.';
+
+  // Os dois lados têm progresso de verdade e são diferentes: NUNCA sobrescrever
+  // em silêncio — foi assim que dava pra perder o progresso local sem aviso.
+  if (progressIsMeaningful(state) && progressIsMeaningful(cloudState) &&
+      JSON.stringify(state) !== JSON.stringify(cloudState)) {
+    await askSyncConflict(cloudState);
+    if (statusEl) statusEl.innerText = 'Progresso sincronizado.';
+    return;
+  }
+
+  // Só um dos lados tem progresso relevante: fica com o que tem mais história.
+  if (progressIsMeaningful(cloudState) || !progressIsMeaningful(state)) {
+    applyStateFromCloud(cloudState);
+    if (statusEl) statusEl.innerText = 'Progresso sincronizado.';
+  } else {
+    await pushStateToCloud(true);
+  }
+}
+
+function askSyncConflict(cloudState) {
+  return new Promise((resolve) => {
+    const modal = document.getElementById('sync-conflict-modal');
+    if (!modal) { resolve('none'); return; }
+
+    document.getElementById('sync-local-summary').innerText = describeProgress(state);
+    document.getElementById('sync-cloud-summary').innerText = describeProgress(cloudState);
+
+    const keepLocal = document.getElementById('sync-keep-local');
+    const keepCloud = document.getElementById('sync-keep-cloud');
+
+    // onclick (e não addEventListener) pra sempre sobrescrever o handler
+    // anterior — assim não acumula listener se o modal abrir mais de uma vez.
+    keepLocal.onclick = async () => {
+      playSound('click');
+      modal.classList.add('hidden');
+      await pushStateToCloud(true); // o do aparelho vence e sobe pra nuvem
+      resolve('local');
+    };
+    keepCloud.onclick = () => {
+      playSound('click');
+      modal.classList.add('hidden');
+      applyStateFromCloud(cloudState);
+      resolve('cloud');
+    };
+
+    modal.classList.remove('hidden');
+  });
 }
 
 function scheduleCloudSync() {
@@ -168,35 +288,70 @@ function scheduleCloudSync() {
   cloudSyncTimer = setTimeout(() => pushStateToCloud(false), 4000);
 }
 
+// Envia imediatamente o que estiver pendente, sem esperar o debounce.
+function flushCloudSync() {
+  if (!isCloudEnabled() || !cloudUser) return;
+  clearTimeout(cloudSyncTimer);
+  pushStateToCloud(true);
+}
+
 async function pushStateToCloud(immediate) {
-  if (!isCloudEnabled() || !cloudUser || cloudSyncing) return;
+  if (!isCloudEnabled() || !cloudUser) return;
+  // Se já tem um envio em andamento, marca que ficou coisa nova pra enviar em
+  // vez de descartar silenciosamente (senão as últimas mudanças se perdiam).
+  if (cloudSyncing) { cloudSyncDirty = true; return; }
   cloudSyncing = true;
   const statusEl = document.getElementById('account-sync-status');
   if (statusEl && !immediate) statusEl.innerText = 'Sincronizando...';
 
-  const nowIso = new Date().toISOString();
-  await supabaseClient.from('profiles').upsert({
-    id: cloudUser.id,
-    state: state,
-    updated_at: nowIso
-  });
-
-  if (cloudNickname) {
-    await supabaseClient.from('public_profiles').upsert({
+  try {
+    const nowIso = new Date().toISOString();
+    const { error: profileErr } = await supabaseClient.from('profiles').upsert({
       id: cloudUser.id,
-      nickname: cloudNickname,
-      xp: state.xp || 0,
-      level: state.level || 1,
-      active_mentor: state.activeMentor || null,
-      current_streak: state.currentStreak || 0,
+      state: state,
       updated_at: nowIso
     });
-  }
+    if (profileErr) throw profileErr;
 
-  cloudSyncing = false;
-  if (statusEl) {
-    const timeStr = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-    statusEl.innerText = `Progresso sincronizado às ${timeStr}`;
+    if (cloudNickname) {
+      const { error: publicErr } = await supabaseClient.from('public_profiles').upsert({
+        id: cloudUser.id,
+        nickname: cloudNickname,
+        xp: state.xp || 0,
+        level: state.level || 1,
+        active_mentor: state.activeMentor || null,
+        current_streak: state.currentStreak || 0,
+        updated_at: nowIso
+      });
+      if (publicErr) throw publicErr;
+    }
+
+    if (statusEl) {
+      const timeStr = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+      statusEl.innerText = `Progresso sincronizado às ${timeStr}`;
+    }
+    cloudSyncFailures = 0;
+  } catch (e) {
+    // Sem internet / erro do servidor: o progresso continua salvo no aparelho.
+    // Tentamos de novo com espera crescente, mas com um limite — sem isso, um
+    // erro permanente (sessão expirada, por ex.) viraria um laço infinito de
+    // requisições a cada 4s, gastando bateria e rede à toa.
+    cloudSyncFailures++;
+    console.error('[sync] falha ao enviar progresso', e);
+    if (statusEl) statusEl.innerText = 'Sem conexão — progresso salvo no aparelho.';
+    if (cloudSyncFailures <= CLOUD_SYNC_MAX_RETRIES) {
+      const backoff = Math.min(60000, 4000 * Math.pow(2, cloudSyncFailures - 1));
+      clearTimeout(cloudSyncTimer);
+      cloudSyncTimer = setTimeout(() => pushStateToCloud(false), backoff);
+    }
+    // Estourando o limite, paramos de insistir sozinhos: a próxima ação do
+    // usuário chama saveState() → scheduleCloudSync() e a tentativa recomeça.
+  } finally {
+    cloudSyncing = false;
+    if (cloudSyncDirty) {
+      cloudSyncDirty = false;
+      scheduleCloudSync();
+    }
   }
 }
 
@@ -298,17 +453,23 @@ async function renderFriendsList() {
   if (!container || !cloudUser) return;
   container.innerHTML = '<p style="font-size:0.7rem; color:var(--text-secondary); text-align:center;">Carregando...</p>';
 
+  // A amizade é guardada numa linha só (quem adicionou → quem foi adicionado),
+  // mas vale para os dois lados: lemos nos dois sentidos pra que quem RECEBEU
+  // o convite também veja a pessoa na lista dele. A policy de RLS de select já
+  // permite ler linhas onde você é user_id OU friend_id.
   const { data: friendships, error: fErr } = await supabaseClient
     .from('friendships')
-    .select('friend_id')
-    .eq('user_id', cloudUser.id);
+    .select('user_id, friend_id')
+    .or(`user_id.eq.${cloudUser.id},friend_id.eq.${cloudUser.id}`);
 
   if (fErr || !friendships || friendships.length === 0) {
     container.innerHTML = '<p style="font-size:0.7rem; color:var(--text-secondary); text-align:center; padding: 12px 0;">Você ainda não adicionou nenhum amigo. Compartilha seu código!</p>';
     return;
   }
 
-  const friendIds = friendships.map(f => f.friend_id);
+  const friendIds = [...new Set(
+    friendships.map(f => (f.user_id === cloudUser.id ? f.friend_id : f.user_id))
+  )];
   const { data: profiles } = await supabaseClient
     .from('public_profiles')
     .select('id, nickname, xp, level, active_mentor, current_streak')
@@ -349,23 +510,29 @@ async function renderRankingList() {
 // automático. Retorna { ok, nickname, reason } sem tocar em UI nenhuma.
 async function tryAddFriend(code) {
   const clean = (code || '').trim().toUpperCase();
-  if (clean.length !== 8) return { ok: false, reason: 'invalid' };
+  if (!/^[0-9A-F]{8}$/.test(clean)) return { ok: false, reason: 'invalid' };
   if (!cloudUser) return { ok: false, reason: 'not_logged_in' };
   if (clean === getMyInviteCode()) return { ok: false, reason: 'self' };
 
+  // `id` é uuid — não dá pra usar ilike (Postgres: "operator does not exist:
+  // uuid ~~* unknown"). Como o código são os 8 primeiros dígitos hex do uuid,
+  // buscamos pela FAIXA de uuids que começam com esse prefixo.
+  const prefix = clean.toLowerCase();
   const { data: matches, error } = await supabaseClient
     .from('public_profiles')
     .select('id, nickname')
-    .ilike('id', `${clean.toLowerCase()}%`);
+    .gte('id', `${prefix}-0000-0000-0000-000000000000`)
+    .lte('id', `${prefix}-ffff-ffff-ffff-ffffffffffff`);
 
-  if (error || !matches || matches.length === 0) return { ok: false, reason: 'not_found' };
+  if (error) return { ok: false, reason: 'query_failed', detail: error.message };
+  if (!matches || matches.length === 0) return { ok: false, reason: 'not_found' };
 
   const friend = matches[0];
   const { error: insertError } = await supabaseClient
     .from('friendships')
     .upsert({ user_id: cloudUser.id, friend_id: friend.id }, { onConflict: 'user_id,friend_id' });
 
-  if (insertError) return { ok: false, reason: 'insert_failed' };
+  if (insertError) return { ok: false, reason: 'insert_failed', detail: insertError.message };
   return { ok: true, nickname: friend.nickname };
 }
 
@@ -375,15 +542,17 @@ async function addFriendByCode(code) {
 
   const result = await tryAddFriend(code);
   const messages = {
-    invalid: 'Código inválido — precisa ter 8 letras.',
+    invalid: 'Código inválido — são 8 caracteres (0-9 e A-F).',
     self: 'Esse é o seu próprio código!',
     not_found: 'Nenhum jogador encontrado com esse código.',
+    query_failed: 'Erro ao buscar. Confira sua conexão e tente de novo.',
     insert_failed: 'Não deu pra adicionar. Tenta de novo.',
     not_logged_in: 'Você precisa estar logado.'
   };
 
   if (!result.ok) {
     statusEl.innerText = messages[result.reason] || 'Não deu pra adicionar. Tenta de novo.';
+    if (result.detail) console.error('[amigos]', result.reason, result.detail);
     return;
   }
 
@@ -1454,6 +1623,29 @@ let state = {
   // Equipamentos equipados atualmente nos slots
   equippedItems: { head: null, aura: null, arms: null, waist: null }
 };
+
+// Cópia intacta do estado inicial, tirada antes de qualquer carregamento.
+// Serve de "molde" pra completar estados vindos de fora (nuvem) que foram
+// gravados por uma versão mais antiga do app e não têm os campos novos.
+const DEFAULT_STATE_SHAPE = JSON.parse(JSON.stringify(state));
+
+// Completa um estado externo com os campos que faltam, sem sobrescrever nada
+// que já exista nele. Sem isso, um progresso salvo por uma versão antiga
+// quebraria a tela ao ser aplicado (updateUI acessa campos que não existiriam).
+function normalizeStateShape(raw) {
+  const base = JSON.parse(JSON.stringify(DEFAULT_STATE_SHAPE));
+  const merged = { ...base, ...(raw || {}) };
+  // Objetos aninhados precisam de merge próprio: o spread acima troca o objeto
+  // inteiro, então um "attributes" antigo sem alguma chave ficaria incompleto.
+  ['attributes', 'dailyMacros', 'customWorkouts', 'personalRecords',
+   'mentorLevels', 'mentorXP', 'dailyChallenge', 'activeSetsTracker',
+   'equippedItems', 'dailyHistory'].forEach((key) => {
+    if (base[key] && typeof base[key] === 'object' && !Array.isArray(base[key])) {
+      merged[key] = { ...base[key], ...((raw && raw[key]) || {}) };
+    }
+  });
+  return merged;
+}
 
 const ACTIVITY_MULTIPLIERS = {
   pouco: 1.2,
@@ -3891,25 +4083,41 @@ const CARDIO_TYPE_LABELS = {
   outro: 'Cardio'
 };
 
+// Teto diário de minutos de cardio que geram XP. Acima disso o tempo continua
+// sendo registrado (o histórico é seu), mas não rende mais XP — sem isso dava
+// pra spammar o botão e subir de nível em segundos, o que quebraria o ranking.
+const CARDIO_XP_DAILY_CAP_MIN = 120;
+
 // Registra uma sessão de cardio livre (esteira, bike, etc.) e concede XP
 // proporcional aos minutos, escalado pelo atributo RES (Resistência).
 function logCardioSession(type, minutes) {
+  const alreadyToday = state.cardioMinutesToday || 0;
+  const payableMinutes = Math.max(0, Math.min(minutes, CARDIO_XP_DAILY_CAP_MIN - alreadyToday));
   const xpPerMinute = 1 + Math.max(0, (getEffectiveAttributes().res - 10) * 0.02);
-  const xpGained = Math.round(minutes * xpPerMinute);
+  const xpGained = Math.round(payableMinutes * xpPerMinute);
 
-  addXP(xpGained);
-  state.cardioMinutesToday = (state.cardioMinutesToday || 0) + minutes;
+  if (xpGained > 0) addXP(xpGained);
+  state.cardioMinutesToday = alreadyToday + minutes;
   state.cardioMinutesTotal = (state.cardioMinutesTotal || 0) + minutes;
   saveState();
   updateUI();
 
   const label = CARDIO_TYPE_LABELS[type] || CARDIO_TYPE_LABELS.outro;
-  showItemAcquiredModal(
-    '🏃',
-    'CARDIO REGISTRADO!',
-    `${minutes} min de ${label}. +${xpGained} XP!`,
-    { subtitle: 'REGISTRO DE CARDIO', btnText: 'BORA MAIS!' }
-  );
+  const isSimple = state.appMode === 'simple';
+  let desc;
+  if (isSimple) {
+    // Modo simples esconde XP em toda a UI — não faz sentido citar aqui.
+    desc = `${minutes} min de ${label} registrados. Bom trabalho!`;
+  } else if (payableMinutes < minutes) {
+    desc = `${minutes} min de ${label}. +${xpGained} XP (você bateu o teto diário de ${CARDIO_XP_DAILY_CAP_MIN} min de cardio com XP — o tempo extra fica registrado mesmo assim).`;
+  } else {
+    desc = `${minutes} min de ${label}. +${xpGained} XP!`;
+  }
+
+  showItemAcquiredModal('🏃', 'CARDIO REGISTRADO!', desc, {
+    subtitle: 'REGISTRO DE CARDIO',
+    btnText: 'BORA MAIS!'
+  });
   playSound('quest');
 }
 
@@ -4803,6 +5011,7 @@ function renderProfileCard() {
   document.getElementById('pcm-stat-xp').innerText = state.xp + (state.level > 1 ? '' : '');
   document.getElementById('pcm-stat-workouts').innerText = state.workoutsCompleted || 0;
   document.getElementById('pcm-stat-trophies').innerText = (state.unlockedTrophies || []).length;
+  document.getElementById('pcm-stat-cardio').innerText = state.cardioMinutesTotal || 0;
 
   renderPinnedRecords();
   renderProfileMentorMinis();
@@ -5976,6 +6185,11 @@ const TUTORIAL_STEPS = [
     text: 'Registre a carga, toque nas séries pra completar e deixe o Cronômetro de Descanso cuidar do tempo entre elas. Supere seu próprio recorde e a Progressão de Carga te recompensa com XP bônus na hora.'
   },
   {
+    title: 'Cardio Também Vale XP 🏃',
+    illoHTML: '<div class="tutorial-illustration-container"><div class="tutorial-anim-workout">🏃</div></div>',
+    text: 'Esteira, bike, corrida ou natação: na aba Treinos, toque em "Registrar Cardio", escolha a atividade e o tempo. O XP é proporcional aos minutos e cresce junto com sua Resistência — quem prefere cardio a puxar ferro evolui igual.'
+  },
+  {
     title: 'Dieta: Três Anéis, Um Objetivo 🍗',
     illoHTML: '<div class="tutorial-anim-attributes"><div class="tutorial-attr-node node-n"></div><div class="tutorial-attr-node node-e"></div><div class="tutorial-attr-node node-w"></div><div class="tutorial-attr-core">🍗</div></div>',
     text: 'Calorias, proteína e fibra ganharam HUD próprio com três anéis. Registre suas refeições e veja eles se preencherem — sua meta calórica já é calculada automaticamente com base no seu objetivo.'
@@ -5983,7 +6197,7 @@ const TUTORIAL_STEPS = [
   {
     title: 'Mentores: Todos Liberados desde o Nível 1 🐉',
     illoHTML: '<div class="tutorial-illustration-container"><div class="tutorial-anim-mentors">🐉</div></div>',
-    text: 'Filtre por universo — Dragon Ball, Naruto, One Punch Man, Fisiculturistas — e escolha seu mentor base sem precisar destravar nada. Cada um sobe até o nível 30 com 23 recompensas próprias: a jornada é longa de propósito.'
+    text: 'Filtre por universo — Dragon Ball, Naruto, One Punch Man, Fisiculturistas, Coreaninhos — e escolha seu mentor base sem precisar destravar nada. Cada um sobe até o nível 30 com 23 recompensas próprias: a jornada é longa de propósito.'
   },
   {
     title: 'Equipamentos: Vista suas Conquistas 🛡️',
@@ -5993,7 +6207,17 @@ const TUTORIAL_STEPS = [
   {
     title: 'Seu Cartão de Caçador 🪪',
     illoHTML: '<div class="tutorial-illustration-container"><div class="tutorial-anim-profile">🪪</div></div>',
-    text: 'Na aba Status, abra o Cartão de Caçador pra ver seu Hunter Rank, fixar seus marcos de força favoritos e destacar troféus. Em breve você vai poder comparar tudo isso com amigos. Bora treinar?'
+    text: 'Na aba Status, abra o Cartão de Caçador pra ver seu Hunter Rank, fixar seus marcos de força favoritos e destacar troféus.'
+  },
+  {
+    title: 'Amigos & Ranking 👥',
+    illoHTML: '<div class="tutorial-illustration-container"><div class="tutorial-anim-mentors">👥</div></div>',
+    text: 'Compartilhe seu link de convite e acompanhe a evolução da galera lado a lado. Tem também o Ranking Global, com os caçadores de mais XP. Você encontra tudo em Ajustes → Amigos & Ranking.'
+  },
+  {
+    title: 'Salve seu Progresso na Nuvem ☁️',
+    illoHTML: '<div class="tutorial-illustration-container"><div class="tutorial-rune-welcome">☁️</div></div>',
+    text: 'Em Ajustes → Conta, coloque seu e-mail e digite o código de 6 dígitos que chegar (sem senha pra decorar). Assim seu progresso fica salvo e você continua de onde parou mesmo trocando de celular. Bora treinar?'
   }
 ];
 
@@ -6014,9 +6238,19 @@ const SIMPLE_TUTORIAL_STEPS = [
     text: 'Marque as séries conforme conclui, acompanhe o progresso e finalize o treino. Sem XP, sem ranks — só registro.'
   },
   {
+    title: 'Cardio 🏃',
+    illoHTML: '<div class="tutorial-illustration-container"><div class="tutorial-anim-workout">🏃</div></div>',
+    text: 'Fez esteira, bike ou corrida? Na aba Treinos, toque em "Registrar Cardio" e anote o tempo. Fica tudo registrado junto com o resto do seu dia.'
+  },
+  {
     title: 'Dieta 🍗',
     illoHTML: '<div class="tutorial-anim-attributes"><div class="tutorial-attr-node node-n"></div><div class="tutorial-attr-node node-e"></div><div class="tutorial-attr-node node-w"></div><div class="tutorial-attr-core">🍗</div></div>',
     text: 'Registre refeições e veja os anéis de calorias, proteína e fibra atualizados em tempo real. Seu objetivo já está configurado no onboarding.'
+  },
+  {
+    title: 'Salve seu Progresso ☁️',
+    illoHTML: '<div class="tutorial-illustration-container"><div class="tutorial-rune-welcome">☁️</div></div>',
+    text: 'Em Ajustes → Conta, coloque seu e-mail e digite o código de 6 dígitos que chegar (sem senha pra decorar). Seu progresso fica salvo e você continua de onde parou mesmo trocando de celular.'
   },
   {
     title: 'Pronto para começar! ✅',
@@ -6045,14 +6279,16 @@ function closeTutorial() {
 
 function startTutorial() {
   const overlay = document.getElementById('tutorial-overlay');
-  if (overlay && overlay.classList.contains('hidden')) {
+  // O overlay nasce com a classe "hidden" no HTML — checar por ela aqui
+  // fazia o tutorial se marcar como concluído e nunca aparecer.
+  if (!overlay) {
     state.tutorialCompleted = true;
     saveState();
     return;
   }
   tutorialStep = 0;
   renderTutorialStep(tutorialStep);
-  if (overlay) overlay.classList.remove('hidden');
+  overlay.classList.remove('hidden');
 }
 
 function renderTutorialStep(idx) {
@@ -6061,9 +6297,18 @@ function renderTutorialStep(idx) {
   document.getElementById('tutorial-step-title').innerText = step.title;
   document.getElementById('tutorial-step-illustration').innerHTML = step.illoHTML;
   document.getElementById('tutorial-step-text').innerText = step.text;
-  document.querySelectorAll('#tutorial-overlay .dot').forEach((dot, i) => {
-    dot.classList.toggle('active', i === idx);
-  });
+
+  // Bolinhas geradas conforme o número real de passos do modo atual (RPG e
+  // Simples têm quantidades diferentes).
+  const dotsContainer = document.getElementById('tutorial-steps-dots');
+  if (dotsContainer) {
+    if (dotsContainer.children.length !== steps.length) {
+      dotsContainer.innerHTML = steps.map((_, i) => `<span class="dot" data-step="${i}"></span>`).join('');
+    }
+    Array.from(dotsContainer.children).forEach((dot, i) => {
+      dot.classList.toggle('active', i === idx);
+    });
+  }
   const btnNext = document.getElementById('btn-tutorial-next');
   btnNext.innerText = (idx === steps.length - 1) ? 'VAMOS TREINAR! 💪' : 'AVANÇAR →';
 
@@ -6113,9 +6358,9 @@ document.addEventListener('DOMContentLoaded', () => {
   capturePendingInviteFromURL();
   initCloudAuth();
 
-  const magicLinkBtn = document.getElementById('account-send-magic-link');
-  if (magicLinkBtn) {
-    magicLinkBtn.addEventListener('click', async () => {
+  const sendCodeBtn = document.getElementById('account-send-magic-link');
+  if (sendCodeBtn) {
+    sendCodeBtn.addEventListener('click', async () => {
       const emailInput = document.getElementById('account-email-input');
       const statusEl = document.getElementById('account-status-msg');
       const email = (emailInput?.value || '').trim();
@@ -6124,13 +6369,40 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
       playSound('click');
-      magicLinkBtn.disabled = true;
-      if (statusEl) statusEl.innerText = 'Enviando link...';
-      const { error } = await sendMagicLink(email);
-      magicLinkBtn.disabled = false;
-      if (statusEl) {
-        statusEl.innerText = error ? `Erro: ${error}` : 'Link enviado! Confira seu e-mail (e o spam).';
+      sendCodeBtn.disabled = true;
+      if (statusEl) statusEl.innerText = 'Enviando código...';
+      const { error } = await sendLoginCode(email);
+      sendCodeBtn.disabled = false;
+      if (error) {
+        if (statusEl) statusEl.innerText = `Erro: ${error}`;
+        return;
       }
+      if (statusEl) statusEl.innerText = 'Código enviado! Confira seu e-mail (e o spam).';
+      document.getElementById('account-code-step').classList.remove('hidden');
+      sendCodeBtn.innerText = 'Reenviar código';
+      document.getElementById('account-code-input').focus();
+    });
+  }
+
+  const verifyCodeBtn = document.getElementById('account-verify-code');
+  if (verifyCodeBtn) {
+    verifyCodeBtn.addEventListener('click', async () => {
+      const statusEl = document.getElementById('account-status-msg');
+      const email = (document.getElementById('account-email-input')?.value || '').trim();
+      const code = document.getElementById('account-code-input')?.value || '';
+      playSound('click');
+      verifyCodeBtn.disabled = true;
+      if (statusEl) statusEl.innerText = 'Verificando...';
+      const { error } = await verifyLoginCode(email, code);
+      verifyCodeBtn.disabled = false;
+      if (error) {
+        if (statusEl) statusEl.innerText = `Código inválido ou expirado. Peça um novo.`;
+        return;
+      }
+      if (statusEl) statusEl.innerText = '';
+      document.getElementById('account-code-step').classList.add('hidden');
+      document.getElementById('account-code-input').value = '';
+      sendCodeBtn.innerText = 'Enviar código';
     });
   }
 
@@ -6176,6 +6448,25 @@ document.addEventListener('DOMContentLoaded', () => {
       openFriendsModal();
     });
   }
+  // Entrada alternativa em Ajustes — a aba Status (onde fica o Cartão de
+  // Caçador) é escondida no Modo Simples, então sem isso quem usa o modo
+  // simples não conseguiria acessar amigos/ranking de jeito nenhum.
+  const settingsFriendsBtn = document.getElementById('settings-open-friends');
+  if (settingsFriendsBtn) {
+    settingsFriendsBtn.addEventListener('click', () => {
+      playSound('click');
+      openFriendsModal();
+    });
+  }
+
+  const replayTutorialBtn = document.getElementById('settings-replay-tutorial');
+  if (replayTutorialBtn) {
+    replayTutorialBtn.addEventListener('click', () => {
+      playSound('click');
+      startTutorial();
+    });
+  }
+
   const closeFriendsBtn = document.getElementById('btn-close-friends-modal');
   if (closeFriendsBtn && friendsModal) {
     closeFriendsBtn.addEventListener('click', () => {
@@ -6279,12 +6570,38 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       playSound('click');
       earlyLoginSendBtn.disabled = true;
-      if (statusEl) statusEl.innerText = 'Enviando link...';
-      const { error } = await sendMagicLink(email);
+      if (statusEl) statusEl.innerText = 'Enviando código...';
+      const { error } = await sendLoginCode(email);
       earlyLoginSendBtn.disabled = false;
-      if (statusEl) {
-        statusEl.innerText = error ? `Erro: ${error}` : 'Link enviado! Confira seu e-mail (e o spam).';
+      if (error) {
+        if (statusEl) statusEl.innerText = `Erro: ${error}`;
+        return;
       }
+      if (statusEl) statusEl.innerText = 'Código enviado! Confira seu e-mail (e o spam).';
+      document.getElementById('early-login-code-step').classList.remove('hidden');
+      document.getElementById('early-login-verify-btn').classList.remove('hidden');
+      earlyLoginSendBtn.innerText = 'Reenviar código';
+      document.getElementById('early-login-code-input').focus();
+    });
+  }
+
+  const earlyLoginVerifyBtn = document.getElementById('early-login-verify-btn');
+  if (earlyLoginVerifyBtn) {
+    earlyLoginVerifyBtn.addEventListener('click', async () => {
+      const statusEl = document.getElementById('early-login-status-msg');
+      const email = (document.getElementById('early-login-email-input')?.value || '').trim();
+      const code = document.getElementById('early-login-code-input')?.value || '';
+      playSound('click');
+      earlyLoginVerifyBtn.disabled = true;
+      if (statusEl) statusEl.innerText = 'Verificando...';
+      const { error } = await verifyLoginCode(email, code);
+      earlyLoginVerifyBtn.disabled = false;
+      if (error) {
+        if (statusEl) statusEl.innerText = 'Código inválido ou expirado. Peça um novo.';
+        return;
+      }
+      if (statusEl) statusEl.innerText = '';
+      document.getElementById('early-login-modal').classList.add('hidden');
     });
   }
 
@@ -6343,7 +6660,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // Pausa animações e persiste estado ao ir para background (economia de bateria / perda de dados)
   document.addEventListener('visibilitychange', () => {
     document.body.classList.toggle('app-paused', document.hidden);
-    if (document.hidden) saveState();
+    if (document.hidden) {
+      saveState();
+      // saveState() só AGENDA o envio pra nuvem (debounce de 4s). Se o app for
+      // fechado/minimizado antes disso, o progresso recente ficaria só no
+      // aparelho. Aqui a página ainda está viva, então dá pra enviar na hora.
+      flushCloudSync();
+    }
   });
   window.addEventListener('pagehide', saveState);
   window.addEventListener('beforeunload', saveState);

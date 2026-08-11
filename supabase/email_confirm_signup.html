@@ -1,8 +1,11 @@
 <!--
   Template do e-mail de PRIMEIRO ACESSO (Confirm signup) — usado na primeira
-  vez que um e-mail novo pede o link mágico (cria a conta + confirma o e-mail).
-  Colar em: Supabase → Authentication → Email Templates → "Confirm signup"
-  Variável usada: {{ .ConfirmationURL }}
+  vez que um e-mail novo pede acesso (cria a conta + confirma o e-mail).
+  Colar em: Supabase → Authentication → Emails → template "Confirm signup"
+  Variável usada: {{ .Token }}  (código de 6 dígitos)
+
+  Igual ao Magic Link: só código, sem link clicável — ver explicação em
+  email_magic_link.html.
 -->
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#0a0e0a; padding:32px 16px; font-family:Arial,Helvetica,sans-serif;">
   <tr>
@@ -18,16 +21,16 @@
           <td style="padding:20px 28px 8px; text-align:center;">
             <div style="font-size:40px; line-height:1;">⚔️</div>
             <h1 style="font-size:18px; color:#ffffff; margin:14px 0 8px;">Bem-vindo(a), Recruta!</h1>
-            <p style="font-size:13px; color:#9ca3af; line-height:1.6; margin:0 0 24px;">
-              Confirma seu e-mail pra ativar sua conta. Depois disso, seu progresso fica salvo na nuvem e você pode acessar de qualquer aparelho.
+            <p style="font-size:13px; color:#9ca3af; line-height:1.6; margin:0 0 20px;">
+              Digite o código abaixo na tela do FreakyQuest pra ativar sua conta. Depois disso seu progresso fica salvo na nuvem e você acessa de qualquer aparelho.
             </p>
           </td>
         </tr>
         <tr>
-          <td style="padding:0 28px 28px; text-align:center;">
-            <a href="{{ .ConfirmationURL }}" style="display:inline-block; background-color:#22c55e; color:#0a0e0a; font-weight:800; font-size:14px; text-decoration:none; padding:14px 32px; border-radius:10px; letter-spacing:0.5px;">
-              CONFIRMAR E ENTRAR
-            </a>
+          <td style="padding:0 28px 24px; text-align:center;">
+            <div style="display:inline-block; background-color:#0a0e0a; border:1px solid #22c55e; border-radius:12px; padding:16px 28px; font-size:32px; font-weight:900; letter-spacing:10px; color:#22c55e; font-family:'Courier New',Courier,monospace;">
+              {{ .Token }}
+            </div>
           </td>
         </tr>
         <tr>

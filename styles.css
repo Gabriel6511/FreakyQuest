@@ -817,9 +817,11 @@ body.mode-simple #mentors-list-container,
 body.mode-simple .showcase-section,
 body.mode-simple .inventory-section,
 body.mode-simple .subclass-lore-card,
-body.mode-simple .level-up-modal,
-body.mode-simple .item-acquired-modal,
-body.mode-simple .profile-card-modal,
+/* Removidos daqui: .level-up-modal, .item-acquired-modal e .profile-card-modal.
+   Eram seletores de CLASSE que não batiam com nada (os elementos usam id), ou
+   seja, código morto. Além disso o #item-acquired-modal hoje é reaproveitado
+   como modal genérico (ajuda de atributo, registro de cardio, recordes), então
+   ele PRECISA funcionar no modo simples. */
 body.mode-simple .tribute-section-card,
 body.mode-simple .tribute-quotes-grid,
 body.mode-simple .milestones-timeline,
@@ -3701,7 +3703,8 @@ body.diet-disabled #dashboard-diet-card {
 
 .pcm-stats-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  /* auto-fit pra acomodar 5 tiles: 3+2 no celular, tudo em linha no desktop */
+  grid-template-columns: repeat(auto-fit, minmax(86px, 1fr));
   gap: 6px;
 }
 .pcm-stat {
@@ -3817,11 +3820,14 @@ body.diet-disabled #dashboard-diet-card {
   padding: 10px 12px;
   border-radius: 10px;
   background: rgba(255,255,255,0.03);
-  border: 1px dashed rgba(255,255,255,0.12);
+  border: 1px solid var(--color-primary);
   margin-top: 2px;
+  transition: background 0.15s ease;
 }
+.pcm-compare-teaser:hover { background: rgba(255,255,255,0.07); }
+.pcm-compare-teaser:active { transform: scale(0.99); }
 .pcm-compare-icon { font-size: 16px; }
-.pcm-compare-text { flex: 1; font-size: 0.7rem; color: var(--text-secondary); }
+.pcm-compare-text { flex: 1; font-size: 0.72rem; font-weight: 700; color: var(--color-primary); text-align: left; }
 .pcm-compare-badge {
   font-size: 0.58rem; font-weight: 700;
   color: var(--text-muted);

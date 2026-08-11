@@ -1739,13 +1739,19 @@
             <div id="account-logged-out">
               <p style="font-size: 0.65rem; color: var(--text-secondary); margin-bottom: 6px;">Entre com seu e-mail pra salvar o progresso na nuvem e acessar de outro aparelho.</p>
               <input type="email" id="account-email-input" placeholder="seu@email.com" style="width: 100%; padding: 8px; border-radius: 8px; margin-bottom: 6px;">
-              <button type="button" id="account-send-magic-link" class="btn btn-outline" style="width: 100%;">Enviar link mágico</button>
+              <button type="button" id="account-send-magic-link" class="btn btn-outline" style="width: 100%;">Enviar código</button>
+              <div id="account-code-step" class="hidden" style="margin-top: 8px;">
+                <p style="font-size: 0.65rem; color: var(--text-secondary); margin-bottom: 6px;">Digite aqui o código de 6 dígitos que chegou no seu e-mail. <strong>Não saia desta tela</strong> — seu progresso atual é salvo assim que você entrar.</p>
+                <input type="text" id="account-code-input" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="000000" style="width: 100%; padding: 10px; border-radius: 8px; text-align: center; letter-spacing: 6px; font-size: 1.1rem; font-weight: 800; margin-bottom: 6px;">
+                <button type="button" id="account-verify-code" class="btn btn-primary" style="width: 100%;">Confirmar código</button>
+              </div>
               <p id="account-status-msg" style="font-size: 0.65rem; margin-top: 6px;"></p>
             </div>
             <div id="account-logged-in" class="hidden">
               <p style="font-size: 0.8rem;">Logado como <strong id="account-user-email"></strong></p>
               <p id="account-sync-status" style="font-size: 0.65rem; color: var(--text-secondary); margin: 4px 0 10px;"></p>
               <button type="button" id="account-sign-out" class="btn btn-outline" style="width: 100%;">Sair</button>
+              <button type="button" id="settings-open-friends" class="btn btn-accent" style="width: 100%; margin-top: 8px;">👥 Amigos & Ranking</button>
               <button type="button" id="account-delete-cloud-data" class="btn btn-outline" style="width: 100%; margin-top: 8px; color: var(--color-danger, #e63946); border-color: var(--color-danger, #e63946);">Apagar dados da nuvem</button>
               <p style="font-size: 0.6rem; color: var(--text-secondary); margin-top: 4px;">Apaga o progresso salvo dessa conta na nuvem e desconecta. O que estiver salvo só neste aparelho não é afetado.</p>
             </div>
@@ -1801,6 +1807,11 @@
               Rastrear dieta
             </label>
             <p style="font-size: 0.65rem; color: var(--text-secondary); margin-top: 6px;">Desative se não quiser registrar refeições — a aba Dieta some, os avisos somem e a missão diária de proteína vira uma missão de treino.</p>
+          </div>
+
+          <div class="settings-group" style="margin-top: 10px;">
+            <h4>Ajuda</h4>
+            <button type="button" id="settings-replay-tutorial" class="btn btn-outline" style="width: 100%; margin-top: 4px;">Ver tutorial novamente</button>
           </div>
 
           <div class="settings-group" style="margin-top: 10px;">
@@ -1860,6 +1871,11 @@
             <span class="pcm-stat-val" id="pcm-stat-trophies">0</span>
             <span class="pcm-stat-lbl">Conquistas</span>
           </div>
+          <div class="pcm-stat">
+            <span class="pcm-stat-icon">🏃</span>
+            <span class="pcm-stat-val" id="pcm-stat-cardio">0</span>
+            <span class="pcm-stat-lbl">Min. Cardio</span>
+          </div>
         </div>
 
         <div class="pcm-section">
@@ -1877,9 +1893,10 @@
           <div id="pcm-trophies-preview" class="pcm-trophies-preview-row"></div>
         </div>
 
-        <button type="button" id="btn-open-friends-modal" class="pcm-compare-teaser" style="cursor: pointer; border: none; width: 100%;">
+        <button type="button" id="btn-open-friends-modal" class="pcm-compare-teaser" style="cursor: pointer; width: 100%;">
           <span class="pcm-compare-icon">👥</span>
-          <span class="pcm-compare-text">Amigos & Ranking</span>
+          <span class="pcm-compare-text">Amigos &amp; Ranking</span>
+          <span class="pcm-compare-icon" aria-hidden="true">›</span>
         </button>
       </div>
     </div>
@@ -2280,14 +2297,40 @@
         <span style="font-size: 3rem; display: block; margin-bottom: 12px;">🔑</span>
         <h3 style="margin-bottom: 10px; font-family: var(--font-display); font-weight: 800;">Entrar na sua conta</h3>
         <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 16px;">
-          Digite o e-mail que você usou antes — mandamos um link mágico pra recuperar seu progresso.
+          Digite o e-mail que você usou antes — mandamos um código de 6 dígitos pra recuperar seu progresso.
         </p>
         <input type="email" id="early-login-email-input" placeholder="seu@email.com" style="width: 100%; padding: 10px; border-radius: 8px; margin-bottom: 8px; text-align: center;">
+        <div id="early-login-code-step" class="hidden">
+          <p style="font-size: 0.72rem; color: var(--text-secondary); margin-bottom: 8px;">Digite o código de 6 dígitos que chegou no seu e-mail.</p>
+          <input type="text" id="early-login-code-input" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="000000" style="width: 100%; padding: 10px; border-radius: 8px; margin-bottom: 8px; text-align: center; letter-spacing: 6px; font-size: 1.1rem; font-weight: 800;">
+        </div>
         <p id="early-login-status-msg" style="font-size: 0.65rem; margin-bottom: 8px; min-height: 1em;"></p>
         <div class="btn-group-row" style="justify-content: center;">
-          <button type="button" id="early-login-send-btn" class="btn btn-primary ripple" style="width: 100%;">Enviar link mágico</button>
+          <button type="button" id="early-login-send-btn" class="btn btn-primary ripple" style="width: 100%;">Enviar código</button>
         </div>
+        <button type="button" id="early-login-verify-btn" class="btn btn-primary ripple hidden" style="width: 100%; margin-top: 8px;">Confirmar código</button>
         <button type="button" id="early-login-close-btn" class="btn btn-outline" style="width: 100%; margin-top: 8px;">Cancelar</button>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL: CONFLITO DE PROGRESSO (local x nuvem) -->
+    <!-- ========================================== -->
+    <div id="sync-conflict-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+      <div class="custom-modal-card glass-panel fade-in" style="max-width: 400px; padding: 24px;">
+        <span style="font-size: 2.5rem; display: block; margin-bottom: 10px; text-align: center;">⚠️</span>
+        <h3 style="margin-bottom: 8px; text-align: center; font-family: var(--font-display); font-weight: 800;">Qual progresso manter?</h3>
+        <p style="font-size: 0.78rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 16px; text-align: center;">
+          Encontramos progresso salvo nessa conta e também neste aparelho. Escolha qual manter — o outro será substituído.
+        </p>
+        <button type="button" id="sync-keep-local" class="btn btn-primary" style="width: 100%; text-align: left; padding: 12px;">
+          <strong style="display:block; font-size:0.8rem;">📱 Manter o deste aparelho</strong>
+          <span id="sync-local-summary" style="font-size:0.65rem; opacity:0.85;"></span>
+        </button>
+        <button type="button" id="sync-keep-cloud" class="btn btn-outline" style="width: 100%; margin-top: 10px; text-align: left; padding: 12px;">
+          <strong style="display:block; font-size:0.8rem;">☁️ Manter o salvo na conta</strong>
+          <span id="sync-cloud-summary" style="font-size:0.65rem; opacity:0.85;"></span>
+        </button>
       </div>
     </div>
 
@@ -2416,14 +2459,8 @@
           </div>
         </div>
         <div class="tutorial-footer">
-          <div class="tutorial-steps-dots">
-            <span class="dot active" data-step="0"></span>
-            <span class="dot" data-step="1"></span>
-            <span class="dot" data-step="2"></span>
-            <span class="dot" data-step="3"></span>
-            <span class="dot" data-step="4"></span>
-            <span class="dot" data-step="5"></span>
-            <span class="dot" data-step="6"></span>
+          <div class="tutorial-steps-dots" id="tutorial-steps-dots">
+            <!-- bolinhas geradas dinamicamente conforme a quantidade de passos do modo -->
           </div>
           <div class="tutorial-actions-row">
             <button type="button" id="btn-tutorial-skip" class="btn btn-sm btn-outline">PULAR</button>
