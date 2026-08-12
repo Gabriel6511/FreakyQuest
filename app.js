@@ -868,10 +868,9 @@ const OFFICIAL_MENTORS = [
     levelReq: 1,
     theme: 'theme-anya',
     avatar: 'anya.webp',
-    // Preset "Anime" padrao — ainda NAO calibrado contra a arte real (arquivo
-    // pendente). Recomparar lado a lado assim que a imagem chegar, como foi
-    // feito com o Sukuna (a arte real pode pedir ajuste).
-    filterCSS: 'contrast(1.45) saturate(1.75) brightness(0.9)',
+    // Calibrado lado a lado contra a arte real: o preset "Anime" padrao
+    // escurecia demais o rosto dela contra o fundo escuro da academia.
+    filterCSS: 'contrast(1.25) saturate(1.45) brightness(0.98)',
     quote: '"Anya sabe... Anya sabe que você pode treinar mais! Waku waku!!"',
     buff: '+15% Foco & +10% Agilidade (Telepatia)',
     colorHex: '#ff6fb0',
@@ -1545,7 +1544,162 @@ const EQUIPMENT_DATABASE = [
     stats: { foc: 5 },
     unlockDesc: 'Desbloqueia no Mentor RM Nível 5.',
     equivalentIds: ['item_namjoon', 'has-item-namjoon']
-  }
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // LEVA 2026-08-12 — 30 itens novos, 3 por mentor (4 na Anya).
+  //
+  // Os níveis usados (4/9/19/30) NÃO são arbitrários: são os níveis em que
+  // generateMentorRewards() emite uma recompensa do tipo `css_class`, que é
+  // o único tipo que checkMentorRewards() empurra pra state.unlockedItems.
+  // Por isso cada item traz o `has-men-<shortcode><nível>` correspondente em
+  // equivalentIds — é ele que destrava o item, não o texto de unlockDesc.
+  // Ver docs/MENTOR_CRITERIA.md seção 7.
+  // ─────────────────────────────────────────────────────────────
+
+  // ══ GOKU ══
+  { id: 'item_kame', name: 'Símbolo da Tartaruga', slot: 'badge', icon: 'simbolo_kame_icon.webp',
+    desc: 'O kanji 亀 da Escola Tartaruga marcado no seu perfil. Treino do Mestre Kame validado.',
+    stats: { foc: 8, for: 4 }, unlockDesc: 'Desbloqueia no Mentor Goku Nível 19.',
+    equivalentIds: ['item_kame', 'has-men-gok19'] },
+  { id: 'item_kaioken', name: 'Punhos do Kaioken', slot: 'hands', icon: 'punhos_kaioken_icon.webp',
+    desc: 'Seus punhos queimam em chamas vermelhas. Kaioken multiplica tudo — inclusive o risco.',
+    stats: { for: 12, foc: 6 }, unlockDesc: 'Desbloqueia no Mentor Goku Nível 30.',
+    equivalentIds: ['item_kaioken', 'has-men-gok30'] },
+
+  // ══ BROLY ══
+  { id: 'item_paragus', name: 'Coroa de Paragus', slot: 'badge', icon: 'coroa_paragus_icon.webp',
+    desc: 'A tiara de controle que segurava o Lendário. Você decide se ela te contém ou te liberta.',
+    stats: { for: 8, res: 4 }, unlockDesc: 'Desbloqueia no Mentor Broly Nível 19.',
+    equivalentIds: ['item_paragus', 'has-men-bro19'] },
+  { id: 'item_punhosbroly', name: 'Punhos do Lendário', slot: 'hands', icon: 'punhos_broly_icon.webp',
+    desc: 'Punhos colossais envoltos em energia verde. Não existe peso, só coisas a serem esmagadas.',
+    stats: { for: 12, res: 6 }, unlockDesc: 'Desbloqueia no Mentor Broly Nível 30.',
+    equivalentIds: ['item_punhosbroly', 'has-men-bro30'] },
+
+  // ══ ROCK LEE ══
+  { id: 'item_caneleiras', name: 'Caneleiras de Peso', slot: 'legs', icon: 'caneleiras_lee_icon.webp',
+    desc: 'As caneleiras que o Lee treina o tempo todo. Quando você tirar, vai se assustar com a própria velocidade.',
+    stats: { agi: 8, vig: 4 }, unlockDesc: 'Desbloqueia no Mentor Rock Lee Nível 19.',
+    equivalentIds: ['item_caneleiras', 'has-men-lee19'] },
+  { id: 'item_oitavoportao', name: 'Oitavo Portão', slot: 'aura', icon: 'oitavo_portao_icon.webp',
+    desc: 'O último dos Oito Portões Internos. Poder absoluto ao custo do próprio corpo.',
+    stats: { agi: 12, vig: 6 }, unlockDesc: 'Desbloqueia no Mentor Rock Lee Nível 30.',
+    equivalentIds: ['item_oitavoportao', 'has-men-lee30'] },
+
+  // ══ SAITAMA ══
+  { id: 'item_luvassaitama', name: 'Luvas Vermelhas do Herói', slot: 'hands', icon: 'luvas_saitama_icon.webp',
+    desc: 'As luvas vermelhas do Careca Capa. Simples, como tudo que funciona.',
+    stats: { res: 8, agi: 4 }, unlockDesc: 'Desbloqueia no Mentor Saitama Nível 19.',
+    equivalentIds: ['item_luvassaitama', 'has-men-sai19'] },
+  { id: 'item_registroheroi', name: 'Registro de Herói', slot: 'badge', icon: 'registro_heroi_icon.webp',
+    desc: 'Sua licença oficial da Associação de Heróis. O ranking não importa — a rotina importa.',
+    stats: { res: 12, agi: 6 }, unlockDesc: 'Desbloqueia no Mentor Saitama Nível 30.',
+    equivalentIds: ['item_registroheroi', 'has-men-sai30'] },
+
+  // ══ BEBEZINHO ══
+  { id: 'item_seloallday', name: 'Selo All Day', slot: 'badge', icon: 'selo_allday_icon.webp',
+    desc: 'O selo da filosofia All Day. Wake wake, big — todo dia, sem exceção.',
+    stats: { foc: 5 }, unlockDesc: 'Desbloqueia no Mentor Bebezinho Nível 9.',
+    equivalentIds: ['item_seloallday', 'has-men-beb9'] },
+  { id: 'item_legpress500', name: 'Leg Press 500kg', slot: 'legs', icon: 'legpress_500_icon.webp',
+    desc: 'O feito que rodou o mundo. 500kg no leg press, tributo eterno ao Bebezinho.',
+    stats: { for: 8, vig: 4 }, unlockDesc: 'Desbloqueia no Mentor Bebezinho Nível 19.',
+    equivalentIds: ['item_legpress500', 'has-men-beb19'] },
+  { id: 'item_aurafreaky', name: 'Aura Freaky Season', slot: 'aura', icon: 'aura_freaky_icon.webp',
+    desc: 'Aura roxa e dourada em chamas. Freaky Season não tem data pra acabar.',
+    stats: { foc: 12, for: 6 }, unlockDesc: 'Desbloqueia no Mentor Bebezinho Nível 30.',
+    equivalentIds: ['item_aurafreaky', 'has-men-beb30'] },
+
+  // ══ RAMON DINO ══
+  { id: 'item_cintaclassic', name: 'Cinta Classic Physique', slot: 'waist', icon: 'cinta_classic_icon.webp',
+    desc: 'A cinta fina de posing do Classic Physique. Cintura fina, dorsal larga.',
+    stats: { vig: 5 }, unlockDesc: 'Desbloqueia no Mentor Ramon Dino Nível 9.',
+    equivalentIds: ['item_cintaclassic', 'has-men-ram9'] },
+  { id: 'item_seloolympia', name: 'Selo Olympia Classic', slot: 'badge', icon: 'selo_olympia_icon.webp',
+    desc: 'A medalha do palco mais alto do mundo. Do Acre pro Olympia, batendo peso certinho.',
+    stats: { vig: 8, for: 4 }, unlockDesc: 'Desbloqueia no Mentor Ramon Dino Nível 19.',
+    equivalentIds: ['item_seloolympia', 'has-men-ram19'] },
+  { id: 'item_auradino', name: 'Aura Verde-Amarela', slot: 'aura', icon: 'aura_dino_icon.webp',
+    desc: 'Verde e amarelo pulsando ao seu redor. Representação brasileira de elite.',
+    stats: { vig: 12, for: 6 }, unlockDesc: 'Desbloqueia no Mentor Ramon Dino Nível 30.',
+    equivalentIds: ['item_auradino', 'has-men-ram30'] },
+
+  // ══ ARNOLD ══
+  { id: 'item_luvasarnold', name: 'Luvas da Golden Era', slot: 'hands', icon: 'luvas_arnold_icon.webp',
+    desc: 'Luvas de couro sem dedo, direto do Gold\'s Gym de Venice Beach. Puro pump.',
+    stats: { for: 8, vig: 4 }, unlockDesc: 'Desbloqueia no Mentor Arnold Nível 19.',
+    equivalentIds: ['item_luvasarnold', 'has-men-arn19'] },
+  { id: 'item_sandow', name: 'Troféu Sandow', slot: 'badge', icon: 'trofeu_sandow_icon.webp',
+    desc: 'A estatueta do Mr. Olympia. Arnold levantou sete. Você está no caminho.',
+    stats: { for: 12, vig: 6 }, unlockDesc: 'Desbloqueia no Mentor Arnold Nível 30.',
+    equivalentIds: ['item_sandow', 'has-men-arn30'] },
+
+  // ══ NICK WALKER ══
+  { id: 'item_straps', name: 'Straps do Mutante', slot: 'arms', icon: 'straps_mutante_icon.webp',
+    desc: 'Straps de levantamento. Quando a pegada falha antes do músculo, o problema é a pegada.',
+    stats: { for: 5 }, unlockDesc: 'Desbloqueia no Mentor Nick Walker Nível 9.',
+    equivalentIds: ['item_straps', 'has-men-nic9'] },
+  { id: 'item_cinturaoclassic', name: 'Cinturão Arnold Classic', slot: 'waist', icon: 'cinturao_classic_icon.webp',
+    desc: 'O cinturão de campeão do Arnold Classic 2021. Intensidade bizarra premiada.',
+    stats: { for: 8, res: 4 }, unlockDesc: 'Desbloqueia no Mentor Nick Walker Nível 19.',
+    equivalentIds: ['item_cinturaoclassic', 'has-men-nic19'] },
+  { id: 'item_auramutante', name: 'Aura Mutante', slot: 'aura', icon: 'aura_mutante_icon.webp',
+    desc: 'Chamas laranja irregulares te envolvem. A mutação está completa.',
+    stats: { for: 12, res: 6 }, unlockDesc: 'Desbloqueia no Mentor Nick Walker Nível 30.',
+    equivalentIds: ['item_auramutante', 'has-men-nic30'] },
+
+  // ══ JIN ══
+  { id: 'item_medalhajin', name: 'Medalha do Serviço Militar', slot: 'badge', icon: 'medalha_jin_icon.webp',
+    desc: 'Disciplina comprovada em campo. Se aguentou o exército, aguenta o treino de hoje.',
+    stats: { vig: 8, for: 4 }, unlockDesc: 'Desbloqueia no Mentor Jin Nível 19.',
+    equivalentIds: ['item_medalhajin', 'has-men-jin19'] },
+  { id: 'item_luvasjin', name: 'Luvas Rosa Elegantes', slot: 'hands', icon: 'luvas_jin_icon.webp',
+    desc: 'Treinar pesado sem abrir mão do estilo. Worldwide Handsome até na série falha.',
+    stats: { vig: 12, for: 6 }, unlockDesc: 'Desbloqueia no Mentor Jin Nível 30.',
+    equivalentIds: ['item_luvasjin', 'has-men-jin30'] },
+
+  // ══ RM (NAMJOON) ══
+  { id: 'item_fonesrm', name: 'Fones de Estúdio', slot: 'head', icon: 'fones_rm_icon.webp',
+    desc: 'O mundo lá fora silencia. Só existe você, o ferro e a próxima repetição.',
+    stats: { foc: 8, vig: 4 }, unlockDesc: 'Desbloqueia no Mentor RM Nível 19.',
+    equivalentIds: ['item_fonesrm', 'has-men-nam19'] },
+  { id: 'item_selorm', name: 'Selo Speak Yourself', slot: 'badge', icon: 'selo_rm_icon.webp',
+    desc: 'Treinar o corpo é treinar a mente. Ame a si mesmo o suficiente pra continuar.',
+    stats: { foc: 12, vig: 6 }, unlockDesc: 'Desbloqueia no Mentor RM Nível 30.',
+    equivalentIds: ['item_selorm', 'has-men-nam30'] },
+
+  // ══ SUKUNA ══
+  { id: 'item_dedosukuna', name: 'Dedo Amaldiçoado', slot: 'badge', icon: 'dedo_sukuna_icon.webp',
+    desc: 'Um dos vinte dedos do Rei das Maldições. Guardá-lo já é um ato de coragem.',
+    stats: { for: 5 }, unlockDesc: 'Desbloqueia no Mentor Sukuna Nível 9.',
+    equivalentIds: ['item_dedosukuna', 'has-men-suk9'] },
+  { id: 'item_quatrobracos', name: 'Quatro Braços do Rei', slot: 'arms', icon: 'quatro_bracos_icon.webp',
+    desc: 'Quatro braços para dobrar o volume de treino. Nenhuma desculpa sobrevive a isso.',
+    stats: { for: 8, agi: 4 }, unlockDesc: 'Desbloqueia no Mentor Sukuna Nível 19.',
+    equivalentIds: ['item_quatrobracos', 'has-men-suk19'] },
+  { id: 'item_santuario', name: 'Santuário Malevolente', slot: 'aura', icon: 'santuario_icon.webp',
+    desc: 'Expansão de Domínio. Dentro dela, o único resultado possível é o corte.',
+    stats: { for: 12, agi: 6 }, unlockDesc: 'Desbloqueia no Mentor Sukuna Nível 30.',
+    equivalentIds: ['item_santuario', 'has-men-suk30'] },
+
+  // ══ ANYA ══ (único mentor com 4 itens — o Minduim é bônus)
+  { id: 'item_minduim', name: 'Minduim da Anya', slot: 'hands', icon: 'minduim_anya_icon.webp',
+    desc: 'O amendoim favorito da Anya, guardado com carinho. Combustível oficial de quem treina waku waku.',
+    stats: { vig: 3, foc: 2 }, unlockDesc: 'Desbloqueia no Mentor Anya Nível 4.',
+    equivalentIds: ['item_minduim', 'has-men-any4'] },
+  { id: 'item_stella', name: 'Estrela Stella', slot: 'badge', icon: 'estrela_stella_icon.webp',
+    desc: 'A Estrela Stella da Eden Academy. A Anya passou o treino todo torcendo por essa.',
+    stats: { foc: 5 }, unlockDesc: 'Desbloqueia no Mentor Anya Nível 9.',
+    equivalentIds: ['item_stella', 'has-men-any9'] },
+  { id: 'item_lacosanya', name: 'Laços Cor-de-Rosa', slot: 'head', icon: 'lacos_anya_icon.webp',
+    desc: 'Os laços icônicos da Anya. Ninguém desconfia que são chifres de verdade.',
+    stats: { foc: 8, agi: 4 }, unlockDesc: 'Desbloqueia no Mentor Anya Nível 19.',
+    equivalentIds: ['item_lacosanya', 'has-men-any19'] },
+  { id: 'item_auraanya', name: 'Aura Telepática', slot: 'aura', icon: 'aura_anya_icon.webp',
+    desc: 'Ondas psíquicas rosa e violeta. Agora você lê a mente do peso antes de levantar.',
+    stats: { foc: 12, agi: 6 }, unlockDesc: 'Desbloqueia no Mentor Anya Nível 30.',
+    equivalentIds: ['item_auraanya', 'has-men-any30'] }
 ];
 
 function getEffectiveAttributes() {

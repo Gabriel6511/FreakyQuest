@@ -1,4 +1,4 @@
-const CACHE_NAME = 'freakyquest-v34';
+const CACHE_NAME = 'freakyquest-v35';
 const ASSETS = [
   './',
   './index.html',
@@ -17,6 +17,7 @@ const ASSETS = [
   './jin.webp',
   './namjoon.webp',
   './sukuna.webp',
+  './anya.webp',
   './bebezinho_tribute.webp',
   './shape_engordar.webp',
   './shape_emagrecer.webp',
@@ -29,7 +30,38 @@ const ASSETS = [
   './faixa_lee_icon.webp',
   './aura_goku_icon.webp',
   './sorriso_jin_icon.webp',
-  './coroa_lider_icon.webp'
+  './coroa_lider_icon.webp',
+  // Leva 2026-08-12 — 30 icones de itens novos (3 por mentor, 4 na Anya)
+  './simbolo_kame_icon.webp',
+  './punhos_kaioken_icon.webp',
+  './coroa_paragus_icon.webp',
+  './punhos_broly_icon.webp',
+  './caneleiras_lee_icon.webp',
+  './oitavo_portao_icon.webp',
+  './luvas_saitama_icon.webp',
+  './registro_heroi_icon.webp',
+  './selo_allday_icon.webp',
+  './legpress_500_icon.webp',
+  './aura_freaky_icon.webp',
+  './cinta_classic_icon.webp',
+  './selo_olympia_icon.webp',
+  './aura_dino_icon.webp',
+  './luvas_arnold_icon.webp',
+  './trofeu_sandow_icon.webp',
+  './straps_mutante_icon.webp',
+  './cinturao_classic_icon.webp',
+  './aura_mutante_icon.webp',
+  './medalha_jin_icon.webp',
+  './luvas_jin_icon.webp',
+  './fones_rm_icon.webp',
+  './selo_rm_icon.webp',
+  './dedo_sukuna_icon.webp',
+  './quatro_bracos_icon.webp',
+  './santuario_icon.webp',
+  './estrela_stella_icon.webp',
+  './lacos_anya_icon.webp',
+  './aura_anya_icon.webp',
+  './minduim_anya_icon.webp'
 ];
 
 self.addEventListener('install', (event) => {
