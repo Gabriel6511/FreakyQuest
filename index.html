@@ -1069,14 +1069,14 @@
 
           <!-- Complete Workout Button -->
           <button id="btn-finish-workout" class="btn btn-primary btn-block btn-lg btn-finish-workout ripple">
-            ⚔️ FINALIZAR TREINO (+50 XP)
+            ⚔️ FINALIZAR TREINO
           </button>
         </div>
 
         <!-- Cardio (esteira, bike, corrida, etc.) — registro livre de duração -->
         <div class="glass-panel" style="margin-top: 15px; padding: 14px;">
           <h4 style="display:flex; align-items:center; gap:6px; margin-bottom: 4px;">🏃 Cardio</h4>
-          <p style="font-size:0.7rem; color:var(--text-secondary); margin-bottom:10px;">Esteira, bike, corrida, natação — registre o tempo e ganhe XP (escala com Resistência).</p>
+          <p style="font-size:0.7rem; color:var(--text-secondary); margin-bottom:10px;" id="cardio-card-desc">Esteira, bike, corrida, natação — registre o tempo e ganhe XP (escala com Resistência).</p>
           <p style="font-size:0.7rem; color:var(--text-secondary); margin-bottom:10px;">Hoje: <strong id="cardio-minutes-today">0</strong> min</p>
           <button type="button" id="btn-open-cardio-modal" class="btn btn-outline btn-block">➕ Registrar Cardio</button>
         </div>
@@ -1936,7 +1936,7 @@
             <span class="pcm-stat-val" id="pcm-stat-streak">0</span>
             <span class="pcm-stat-lbl">Sequência</span>
           </div>
-          <div class="pcm-stat">
+          <div class="pcm-stat pcm-stat-xp">
             <span class="pcm-stat-icon">⚡</span>
             <span class="pcm-stat-val" id="pcm-stat-xp">0</span>
             <span class="pcm-stat-lbl">XP Total</span>
@@ -1963,7 +1963,7 @@
           <div id="pcm-records-list" class="pcm-records-list"></div>
         </div>
 
-        <div class="pcm-section">
+        <div class="pcm-section" id="pcm-mentor-section">
           <p class="pcm-section-title">Mentores em Destaque</p>
           <div id="pcm-mentors-mini" class="pcm-mentors-mini-row"></div>
         </div>

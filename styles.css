@@ -832,7 +832,11 @@ body.mode-simple .player-avatar-wrapper,
 body.mode-simple .player-level-badge,
 body.mode-simple .workout-type-toggle,
 body.mode-simple #toggle-workout-std,
-body.mode-simple #toggle-workout-cust {
+body.mode-simple #toggle-workout-cust,
+body.mode-simple #workout-category-badge,
+body.mode-simple .pcm-stat-xp,
+body.mode-simple #pcm-mentor-section,
+body.mode-simple #pcm-title-badge {
   display: none !important;
 }
 body.mode-simple .option-select-card.active {

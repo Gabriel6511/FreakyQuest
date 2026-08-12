@@ -3147,6 +3147,17 @@ function updateUI() {
   const playerNameEl = document.getElementById('player-name');
   if (playerNameEl) playerNameEl.innerText = state.charName;
 
+  const finishBtn = document.getElementById('btn-finish-workout');
+  if (finishBtn) finishBtn.innerText = isSimple ? '✅ FINALIZAR TREINO' : '⚔️ FINALIZAR TREINO (+50 XP)';
+  const cardioDescEl = document.getElementById('cardio-card-desc');
+  if (cardioDescEl) cardioDescEl.innerText = isSimple
+    ? 'Esteira, bike, corrida, natação — registre o tempo do seu cardio.'
+    : 'Esteira, bike, corrida, natação — registre o tempo e ganhe XP (escala com Resistência).';
+  const dietHeaderEl = document.querySelector('#tab-diet .section-title-wrapper h3');
+  if (dietHeaderEl) dietHeaderEl.innerText = isSimple ? '🍎 Alimentação & Dieta' : '🍎 Alimentação & Dieta RPG';
+  const inventoryHeaderEl = document.querySelector('.rpg-inventory-card h4');
+  if (inventoryHeaderEl) inventoryHeaderEl.innerText = isSimple ? '🎒 Registro Rápido (Refeições Rápidas)' : '🎒 Inventário RPG (Refeições Rápidas)';
+
   if (!isSimple) {
     document.getElementById('player-level-badge').innerText = `Lvl ${state.level}`;
     const mhsLevel = document.getElementById('mhs-level-badge');
@@ -3305,16 +3316,17 @@ function updateUI() {
   if (playerNameEl2) {
     playerNameEl2.innerText = pName;
   }
-  document.getElementById('player-level-badge').innerText = `Nv ${state.level}`;
+  if (!isSimple) {
+    document.getElementById('player-level-badge').innerText = `Nv ${state.level}`;
+    const mhsLevel2 = document.getElementById('mhs-level-badge');
+    if (mhsLevel2) mhsLevel2.innerText = state.level;
 
-  const mhsLevel2 = document.getElementById('mhs-level-badge');
-  if (mhsLevel2) mhsLevel2.innerText = state.level;
+    const uClass = userProfile.class || state.charClass || 'bodybuilder';
+    document.getElementById('player-class-name').innerText = classLabels[uClass] || uClass;
 
-  const uClass = userProfile.class || state.charClass || 'bodybuilder';
-  document.getElementById('player-class-name').innerText = classLabels[uClass] || uClass;
-
-  const uRank = getSubclassRank(uClass, state.level);
-  document.getElementById('player-rank').innerText = uRank;
+    const uRank = getSubclassRank(uClass, state.level);
+    document.getElementById('player-rank').innerText = uRank;
+  }
 
   // Hero quote (safe — element may be the new mhs strip or legacy)
   const heroQuoteEl = document.getElementById('mentor-bubble-quote');
@@ -5012,9 +5024,16 @@ function renderProfileCard() {
   const nameEl = document.getElementById('pcm-name');
   if (nameEl) nameEl.innerText = state.charName || 'Hunter';
 
-  const rankChar = getHunterRankChar(state.level);
+  const isSimpleProfile = state.appMode === 'simple';
   const subEl = document.getElementById('pcm-sub');
-  if (subEl) subEl.innerText = `Hunter Rank ${rankChar} · ${classLabels[state.charClass] || state.charClass || ''}`;
+  if (subEl) {
+    if (isSimpleProfile) {
+      subEl.innerText = classLabels[state.charClass] || state.charClass || '';
+    } else {
+      const rankChar = getHunterRankChar(state.level);
+      subEl.innerText = `Hunter Rank ${rankChar} · ${classLabels[state.charClass] || state.charClass || ''}`;
+    }
+  }
 
   const titleEl = document.getElementById('pcm-title-badge');
   if (titleEl) titleEl.innerText = getSubclassRank(state.charClass, state.level);
@@ -8246,7 +8265,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     playSound('click');
-    document.getElementById('rpe-modal').classList.remove('hidden');
+    if (state.appMode === 'simple') {
+      // Modo Simples não tem XP/mentor — pula direto pro registro do treino,
+      // sem a avaliação de intensidade (que é 100% flavor de RPG).
+      completeActiveWorkout(0);
+    } else {
+      document.getElementById('rpe-modal').classList.remove('hidden');
+    }
   });
 
   // RPE MODAL OPTIONS WIRING
