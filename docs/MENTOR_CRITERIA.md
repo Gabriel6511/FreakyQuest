@@ -21,6 +21,7 @@ Um mentor toca 4 arquivos e ~5 estruturas de dados diferentes. Nenhuma delas ger
 | Botão de filtro por universo (só se for universo novo) | `.muf-btn[data-filter="..."]` | `index.html` (~linha 1292) |
 | Ordem/descrição do universo na lista (só se for universo novo) | `UNIVERSE_ORDER` (array) + `UNIVERSE_META` (objeto) | `app.js` (~linha 3798) |
 | Frases rotativas do dashboard quando o mentor está ativo (opcional, tem fallback vazio) | `MENTOR_DASHBOARD_QUOTES[id]` | `app.js` (~linha 224) |
+| **Falas do tom "Fiel ao Personagem"** (5 situações) | `MENTOR_VOICE_LINES[id]` | `app.js` |
 | Imagem do mentor | `<id>.webp` na raiz + precache | `sw.js` (`ASSETS`) |
 
 > ⚠️ **Universo novo precisa OBRIGATORIAMENTE entrar em `UNIVERSE_ORDER`** — o comentário no código diz "aparece automaticamente" mas isso só é verdade pra `UNIVERSE_META` (tem fallback gracioso). `renderMentorsList()` só itera sobre `UNIVERSE_ORDER`; um universo de fora dessa lista fica com mentores **invisíveis na aba Mentores** mesmo existindo em `OFFICIAL_MENTORS`. Descoberto na prática ao adicionar a categoria `Coreaninhos` (2026-07-30).
@@ -50,6 +51,9 @@ Para cada mentor novo, definir:
    - **O ícone tem que representar o NOME do item ao pé da letra, não a personalidade geral do mentor.** Erro cometido no primeiro rascunho: pra "Aura do Líder" foi gerado um livro (ligado à fama do RM de gostar de ler, mas o item não se chama "aura do leitor") — o certo era uma coroa, símbolo universal de líder. Mesma coisa pra "Sorriso Worldwide Handsome": o primeiro rascunho gerou um coração; o certo é um sorriso brilhando, porque o nome do item é literalmente "sorriso". Regra prática: leia o nome do item, ache o substantivo central, e desenhe ESSE substantivo brilhando — não um símbolo "adjacente" à vibe do personagem.
    - Prompt-modelo (mesmo estilo dos 5 ícones antigos — pintura digital, brilho dramático, fundo preto): *"Digital painting icon, [cor] radiant glow, a glowing [SUBSTANTIVO DO NOME DO ITEM] silhouette/shape at the very center as the light source, [raios/partículas de acordo com o tom], flat vector illustration style, black background, centered composition, square 1:1, no text, no human face — abstract glowing aura only"*.
 8. **Nome do arquivo/id** — `id` curto e único (usado em `theme-<id>`, `aura-<id>`, nome do arquivo de imagem); `shortcode` de 3 letras único em `MENTOR_REWARD_CONFIGS` (usado em `has-men-<shortcode><nível>`).
+9. **Falas do tom "Fiel ao Personagem"** (`MENTOR_VOICE_LINES[id]`, obrigatório desde 2026-08-12) — 5 situações: `reminder`, `workoutDone`, `newRecord`, `levelUp`, `comeback`. Placeholders disponíveis: `{exercise}`, `{kg}`, `{level}`, `{days}`, `{name}`.
+   - ⚠️ **Regra de fidelidade**: se você trocar o nome do mentor e a frase continuar fazendo sentido, ela está genérica demais. Cada fala precisa de um gancho que **só existe naquele universo/carreira**. Exemplos do padrão certo: Rock Lee cita não saber ninjutsu, as caneleiras de peso e os Oito Portões; Broly se declara o diabo e grita "KAKAROT"; Saitama cita a rotina de 100/100/100/10km e a careca. Errado seria "bora, você consegue!" — isso qualquer um diria.
+   - Se o mentor não tiver entrada aqui, o app **não quebra**: cai automaticamente no tom "Parceiro de Treino".
 
 ---
 
@@ -86,6 +90,7 @@ Para cada mentor novo, definir:
 7. [ ] Adicionar `.aura-<id>` (efeito de borda/aura no avatar do jogador) em `styles.css`, seguindo o padrão de `.aura-rocklee`/`.aura-goku`.
 8. [ ] Se for universo novo: adicionar `<button class="muf-btn" data-filter="<Universo>">` no filtro de universo em `index.html` **e** adicionar o universo em `UNIVERSE_ORDER` + `UNIVERSE_META` em `app.js` (~linha 3798) — sem isso o mentor fica invisível na lista.
 9. [ ] (Opcional) Adicionar 5 frases em `MENTOR_DASHBOARD_QUOTES[id]` (`app.js`) — tem fallback vazio, não quebra se pular.
+9b. [ ] **Adicionar as 5 falas em `MENTOR_VOICE_LINES[id]`** (`app.js`) seguindo a regra de fidelidade da seção 2, item 9. Sem isso o mentor fica mudo no tom "Fiel ao Personagem".
 10. [ ] Adicionar `<id>.webp` à lista `ASSETS` do `sw.js` **e** bumpar `CACHE_NAME` (senão o app fica preso na versão de cache anterior sem a imagem nova).
 11. [ ] Rodar `python validate.py` e `python check_duplicate_ids.py`.
 12. [ ] Testar visualmente: mentor aparece no grupo certo da lista, filtro de universo funciona, ativar mentor troca o tema/aura/avatar em toda a UI (header, bubble do dashboard, cards), 0 erros de console.
@@ -103,3 +108,14 @@ Para cada mentor novo, definir:
 - ✅ **Concluído (2026-07-30)**: adicionados **Jin "Worldwide Handsome"** (`genetics`, VIG/FOR) e **RM "Namjoon"** (`wisdom`, FOC/VIG), categoria nova `Coreaninhos`. Fotos reais (não geradas por IA) fornecidas pelo usuário, recortadas em quadrado 1024x1024 e convertidas pra webp. 10 mentores no total agora.
 - ✅ **Concluído (2026-08-10)**: itens dos dois mentores (`item_jin`/"Sorriso Worldwide Handsome" e `item_namjoon`/"Aura do Líder") ganharam ícone `.webp` próprio, substituindo os emoji genéricos (✨/📖) do lançamento inicial. Ver regra nova na seção 2, item 7.
 - **Próximo passo, ainda não iniciado**: refazer as fotos de TODOS os 10 mentores numa leva só, pra padronizar tudo dentro dos presets formais desta seção (usuário confirmou que quer fazer isso).
+
+## 7. Atualizações de 2026-08-12
+
+- ✅ **11º mentor: Ryomen Sukuna** (`sukuna`, universo novo `Jujutsu Kaisen`, `beast`, FOR/AGI, tema vermelho amaldiçoado).
+  - ⚠️ **Exceção de filtro**: a arte dele é escura e já muito saturada, então ele **não usa o preset "Anime" padrão** — usa `contrast(1.3) saturate(1.4) brightness(1.28)`, que **clareia** em vez de escurecer. Lição geral: o preset é ponto de partida, não regra cega — sempre comparar lado a lado antes de fixar.
+  - 🔴 **Pendência**: a imagem atual é fan art de terceiro (assinatura `u/Someone_Else_Lurking` visível). Trocar por arte oficial ou obter autorização do artista antes de considerar isso finalizado.
+- ✅ **Sistema de 3 tons de voz** (`MESSAGE_TONES`): `faithful` (voz de cada mentor), `brutal` (Ego Brutal) e `buddy` (Parceiro de Treino), selecionável em Ajustes. Ver seção 2, item 9.
+  - **Regra do tom `brutal`**: o insulto bate no **esforço e na desculpa**, nunca no corpo ou na aparência. Iniciante é justamente quem mais precisa voltar no dia seguinte.
+- ✅ **Slots de equipamento: de 4 para 7.** Novos: `hands` (Punhos), `legs` (Pernas), `badge` (Insígnia).
+  - **Motivo**: 5 dos 8 itens existentes eram do slot `aura`, então o jogador só conseguia usar um por vez e o resto virava inventário morto. Ao criar item novo, **distribuir entre slots** em vez de empilhar em `aura`.
+  - Saves antigos (4 slots) são migrados automaticamente em `loadState()`.

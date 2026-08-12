@@ -1852,7 +1852,7 @@ let state = {
   activeSetsTracker: {},
   
   // Equipamentos equipados atualmente nos slots
-  equippedItems: { head: null, aura: null, arms: null, waist: null }
+  equippedItems: { head: null, aura: null, arms: null, waist: null, hands: null, legs: null, badge: null }
 };
 
 // Cópia intacta do estado inicial, tirada antes de qualquer carregamento.
@@ -2569,8 +2569,14 @@ function loadState() {
         if (state.unlockedTrophies === undefined) state.unlockedTrophies = [];
         if (state.showcaseTrophies === undefined) state.showcaseTrophies = [];
         if (state.profilePic === undefined) state.profilePic = '';
+        // Save antigo pode ter só os 4 slots originais — completa os que faltam
+        // sem apagar o que já estava equipado.
         if (state.equippedItems === undefined) {
-          state.equippedItems = { head: null, aura: null, arms: null, waist: null };
+          state.equippedItems = { head: null, aura: null, arms: null, waist: null, hands: null, legs: null, badge: null };
+        } else {
+          ['head', 'aura', 'arms', 'waist', 'hands', 'legs', 'badge'].forEach(s => {
+            if (state.equippedItems[s] === undefined) state.equippedItems[s] = null;
+          });
         }
         try {
           const userObj = JSON.parse(localStorage.getItem('freaky_quest_user'));
@@ -6005,7 +6011,7 @@ function renderEquipment() {
   if (!tabEquipment) return;
 
   // 1. Render Active Slots
-  const slots = ['head', 'aura', 'arms', 'waist'];
+  const slots = ['head', 'aura', 'arms', 'waist', 'hands', 'legs', 'badge'];
   slots.forEach(slot => {
     const equippedItemId = state.equippedItems ? state.equippedItems[slot] : null;
     const slotEl = document.getElementById(`equip-slot-${slot}`);
@@ -6142,12 +6148,15 @@ function renderEquipment() {
 }
 
 function getSlotLabel(slot) {
-  const labels = { head: 'Cabeça', aura: 'Aura/Costas', arms: 'Braços', waist: 'Cintura' };
+  const labels = {
+    head: 'Cabeça', aura: 'Aura/Costas', arms: 'Braços', waist: 'Cintura',
+    hands: 'Punhos', legs: 'Pernas', badge: 'Insígnia'
+  };
   return labels[slot] || slot;
 }
 
 function renderEmptySlot(slotEl, slot) {
-  const slotIcons = { head: '👑', aura: '✨', arms: '🦾', waist: '🏆' };
+  const slotIcons = { head: '👑', aura: '✨', arms: '🦾', waist: '🏆', hands: '🥊', legs: '🦵', badge: '🎖️' };
   slotEl.innerHTML = `
     <div class="equip-slot-empty">
       <span class="equip-slot-icon-placeholder">${slotIcons[slot]}</span>
@@ -6158,7 +6167,7 @@ function renderEmptySlot(slotEl, slot) {
 
 function equipItem(slot, itemId) {
   if (!state.equippedItems) {
-    state.equippedItems = { head: null, aura: null, arms: null, waist: null };
+    state.equippedItems = { head: null, aura: null, arms: null, waist: null, hands: null, legs: null, badge: null };
   }
   state.equippedItems[slot] = itemId;
   saveState();
@@ -6167,7 +6176,7 @@ function equipItem(slot, itemId) {
 
 function unequipItem(slot) {
   if (!state.equippedItems) {
-    state.equippedItems = { head: null, aura: null, arms: null, waist: null };
+    state.equippedItems = { head: null, aura: null, arms: null, waist: null, hands: null, legs: null, badge: null };
   }
   state.equippedItems[slot] = null;
   saveState();
