@@ -1746,6 +1746,10 @@
                 <button type="button" id="account-verify-code" class="btn btn-primary" style="width: 100%;">Confirmar código</button>
               </div>
               <p id="account-status-msg" style="font-size: 0.65rem; margin-top: 6px;"></p>
+              <div style="display: flex; align-items: center; gap: 8px; margin-top: 12px; padding: 10px 12px; border-radius: 10px; background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.15);">
+                <span style="font-size: 16px;">👥🔒</span>
+                <span style="flex: 1; font-size: 0.68rem; color: var(--text-secondary);">Entre com seu e-mail acima pra desbloquear <strong style="color: var(--text-primary, #fff);">Amigos &amp; Ranking</strong></span>
+              </div>
             </div>
             <div id="account-logged-in" class="hidden">
               <p style="font-size: 0.8rem;">Logado como <strong id="account-user-email"></strong></p>
@@ -2496,9 +2500,12 @@
   <script src="app.js"></script>
   <script>
     if ('serviceWorker' in navigator) {
+      let swRegistration = null;
+
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js').catch(() => {});
+        navigator.serviceWorker.register('sw.js').then((reg) => { swRegistration = reg; }).catch(() => {});
       });
+
       // Recarrega quando um novo SW assume o controle apos um deploy,
       // para aplicar os assets novos sem janela de cache obsoleto.
       let reloadOnUpdate = false;
@@ -2507,6 +2514,19 @@
       navigator.serviceWorker.addEventListener('controllerchange', () => {
         if (reloadOnUpdate) window.location.reload();
       });
+
+      // App "adicionado a tela de inicio" no iOS costuma REABRIR retomando a
+      // aba suspensa em vez de navegar de novo — o 'load' acima pode nunca
+      // rodar de novo, e o navegador só checa update do sw.js sozinho a cada
+      // ~24h. Sem isso, o app fica preso numa versao antiga indefinidamente
+      // mesmo apos fechar/abrir o app varias vezes.
+      const checkForUpdate = () => {
+        if (swRegistration) swRegistration.update().catch(() => {});
+      };
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) checkForUpdate();
+      });
+      window.addEventListener('pageshow', checkForUpdate);
     }
   </script>
 </body>

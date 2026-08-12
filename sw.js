@@ -1,4 +1,4 @@
-const CACHE_NAME = 'freakyquest-v27';
+const CACHE_NAME = 'freakyquest-v28';
 const ASSETS = [
   './',
   './index.html',

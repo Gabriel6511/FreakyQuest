@@ -3680,7 +3680,7 @@ body.diet-disabled #dashboard-diet-card {
   background: rgba(0,0,0,0.4);
   flex-shrink: 0;
 }
-.pcm-avatar-wrap img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.pcm-avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
 .pcm-identity-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .pcm-name {
   font-family: var(--font-display);
@@ -5992,17 +5992,12 @@ body.screen-shake::after {
   letter-spacing: 1.5px;
   text-align: center;
   z-index: 2020;
-  white-space: nowrap;
+  /* Sempre limitado e com quebra segura — nomes de mentor longos (ex.: Nick
+     Walker "The Mutant") estouravam a tela mesmo em telas grandes, já que a
+     correção antiga só valia abaixo de 400px (iPhone Pro Max tem 430px). */
+  max-width: min(92vw, 340px);
+  white-space: normal;
   animation: hacker-alert-anim 1.8s ease-in-out forwards;
-}
-/* QA FIX (2026-07-10): em telas estreitas o texto nowrap centralizado
-   ultrapassava a viewport. Limita a largura e permite quebra segura. */
-@media (max-width: 400px) {
-  .neural-hacker-alert {
-    max-width: 92vw;
-    white-space: normal;
-    font-size: 0.7rem;
-  }
 }
 
 @keyframes hacker-alert-anim {
