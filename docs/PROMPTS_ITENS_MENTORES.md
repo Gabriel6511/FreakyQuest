@@ -1,4 +1,4 @@
-# Prompts dos 29 ícones de itens pendentes
+# Prompts dos 30 ícones de itens pendentes
 
 Gerar cada um, exportar como `.webp` (1024x1024 ou similar quadrado), e nomear
 EXATAMENTE como a coluna "Arquivo". Depois é só apontar a pasta pra mim que eu
@@ -295,4 +295,13 @@ psychic energy silhouette at the very center as the light source,
 telepathic wave ripples radiating outward, flat vector illustration style,
 black background, centered composition, square 1:1, no text, no human
 face — abstract glowing aura only
+```
+
+**30. Minduim da Anya** — `minduim_anya_icon.webp` (Nv4 · Punhos — item bônus, exclusivo dela)
+```
+Digital painting icon, warm golden-brown radiant glow, a single glowing
+peanut shell shape at the very center as the light source, joyful small
+golden sparkles radiating outward, flat vector illustration style, black
+background, centered composition, square 1:1, no text, no human face —
+abstract glowing aura only
 ```
