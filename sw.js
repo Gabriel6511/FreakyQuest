@@ -1,4 +1,4 @@
-const CACHE_NAME = 'freakyquest-v31';
+const CACHE_NAME = 'freakyquest-v32';
 const ASSETS = [
   './',
   './index.html',
@@ -16,6 +16,7 @@ const ASSETS = [
   './nickwalker.webp',
   './jin.webp',
   './namjoon.webp',
+  './sukuna.webp',
   './bebezinho_tribute.webp',
   './shape_engordar.webp',
   './shape_emagrecer.webp',

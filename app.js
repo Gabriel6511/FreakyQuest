@@ -836,6 +836,26 @@ const OFFICIAL_MENTORS = [
     colorHex: '#5b5f97',
     particleType: 'embers',
     isCustom: false
+  },
+  // ══════════════ JUJUTSU KAISEN ══════════════
+  {
+    id: 'sukuna',
+    name: 'Ryomen Sukuna',
+    universe: 'Jujutsu Kaisen',
+    category: 'anime',
+    archetype: 'beast',
+    primaryStat: 'for',
+    levelReq: 1,
+    theme: 'theme-sukuna',
+    avatar: 'sukuna.webp',
+    // Arte-fonte ja e escura e muito saturada (gradiente vermelho/ciano), entao
+    // esse mentor foge do preset "Anime" padrao: clareia em vez de escurecer.
+    filterCSS: 'contrast(1.3) saturate(1.4) brightness(1.28)',
+    quote: '"Você acaricia o ferro com medo de machucar as mãos. Ponha peso nessa barra ou aceite ser um inseto."',
+    buff: '+30% Força & +15% Agilidade (Domínio Expandido)',
+    colorHex: '#c1121f',
+    particleType: 'curse',
+    isCustom: false
   }
 ];
 
@@ -909,8 +929,201 @@ const MENTOR_DASHBOARD_QUOTES = {
     "O crescimento de hoje é a sabedoria de amanhã.",
     "Equilíbrio: corpo forte, mente tranquila.",
     "Um bom líder também lidera o próprio treino."
+  ],
+  sukuna: [
+    "Pouco peso? Tá indo treinar ou brincar?",
+    "Você acaricia o ferro com medo de machucar as mãos.",
+    "O músculo não cresce com carinho, ele é moldado quando você o esmaga.",
+    "Vai falhar aqui também? Ou vai levantar esse peso e fazer mais uma repetição?",
+    "Quem tem poder absoluto destrói os próprios limites. Ponha-se no seu lugar."
   ]
 };
+
+// ─────────────────────────────────────────────────────────────
+// TOM DE VOZ DO APP — 3 modos escolhidos pelo usuário em Ajustes.
+//
+//   faithful → cada mentor fala com referências do próprio universo
+//   brutal   → tom único de superioridade/deboche (Sukuna, Vegeta, Escanor)
+//   buddy    → tom único acolhedor, sem cobrança de culpa
+//
+// Regra de escrita do "faithful": se der pra trocar o nome do mentor e a
+// frase continuar fazendo sentido, ela está genérica demais — reescreva
+// com um gancho que só existe naquele anime/carreira.
+//
+// Regra de escrita do "brutal": o insulto bate no ESFORÇO e na DESCULPA,
+// nunca no corpo ou na aparência do usuário. "Preguiçoso" motiva a voltar;
+// comentário sobre corpo faz desinstalar — e iniciante é justamente quem
+// mais precisa aparecer no dia seguinte.
+//
+// Situações: reminder | workoutDone | newRecord | levelUp | comeback
+// Placeholders: {exercise} {kg} {level} {days} {name}
+// ─────────────────────────────────────────────────────────────
+const MESSAGE_TONES = {
+  faithful: { id: 'faithful', label: 'Fiel ao Personagem',
+    desc: 'Cada mentor fala do jeito dele, com referências do próprio universo.' },
+  brutal:   { id: 'brutal',   label: 'Ego Brutal',
+    desc: 'Tom de superioridade e deboche. Nenhum elogio de graça.' },
+  buddy:    { id: 'buddy',    label: 'Parceiro de Treino',
+    desc: 'Tom amigável. Comemora junto e não cobra culpa quando você falha.' }
+};
+
+const MENTOR_VOICE_LINES = {
+  goku: {
+    reminder: 'Ei! Já tá na hora! Eu treinei a 100x a gravidade hoje — vem, quero ver do que você é capaz!',
+    workoutDone: 'Uhul, isso foi divertido! Mas eu sei que você ainda tem mais. Amanhã a gente aumenta a gravidade!',
+    newRecord: 'Uau, {exercise} com {kg}kg! Tá ficando forte de verdade — isso me deixa animado!',
+    levelUp: 'Nível {level}! Sabe o que isso significa? Que agora eu posso treinar sério com você!',
+    comeback: 'Você sumiu {days} dias! Tudo bem, o Mestre Kame também dava folga. Mas agora bora, tô ansioso!'
+  },
+  brolyz: {
+    reminder: 'O ferro te chama. E eu... eu sou o diabo que veio te buscar.',
+    workoutDone: 'Terminou? HAHAHA! Isso não foi treino. Isso foi aquecimento.',
+    newRecord: '{kg}kg no {exercise}. ESMAGUE. Esmague até não sobrar nada. KAKAROT!',
+    levelUp: 'Nível {level}. Seu poder cresce... mas ainda é uma fagulha diante do Lendário.',
+    comeback: '{days} dias fugindo. Todos fogem. Volte pro ferro antes que eu perca a paciência.'
+  },
+  rocklee: {
+    reminder: 'Você não tem talento? Ótimo — eu não sei usar nem ninjutsu. Só sei treinar. Levanta!',
+    workoutDone: 'Terminou? Então tira as caneleiras de peso. Agora sente o quanto você ficou mais rápido!',
+    newRecord: '{kg}kg no {exercise}! Isso é o Portão da Abertura cedendo. Faltam sete!',
+    levelUp: 'Nível {level}! Guy-sensei estaria orgulhoso! Mas não relaxe, ou são 500 voltas na academia!',
+    comeback: 'Faltou {days} dias? Então são 200 flexões de penitência. Eu faria 500. Começa agora!'
+  },
+  saitama: {
+    reminder: 'Ah, hora do treino. 100 flexões, 100 abdominais, 100 agachamentos, 10km. Todo dia. Sem desculpa.',
+    workoutDone: 'Ok. Terminou. Amanhã de novo. E depois de amanhã. É só isso mesmo.',
+    newRecord: '{kg}kg no {exercise}? Legal. Continua fazendo todo dia por 3 anos e a gente conversa.',
+    levelUp: 'Nível {level}. Eu fiquei careca no processo. Você foi avisado.',
+    comeback: '{days} dias parado. O problema não é ter faltado — é que a rotina só funciona se for TODO dia.'
+  },
+  bebezinho: {
+    reminder: 'WAKE WAKE! Abre o olho, big! Hoje é ALL DAY, bora pro ferro!',
+    workoutDone: 'É ISSO, NEGUIN! Fechou o treino! Freaky Season não para nunca!',
+    newRecord: '{kg}kg no {exercise}! Tá ficando FREAKY, big! Aí sim!',
+    levelUp: 'Nível {level}! Cresceu, neguin! All day, todo dia — é assim que vira monstro!',
+    comeback: 'Sumiu {days} dias, big? Relaxa. Wake wake e bora — o importante é voltar!'
+  },
+  ramondino: {
+    reminder: 'Acorda pro treino, irmão! Não tem segredo: é aparecer todo dia.',
+    workoutDone: 'Fechou, irmão! Treino batido é treino batido. Agora come limpo pra render.',
+    newRecord: '{kg}kg no {exercise}! Ó o peso subindo certinho, irmão. É assim que constrói.',
+    levelUp: 'Nível {level}! Eu saí do Acre pro Olympia batendo peso certinho todo dia. Continua!',
+    comeback: '{days} dias fora, irmão? Acontece. Bora voltar hoje mesmo, não deixa pra amanhã.'
+  },
+  arnold: {
+    reminder: 'Chegou a hora. Eu treinava 5 horas por dia no Gold’s Gym. Você consegue dar uma. Vamos!',
+    workoutDone: 'Sentiu o pump? Não existe sensação melhor. Eu voltarei amanhã — e você também.',
+    newRecord: '{kg}kg no {exercise}! É disso que eu falo. A última repetição é a única que conta.',
+    levelUp: 'Nível {level}! Sete títulos de Mr. Olympia não vieram de sorte. Vieram de repetição.',
+    comeback: '{days} dias fora? Eu disse que voltaria. Você voltou também. Agora pega o ferro.'
+  },
+  nickwalker: {
+    reminder: 'Hora de treinar. Intensidade bizarra, ou nem apareça.',
+    workoutDone: 'Treino fechado. Mas se você não tá tremendo, dava pra ter feito mais.',
+    newRecord: '{kg}kg no {exercise}! Progressão de carga é o único caminho. Mutante!',
+    levelUp: 'Nível {level}. Mutação em progresso. Não desacelera agora.',
+    comeback: '{days} dias sumido. O mutante não descansa. Volta e recupera o tempo perdido.'
+  },
+  jin: {
+    reminder: 'Bora treinar, gente linda! Se eu aguentei o exército, você aguenta uma hora de academia!',
+    workoutDone: 'Terminou! E ainda continua bonito. Impressionante, né? Brincadeira... ou não!',
+    newRecord: '{kg}kg no {exercise}! Agora é Worldwide Handsome E worldwide forte!',
+    levelUp: 'Nível {level}! Como o mais velho aqui, eu autorizo oficialmente você a se orgulhar!',
+    comeback: '{days} dias sem aparecer? Tudo bem, eu também já quis dormir até tarde. Bora recomeçar juntos!'
+  },
+  namjoon: {
+    reminder: 'Hora do treino. Hoje não é sobre motivação — é sobre o compromisso que você assumiu ontem.',
+    workoutDone: 'Treino concluído. Você não ficou só mais forte: ficou mais coerente com quem quer ser.',
+    newRecord: '{kg}kg no {exercise}. Progresso é a prova física de que disciplina funciona.',
+    levelUp: 'Nível {level}. Ame a si mesmo o suficiente pra continuar — não pra parar por aqui.',
+    comeback: '{days} dias. Você não falhou, só pausou. Recomeçar também é uma forma de liderança.'
+  },
+  sukuna: {
+    reminder: 'O ferro te espera. Não me faça descer até aí, verme.',
+    workoutDone: 'Acabou. Não espere elogio por fazer o mínimo.',
+    newRecord: '{kg}kg no {exercise}. Finalmente parou de acariciar o ferro.',
+    levelUp: 'Nível {level}. Ficou menos patético. Orgulhe-se: você é forte. Para um inseto.',
+    comeback: '{days} dias. Você fugiu como o verme que é. Ajoelhe-se e recomece.'
+  }
+};
+
+const TONE_LINES = {
+  brutal: {
+    reminder: [
+      'Chegou a hora. Ou você vai fingir de novo que "não deu tempo"? Patético. Levanta.',
+      'O ferro está lá. Parado. Esperando alguém com coragem. Vai ser você hoje, ou continua sendo ninguém?',
+      'Outro dia, outra chance de provar que você não é só conversa. Duvido.'
+    ],
+    workoutDone: [
+      'Terminou. Não confunda cumprir obrigação com mérito. Ninguém aqui vai te aplaudir.',
+      'Acabou. Fez o mínimo aceitável. Não se atreva a achar que foi impressionante.',
+      'Pronto. Agora você está exatamente onde já deveria estar desde o começo. Nada demais.'
+    ],
+    newRecord: [
+      '{kg}kg no {exercise}. Demorou tempo demais pra algo tão insignificante. Mas enfim parou de brincar.',
+      '{kg}kg no {exercise}. Finalmente. Estava na hora de parar de acariciar o ferro.',
+      '{exercise}: {kg}kg. Melhorou. Continua fraco, mas melhorou.'
+    ],
+    levelUp: [
+      'Nível {level}. Você continua sendo lixo — só que um lixo levemente menos patético que ontem.',
+      'Nível {level}. Não comemore. Isso só prova o quão baixo você começou.',
+      'Nível {level}. Um degrau. Faltam mil. Anda.'
+    ],
+    comeback: [
+      '{days} dias sumido. Você é exatamente o tipo que desiste. Provou que eu estava certo. Recomeça — se tiver coragem.',
+      '{days} dias. Sua sequência morreu e ninguém sentiu falta. Senta e faz.',
+      'Voltou depois de {days} dias. Que patético. Da próxima vez, aguenta.'
+    ]
+  },
+  buddy: {
+    reminder: [
+      'Oi! Chegou a hora do seu treino 💪 Bora juntos — nem que hoje seja um treino leve.',
+      'Passando pra lembrar do treino de hoje! Você consegue, um passo de cada vez 🙌',
+      'Hora de se mexer! Lembra: treino feito é sempre melhor que treino perfeito ✨'
+    ],
+    workoutDone: [
+      'Treino concluído! Orgulho de você por ter aparecido hoje 🙌',
+      'Isso aí! Mais um treino na conta. Seu eu do futuro agradece 💛',
+      'Fechou o treino! Aproveita pra alongar e beber água. Você merece ✨'
+    ],
+    newRecord: [
+      'Olha isso! {kg}kg no {exercise}. Você tá evoluindo de verdade 🎉',
+      'Novo recorde no {exercise}: {kg}kg! Tá vendo? O esforço aparece 💪',
+      '{kg}kg no {exercise}! Semana passada isso parecia difícil. Olha você agora 🌟'
+    ],
+    levelUp: [
+      'Nível {level}! Cada treino te trouxe até aqui. Bora pro próximo 💛',
+      'Subiu pro nível {level}! Isso é constância, não sorte 🎉',
+      'Nível {level} desbloqueado! Tô muito feliz por você ✨'
+    ],
+    comeback: [
+      'Que bom te ver de volta! Faltar acontece — o que importa é que você voltou. Recomeçamos juntos 🌱',
+      'Oi de novo! {days} dias não apagam o que você já construiu. Bora retomar com calma 💛',
+      'Voltou! Sem culpa, tá? Hoje a gente recomeça e está tudo certo 🌱'
+    ]
+  }
+};
+
+// Devolve a fala certa para a situação, já com os placeholders trocados.
+// Cai no tom "buddy" se o mentor ativo não tiver linha própria (ex.: mentor
+// personalizado criado pelo usuário).
+function resolveVoiceLine(situation, vars) {
+  vars = vars || {};
+  let tone = state.messageTone || 'faithful';
+  // Modo Simples não mostra mentor em lugar nenhum — "Fiel" não faz sentido lá.
+  if (state.appMode === 'simple' && tone === 'faithful') tone = 'buddy';
+
+  let line = '';
+  if (tone === 'faithful') {
+    line = (MENTOR_VOICE_LINES[state.activeMentor] || {})[situation] || '';
+  }
+  if (!line) {
+    const pool = (TONE_LINES[tone] || TONE_LINES.buddy)[situation] || [];
+    if (pool.length) line = pool[Math.floor(Math.random() * pool.length)];
+  }
+  if (!line) return '';
+  return line.replace(/\{(\w+)\}/g, (full, key) => (vars[key] !== undefined ? vars[key] : full));
+}
 
 // 2b. MENTOR REWARDS — Sistema de progressão de Nível 1 ao 30
 // ─────────────────────────────────────────────────────────────
@@ -1179,6 +1392,19 @@ const MENTOR_REWARD_CONFIGS = {
       desc: 'Brilho índigo máximo pulsando em toda a UI. Badge de elite no perfil.' },
     leaderboardTitle: 'Elite Líder', finalTitle: 'LÍDER ETERNO',
     easterDesc: 'Uma citação inédita e filosófica do RM foi resgatada dos bastidores — puro autoconhecimento.'
+  },
+  sukuna: {
+    shortcode: 'suk', shortName: 'Sukuna', name: 'Ryomen Sukuna', colorLabel: 'Vermelho Amaldiçoado', particleLabel: 'Energia amaldiçoada',
+    primaryStat: 'for', secondaryStat: 'agi',
+    tier1: { type: 'css_class', value: 'has-men-suk5', icon: '💀', name: 'Marca Amaldiçoada',
+      desc: 'Uma marca vermelha amaldiçoada surge ao redor do seu avatar de perfil!' },
+    tier2: { type: 'sound', value: 'domainexpansion', icon: '🔥', name: 'Eco do Domínio',
+      desc: 'Um eco sombrio ao finalizar treino intenso. Aura vermelha máxima no card.' },
+    mission: { name: 'Esmague o Limite', desc: 'Missão semanal: supere sua carga máxima em pelo menos 2 exercícios. Sem dó, sem carinho.' },
+    tier4: { type: 'css_class', value: 'has-men-suk20', icon: '👹', name: 'Domínio Expandido + Badge',
+      desc: 'Aura de Rei das Maldições em toda a UI. Badge de elite no perfil.' },
+    leaderboardTitle: 'Rei das Maldições', finalTitle: 'DOMÍNIO ABSOLUTO',
+    easterDesc: 'Um dedo amaldiçoado foi encontrado escondido no seu inventário... melhor nem perguntar como.'
   },
 };
 
@@ -1592,6 +1818,7 @@ let state = {
   profilePic: '',
   appMode: 'rpg',
   simpleModeSeen: false,
+  messageTone: 'faithful', // faithful | brutal | buddy (ver MESSAGE_TONES)
 
   // --- NEW MENTOR PROGRESSION STATE ---
   mentorLevels: {
@@ -2277,6 +2504,7 @@ function loadState() {
         if (!state.pinnedRecords) state.pinnedRecords = [];
         if (state.currentStreak === undefined) state.currentStreak = 0;
         if (state.bestStreak === undefined) state.bestStreak = 0;
+        if (!state.messageTone) state.messageTone = 'faithful';
         if (!state.customWorkouts) {
           state.customWorkouts = {};
         }
@@ -4019,8 +4247,8 @@ function renderDailyQuests() {
 function showOverloadToast(exerciseName, oldWeight, newWeight) {
   const toast = document.getElementById('overload-notification');
   const message = document.getElementById('overload-msg');
-  const diff = newWeight - oldWeight;
-  message.innerText = `${exerciseName}: +${diff.toFixed(1)}kg batido! (+15 XP)`;
+  const voice = resolveVoiceLine('newRecord', { exercise: exerciseName, kg: newWeight });
+  message.innerText = state.appMode === 'simple' ? voice : `${voice} (+15 XP)`;
   
   toast.classList.remove('hidden');
   playSound('quest');
@@ -4550,13 +4778,14 @@ function renderWorkoutRoutine() {
 // Para adicionar um novo universo: basta incluir o 'universe'
 // no objeto do mentor em OFFICIAL_MENTORS — aparece automaticamente.
 // ─────────────────────────────────────────────────────────────
-const UNIVERSE_ORDER = ['Dragon Ball', 'Naruto', 'One Punch Man', 'Fisiculturistas', 'Coreaninhos', 'Personalizados'];
+const UNIVERSE_ORDER = ['Dragon Ball', 'Naruto', 'One Punch Man', 'Fisiculturistas', 'Coreaninhos', 'Jujutsu Kaisen', 'Personalizados'];
 const UNIVERSE_META = {
   'Dragon Ball':    { icon: '🐉', color: '#f97316', desc: 'O universo dos Saiyajins e do Ki infinito' },
   'Naruto':         { icon: '🥷', color: '#22c55e', desc: 'O caminho ninja do esforço e da garra' },
   'One Punch Man':  { icon: '👊', color: '#ef4444', desc: 'O herói que treinou até virar invencível' },
   'Fisiculturistas':{ icon: '💪', color: '#eab308', desc: 'Lendas reais do ferro e da disciplina' },
   'Coreaninhos':    { icon: '🎤', color: '#ff8fa3', desc: 'Ídolos coreanos com disciplina de aço' },
+  'Jujutsu Kaisen': { icon: '👹', color: '#c1121f', desc: 'Feiticeiros amaldiçoados e poder absoluto' },
   'Personalizados': { icon: '⚙️', color: '#8b5cf6', desc: 'Seus mentores criados por você' },
 };
 
@@ -6028,6 +6257,10 @@ function showLevelUpModal() {
   const modal = document.getElementById('level-up-modal');
   document.getElementById('modal-level-val').innerText = state.level;
   document.getElementById('modal-subclass-val').innerText = getSubclassRank(state.charClass, state.level);
+  const descEl = modal.querySelector('.level-up-desc');
+  if (descEl) {
+    descEl.innerText = `${resolveVoiceLine('levelUp', { level: state.level })} Recebeu +5 Pontos de Atributos para alocar na aba de Status.`;
+  }
   modal.classList.remove('hidden');
 }
 
@@ -7050,6 +7283,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const notifEnable = document.getElementById('settings-notif-enable').checked;
       const notifTime = document.getElementById('settings-notif-time').value;
       const selectedMode = document.getElementById('settings-app-mode').value;
+      const toneEl = document.getElementById('settings-message-tone');
+      if (toneEl && MESSAGE_TONES[toneEl.value]) state.messageTone = toneEl.value;
       const dietCheckEl = document.getElementById('settings-diet-enable');
       const dietEnable = dietCheckEl ? dietCheckEl.checked : true;
       // Campos que vieram do antigo modal "Editar Perfil & Metas"
@@ -7917,10 +8152,40 @@ document.addEventListener('DOMContentLoaded', () => {
   const navItems = document.querySelectorAll('.bottom-nav .nav-item');
   const tabContents = document.querySelectorAll('.tab-content');
   
+  // Mostra a descrição do tom escolhido + uma amostra real da fala,
+  // pra pessoa entender a diferença antes de salvar.
+  function renderToneHint(toneId) {
+    const meta = MESSAGE_TONES[toneId];
+    const descEl = document.getElementById('settings-message-tone-desc');
+    const sampleEl = document.getElementById('settings-message-tone-sample');
+    if (descEl) descEl.innerText = meta ? meta.desc : '';
+    if (!sampleEl) return;
+    let sample = '';
+    if (toneId === 'faithful') {
+      const lines = MENTOR_VOICE_LINES[state.activeMentor];
+      const mentor = MENTORS_LIST_FULL().find(x => x.id === state.activeMentor);
+      if (lines && lines.workoutDone) {
+        sample = `${mentor ? mentor.name : 'Mentor'}: "${lines.workoutDone}"`;
+      }
+    } else {
+      const pool = (TONE_LINES[toneId] || {}).workoutDone || [];
+      if (pool.length) sample = `"${pool[0]}"`;
+    }
+    sampleEl.innerText = sample ? `Ao terminar um treino → ${sample}` : '';
+  }
+
   // Settings tab preload
   function openSettingsTab() {
     const modeSelect = document.getElementById('settings-app-mode');
     if (modeSelect) modeSelect.value = state.appMode || 'rpg';
+    const toneSelect = document.getElementById('settings-message-tone');
+    if (toneSelect) {
+      toneSelect.value = state.messageTone || 'faithful';
+      renderToneHint(toneSelect.value);
+      // onchange (e não addEventListener) pra não empilhar handler a cada
+      // vez que a aba Ajustes é aberta.
+      toneSelect.onchange = () => renderToneHint(toneSelect.value);
+    }
     const weightInput = document.getElementById('settings-weight');
     if (weightInput) weightInput.value = userProfile.currentWeight || state.charWeight || 70;
     const heightInput = document.getElementById('settings-height');
@@ -8786,10 +9051,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // TRAINING NOTIFICATION CHECKER AND TIMER
   function triggerTrainingNotification() {
+    const reminderVoice = resolveVoiceLine('reminder', { name: state.charName });
     if ('Notification' in window && Notification.permission === 'granted') {
       try {
-        new Notification('⚔️ FREAKYQUEST: Hora do Treino!', {
-          body: `E aí ${state.charName}! Hora de ir buscar sua dose diária de ferro e bater o shape! 💪`,
+        new Notification('FREAKYQUEST: Hora do Treino!', {
+          body: reminderVoice,
           icon: 'logo.webp'
         });
       } catch (e) {
@@ -8801,7 +9067,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const toast = document.getElementById('overload-notification');
     const message = document.getElementById('overload-msg');
     if (message && toast) {
-      message.innerText = `⚔️ ALERTA: Hora do shape, ${state.charName}! 💪`;
+      message.innerText = reminderVoice;
       toast.classList.remove('hidden');
       playSound('quest');
       
@@ -8848,6 +9114,19 @@ function completeActiveWorkout(rpeBonusXp) {
   state.bestStreak = Math.max(state.bestStreak || 0, state.currentStreak);
   if (state.currentStreak >= 7) unlockTrophy('sequencia_ferro');
   if (state.currentStreak >= 30) unlockTrophy('mes_disciplina');
+
+  // Fala do tom/mentor. "Voltou depois de sumir" tem prioridade sobre o
+  // "terminou o treino" normal — é o momento de maior peso emocional, e é
+  // onde os 3 tons mais se diferenciam. Calculado ANTES de sobrescrever
+  // lastWorkoutDate logo abaixo.
+  let daysAway = 0;
+  if (prevWorkoutDateStr && prevWorkoutDateStr !== todayDateStr) {
+    daysAway = Math.floor((Date.now() - new Date(state.lastWorkoutDate).getTime()) / 86400000);
+  }
+  const finishVoice = daysAway >= 3
+    ? resolveVoiceLine('comeback', { days: daysAway })
+    : resolveVoiceLine('workoutDone', {});
+  if (finishVoice) showGenericNotification(finishVoice);
 
   state.lastWorkoutDate = new Date().toISOString();
 

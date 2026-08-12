@@ -149,6 +149,15 @@ body.theme-namjoon {
   --accent-light: 58%;
 }
 
+body.theme-sukuna {
+  --primary-hue: 355;
+  --primary-sat: 85%;
+  --primary-light: 45%;
+  --accent-hue: 15;
+  --accent-sat: 75%;
+  --accent-light: 35%;
+}
+
 
 /* BASE RESET */
 *, *::before, *::after {
@@ -5533,6 +5542,10 @@ body.screen-shake::after {
   border-color: #5b5f97 !important;
   animation: aura-pulse-namjoon 2s infinite alternate !important;
 }
+.player-avatar-wrapper.aura-sukuna {
+  border-color: #c1121f !important;
+  animation: aura-pulse-sukuna 2s infinite alternate !important;
+}
 .player-avatar-wrapper.aura-custom {
   border-color: var(--color-primary) !important;
   animation: aura-pulse-custom 2s infinite alternate !important;
@@ -5577,6 +5590,10 @@ body.screen-shake::after {
 @keyframes aura-pulse-namjoon {
   0% { box-shadow: 0 0 5px rgba(91, 95, 151, 0.4), inset 0 0 3px rgba(91, 95, 151, 0.2); }
   100% { box-shadow: 0 0 15px rgba(91, 95, 151, 0.9), inset 0 0 8px rgba(91, 95, 151, 0.4); }
+}
+@keyframes aura-pulse-sukuna {
+  0% { box-shadow: 0 0 5px rgba(193, 18, 31, 0.4), inset 0 0 3px rgba(193, 18, 31, 0.2); }
+  100% { box-shadow: 0 0 15px rgba(193, 18, 31, 0.9), inset 0 0 8px rgba(193, 18, 31, 0.4); }
 }
 @keyframes aura-pulse-custom {
   0% { box-shadow: 0 0 5px var(--color-primary-glow), inset 0 0 3px var(--color-primary-glow); }
