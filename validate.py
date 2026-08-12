@@ -39,8 +39,7 @@ ids_needed = [
     'display-height','display-weight','display-tweight',
     'display-days','wiz-notif-enable','wiz-notif-time',
     'weekly-goal-badge','weekly-progress-fill','weekly-goal-text',
-    'workout-today-progress','settings-modal','settings-form',
-    'btn-open-settings','btn-close-settings-modal'
+    'workout-today-progress','btn-open-settings'
 ]
 missing = [i for i in ids_needed if f'id="{i}"' not in html]
 if missing:

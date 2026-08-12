@@ -1781,14 +1781,64 @@
           </div>
 
           <div class="settings-group" style="margin-top: 10px;">
+            <h4>Foto de Perfil</h4>
+            <input type="file" id="settings-profile-pic" accept="image/*" style="font-size: 0.8rem; background: rgba(255,255,255,0.05); border: 1px dashed rgba(255,255,255,0.15); border-radius: 6px; padding: 6px; width: 100%;">
+            <div id="settings-profile-pic-preview-container" style="margin-top: 5px; display: flex; align-items: center; gap: 8px;">
+              <img id="settings-profile-pic-preview" src="" alt="Preview" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1px solid var(--color-primary); display: none;">
+              <button type="button" id="btn-remove-profile-pic" class="btn btn-sm btn-outline hidden" style="padding: 2px 8px; font-size: 0.7rem;">Remover Foto</button>
+            </div>
+          </div>
+
+          <div class="settings-group" style="margin-top: 10px;">
             <h4>Medidas</h4>
             <div style="display: grid; gap: 8px; grid-template-columns: 1fr 1fr;">
-              <label>Peso (kg)
+              <label>Peso atual (kg)
                 <input type="number" id="settings-weight" value="70" step="0.1">
               </label>
-              <label>Altura (cm)
-                <input type="number" id="settings-height" value="170" step="1">
+              <label>Peso meta (kg)
+                <input type="number" id="settings-target-weight" min="20" max="200" step="0.1">
               </label>
+            </div>
+            <label style="display: block; margin-top: 8px;">Altura (cm)
+              <input type="number" id="settings-height" value="170" step="1">
+            </label>
+          </div>
+
+          <div class="settings-group" style="margin-top: 10px;">
+            <h4>Lesão / Dor</h4>
+            <select id="settings-injury" style="width: 100%; padding: 8px; border-radius: 8px;">
+              <option value="Nenhum">Nenhum</option>
+              <option value="Joelho">Joelho</option>
+              <option value="Quadril">Quadril</option>
+              <option value="Costas">Costas</option>
+              <option value="Pulso">Pulso</option>
+              <option value="Ombro">Ombro</option>
+              <option value="Cotovelo">Cotovelo</option>
+            </select>
+          </div>
+
+          <div class="settings-group" style="margin-top: 10px;">
+            <h4>Aparência</h4>
+            <label style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+              Tamanho da fonte
+              <select id="settings-font-size" style="background: rgba(0,0,0,0.5); border: 1.5px solid var(--border-glass); color: var(--color-primary); font-family: var(--font-display); font-size: 0.8rem; font-weight: 800; padding: 6px 10px; border-radius: 10px; outline: none;">
+                <option value="0.9">Pequeno</option>
+                <option value="1">Médio</option>
+                <option value="1.2">Grande</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="settings-group" style="margin-top: 10px;">
+            <h4>Temporizador de Descanso</h4>
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+              <input type="checkbox" id="settings-rest-enable" checked>
+              Habilitar temporizador de descanso
+            </label>
+            <div id="settings-rest-time-container" style="display: flex; align-items: center; gap: 8px; margin-top: 6px;">
+              <label for="settings-rest-time" style="font-size: 0.7rem; color: var(--text-secondary);">Tempo padrão:</label>
+              <input type="number" id="settings-rest-time" value="90" min="10" max="99" step="5" style="width: 70px; text-align: center; padding: 6px; border-radius: 8px;">
+              <span style="font-size: 0.7rem; color: var(--text-secondary);">segundos</span>
             </div>
           </div>
 
@@ -1812,10 +1862,18 @@
 
           <div class="settings-group" style="margin-top: 10px;">
             <h4>Treinos</h4>
-            <label>Meta semanal (dias)
-              <input type="number" id="settings-weekly-days" value="4" min="1" max="7">
-            </label>
-            <label style="margin-top: 6px; display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <label style="display: block; margin-bottom: 6px;">Dias de treino na semana</label>
+            <div class="settings-days-selector">
+              <button type="button" class="settings-day-btn" data-day="Seg">Seg</button>
+              <button type="button" class="settings-day-btn" data-day="Ter">Ter</button>
+              <button type="button" class="settings-day-btn" data-day="Qua">Qua</button>
+              <button type="button" class="settings-day-btn" data-day="Qui">Qui</button>
+              <button type="button" class="settings-day-btn" data-day="Sex">Sex</button>
+              <button type="button" class="settings-day-btn" data-day="Sab">Sab</button>
+              <button type="button" class="settings-day-btn" data-day="Dom">Dom</button>
+            </div>
+            <input type="hidden" id="settings-weekly-days" value="4">
+            <label style="margin-top: 10px; display: flex; align-items: center; gap: 8px; cursor: pointer;">
               <input type="checkbox" id="settings-notif-enable" checked>
               Lembretes de treino
             </label>
@@ -2005,96 +2063,6 @@
             </div>
           </div>
         </div>
-      </div>
-    </div>
-
-    <div id="settings-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
-      <div class="custom-modal-card glass-panel fade-in">
-        <h3>⚙️ Editar Perfil & Metas</h3>
-        <form id="settings-form" class="form-container">
-          <div class="input-group" style="margin-bottom: 12px;">
-            <label for="settings-profile-pic" style="font-size: 0.8rem; margin-bottom: 4px; display: block; color: var(--text-secondary);">Foto de Perfil</label>
-            <input type="file" id="settings-profile-pic" accept="image/*" style="font-size: 0.8rem; background: rgba(255,255,255,0.05); border: 1px dashed rgba(255,255,255,0.15); border-radius: 6px; padding: 6px; width: 100%;">
-            <div id="settings-profile-pic-preview-container" style="margin-top: 5px; display: flex; align-items: center; gap: 8px;">
-              <img id="settings-profile-pic-preview" src="" alt="Preview" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1px solid var(--color-primary); display: none;">
-              <button type="button" id="btn-remove-profile-pic" class="btn btn-sm btn-outline hidden" style="padding: 2px 8px; font-size: 0.7rem;">Remover Foto</button>
-            </div>
-          </div>
-          <div class="form-row-2">
-            <div class="input-group">
-              <label for="modal-settings-weight">Peso atual (kg)</label>
-              <input type="number" id="modal-settings-weight" min="20" max="200" step="0.1" required>
-            </div>
-            <div class="input-group">
-              <label for="settings-target-weight">Peso meta (kg)</label>
-              <input type="number" id="settings-target-weight" min="20" max="200" step="0.1" required>
-            </div>
-          </div>
-          <div class="form-row" style="margin-bottom: 12px;">
-            <div class="input-group">
-              <label>Dias de Treino na Semana</label>
-              <div class="settings-days-selector">
-                <button type="button" class="settings-day-btn" data-day="Seg">Seg</button>
-                <button type="button" class="settings-day-btn" data-day="Ter">Ter</button>
-                <button type="button" class="settings-day-btn" data-day="Qua">Qua</button>
-                <button type="button" class="settings-day-btn" data-day="Qui">Qui</button>
-                <button type="button" class="settings-day-btn" data-day="Sex">Sex</button>
-                <button type="button" class="settings-day-btn" data-day="Sab">Sab</button>
-                <button type="button" class="settings-day-btn" data-day="Dom">Dom</button>
-              </div>
-              <div style="display: none;">
-                <input type="number" id="modal-settings-weekly-days" min="1" max="7" required>
-              </div>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="input-group">
-              <label for="settings-injury">Lesão / Dor</label>
-              <select id="settings-injury">
-                <option value="Nenhum">Nenhum</option>
-                <option value="Joelho">Joelho</option>
-                <option value="Quadril">Quadril</option>
-                <option value="Costas">Costas</option>
-                <option value="Pulso">Pulso</option>
-                <option value="Ombro">Ombro</option>
-                <option value="Cotovelo">Cotovelo</option>
-              </select>
-            </div>
-          </div>
-          <div class="notification-picker-box">
-            <label style="display:flex; align-items:center; gap:8px; font-size:0.75rem; cursor:pointer;">
-              <input type="checkbox" id="modal-settings-notif-enable" checked style="width:16px; height:16px; accent-color:var(--color-primary);">
-              Lembretes de treino
-            </label>
-            <input type="time" id="modal-settings-notif-time" value="18:00" class="time-input-styled">
-          </div>
-
-          <div class="notification-picker-box" style="margin-top: 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-            <label for="settings-font-size" style="font-size:0.75rem; color:var(--text-secondary);">Tamanho da fonte</label>
-            <select id="settings-font-size" style="background: rgba(0,0,0,0.5); border: 1.5px solid var(--border-glass); color: var(--color-primary); font-family: var(--font-display); font-size: 0.8rem; font-weight: 800; padding: 6px 10px; border-radius: 10px; outline: none;">
-              <option value="0.9">Pequeno</option>
-              <option value="1">Médio</option>
-              <option value="1.2">Grande</option>
-            </select>
-          </div>
-
-          <!-- Rest Timer Global Settings -->
-          <div class="notification-picker-box" style="margin-top: 10px; display: flex; flex-direction: column; align-items: flex-start; gap: 6px;">
-            <label style="display:flex; align-items:center; gap:8px; font-size:0.75rem; cursor:pointer; width: 100%;">
-              <input type="checkbox" id="settings-rest-enable" checked style="width:16px; height:16px; accent-color:var(--color-primary);">
-              Habilitar temporizador de descanso
-            </label>
-            <div id="settings-rest-time-container" style="display: flex; align-items: center; gap: 8px; width: 100%; margin-top: 4px;">
-              <label for="settings-rest-time" style="font-size: 0.7rem; color: var(--text-secondary);">Tempo padrão:</label>
-              <input type="number" id="settings-rest-time" value="90" min="10" max="99" step="5" class="time-input-styled" style="width: 70px; text-align: center; padding: 4px; font-size: 0.75rem;">
-              <span style="font-size: 0.7rem; color: var(--text-secondary);">segundos</span>
-            </div>
-          </div>
-          <div class="btn-group-row">
-            <button type="submit" class="btn btn-primary ripple">Salvar</button>
-            <button type="button" id="btn-close-settings-modal" class="btn btn-outline">Cancelar</button>
-          </div>
-        </form>
       </div>
     </div>
 

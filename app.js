@@ -6667,10 +6667,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   applyNumericSanitizer('#water-target-input', 1);
   applyNumericSanitizer('#settings-weight', 3);
-  applyNumericSanitizer('#modal-settings-weight', 3);
   applyNumericSanitizer('#settings-target-weight', 3);
   applyNumericSanitizer('#settings-weekly-days', 0);
-  applyNumericSanitizer('#modal-settings-weekly-days', 0);
   applyNumericSanitizer('#cust-ex-sets', 1);
   applyNumericSanitizer('#cust-ex-weight', 3);
   applyNumericSanitizer('#cust-food-kcal', 2);
@@ -7035,6 +7033,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const selectedMode = document.getElementById('settings-app-mode').value;
       const dietCheckEl = document.getElementById('settings-diet-enable');
       const dietEnable = dietCheckEl ? dietCheckEl.checked : true;
+      // Campos que vieram do antigo modal "Editar Perfil & Metas"
+      const targetWeight = parseFloat(document.getElementById('settings-target-weight').value);
+      const injuryVal = document.getElementById('settings-injury').value || 'Nenhum';
+      const fontSel = document.getElementById('settings-font-size');
+      const restEnable = document.getElementById('settings-rest-enable').checked;
+      let baseRestTimeVal = parseInt(document.getElementById('settings-rest-time').value, 10) || 90;
+      if (baseRestTimeVal > 99) baseRestTimeVal = 99;
 
       if (!isNaN(weight) && weight > 0) {
         userProfile.currentWeight = weight;
@@ -7044,14 +7049,34 @@ document.addEventListener('DOMContentLoaded', () => {
         userProfile.height = height;
         state.charHeight = height;
       }
+      if (!isNaN(targetWeight) && targetWeight > 0) {
+        state.targetWeight = targetWeight;
+        userProfile.targetWeight = targetWeight;
+      }
       userProfile.mainObjective = goal;
       state.charGoal = goal;
       if (!isNaN(weeklyDays) && weeklyDays > 0) {
         state.weeklyTrainGoal = weeklyDays;
         userProfile.weeklyDaysGoal = weeklyDays;
       }
+      userProfile.trainingDays = state.trainingDays;
       state.notificationEnabled = notifEnable;
       state.notificationTime = notifTime;
+      state.injury = [injuryVal];
+      userProfile.jointPain = state.injury;
+      state.restTimerEnabled = restEnable;
+      state.baseRestTime = baseRestTimeVal;
+      userProfile.restTimerEnabled = restEnable;
+      userProfile.baseRestTime = baseRestTimeVal;
+      if (fontSel) {
+        const fs = parseFloat(fontSel.value) || 1;
+        state.fontScale = fs;
+        document.documentElement.style.setProperty('--font-scale', fs);
+      }
+      if (state.notificationEnabled && 'Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission().catch(() => {});
+      }
+      if (!state.waterTargetManual) updateWaterTargetFromWeight();
 
       // Se a dieta foi ligada/desligada agora, as quests de hoje (geradas na
       // virada do dia, antes dessa mudança) ainda tem a missão de proteína/
@@ -7893,6 +7918,46 @@ document.addEventListener('DOMContentLoaded', () => {
     if (dietCheck) dietCheck.checked = state.dietTrackingEnabled !== false;
     const soundCheck = document.getElementById('settings-sound-enable');
     if (soundCheck) soundCheck.checked = state.soundEnabled !== false;
+
+    // Campos que vieram do antigo modal "Editar Perfil & Metas" (unificado
+    // com Ajustes pra não ter dois lugares editando a mesma coisa).
+    const targetWeightInput = document.getElementById('settings-target-weight');
+    if (targetWeightInput) targetWeightInput.value = state.targetWeight || state.charWeight || 70;
+
+    document.querySelectorAll('.settings-days-selector .settings-day-btn').forEach(btn => {
+      const day = btn.getAttribute('data-day');
+      btn.classList.toggle('active', !!(state.trainingDays && state.trainingDays.includes(day)));
+    });
+
+    const injurySelect = document.getElementById('settings-injury');
+    if (injurySelect) {
+      injurySelect.value = Array.isArray(state.injury) ? (state.injury[0] || 'Nenhum') : (state.injury || 'Nenhum');
+    }
+
+    const fontSel = document.getElementById('settings-font-size');
+    if (fontSel) fontSel.value = (typeof state.fontScale === 'number' && !isNaN(state.fontScale)) ? String(state.fontScale) : '1';
+
+    const restEnableCb = document.getElementById('settings-rest-enable');
+    const restTimeInput = document.getElementById('settings-rest-time');
+    if (restEnableCb) restEnableCb.checked = state.restTimerEnabled !== false;
+    if (restTimeInput) restTimeInput.value = state.baseRestTime || 90;
+    if (window.toggleRestSettingsVisibility) toggleRestSettingsVisibility();
+
+    const picPreview = document.getElementById('settings-profile-pic-preview');
+    const removePicBtn = document.getElementById('btn-remove-profile-pic');
+    if (picPreview) {
+      if (state.profilePic) {
+        picPreview.src = state.profilePic;
+        picPreview.style.display = 'block';
+        if (removePicBtn) removePicBtn.classList.remove('hidden');
+      } else {
+        picPreview.src = '';
+        picPreview.style.display = 'none';
+        if (removePicBtn) removePicBtn.classList.add('hidden');
+      }
+    }
+    const picInput = document.getElementById('settings-profile-pic');
+    if (picInput) picInput.value = '';
   }
 
   // Só os itens que ainda tem data-tab entram no ciclo de troca de aba — o
@@ -8379,64 +8444,12 @@ document.addEventListener('DOMContentLoaded', () => {
     settingsRestEnable.addEventListener('change', toggleRestSettingsVisibility);
   }
 
-  // SETTINGS MODAL
-  function openSettingsModal() {
-    document.getElementById('modal-settings-weight').value = state.charWeight;
-    document.getElementById('settings-target-weight').value = state.targetWeight || state.charWeight;
-    document.getElementById('modal-settings-weekly-days').value = state.weeklyTrainGoal;
-    const settingsDayButtons = document.querySelectorAll('.settings-days-selector .settings-day-btn');
-    settingsDayButtons.forEach(btn => {
-      const day = btn.getAttribute('data-day');
-      if (state.trainingDays && state.trainingDays.includes(day)) {
-        btn.classList.add('active');
-      } else {
-        btn.classList.remove('active');
-      }
-    });
-    document.getElementById('modal-settings-notif-time').value = state.notificationTime || '18:00';
-    const fontSelInit = document.getElementById('settings-font-size');
-    if (fontSelInit) fontSelInit.value = (typeof state.fontScale === 'number' && !isNaN(state.fontScale)) ? String(state.fontScale) : '1';
-    document.getElementById('modal-settings-notif-enable').checked = state.notificationEnabled !== false;
-
-    // Popula preferências do temporizador de descanso
-    const restEnableCb = document.getElementById('settings-rest-enable');
-    const restTimeInput = document.getElementById('settings-rest-time');
-    if (restEnableCb) restEnableCb.checked = state.restTimerEnabled !== false;
-    if (restTimeInput) restTimeInput.value = state.baseRestTime || 90;
-    toggleRestSettingsVisibility();
-
-    const preview = document.getElementById('settings-profile-pic-preview');
-    const removeBtn = document.getElementById('btn-remove-profile-pic');
-    if (preview) {
-      if (state.profilePic) {
-        preview.src = state.profilePic;
-        preview.style.display = 'block';
-        if (removeBtn) removeBtn.classList.remove('hidden');
-      } else {
-        preview.src = '';
-        preview.style.display = 'none';
-        if (removeBtn) removeBtn.classList.add('hidden');
-      }
-    }
-    const settingsInput = document.getElementById('settings-profile-pic');
-    if (settingsInput) settingsInput.value = '';
-
-    const injurySelect = document.getElementById('settings-injury');
-    if (injurySelect) {
-      injurySelect.value = Array.isArray(state.injury) ? (state.injury[0] || 'Nenhum') : (state.injury || 'Nenhum');
-    }
-
-    document.getElementById('settings-modal').classList.remove('hidden');
-  }
-
-  function closeSettingsModal() {
-    document.getElementById('settings-modal').classList.add('hidden');
-  }
-
+  // "Editar Perfil & Metas" (aba Status) — unificado com a aba Ajustes,
+  // não abre mais um modal próprio com campos duplicados.
   const btnOpenSettings = document.getElementById('btn-open-settings');
   if (btnOpenSettings) btnOpenSettings.addEventListener('click', () => {
     playSound('click');
-    openSettingsModal();
+    goToSettingsTab();
   });
 
   // Cartão de Caçador — abrir/fechar
@@ -8477,15 +8490,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Settings gear button removed from UI
-
-  const btnEditMeasuresShortcut = document.getElementById('btn-edit-measures-shortcut');
-  if (btnEditMeasuresShortcut) {
-    btnEditMeasuresShortcut.addEventListener('click', () => {
-      playSound('click');
-      openSettingsModal();
-    });
-  }
 
   // ── Hero do mentor: clique no avatar troca a quote ──
   const heroSection = document.getElementById('mentor-hero-section');
@@ -8625,75 +8629,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  document.getElementById('btn-close-settings-modal').addEventListener('click', () => {
-    playSound('click');
-    closeSettingsModal();
-  });
-
-  document.getElementById('settings-form').addEventListener('submit', (e) => {
-    e.preventDefault();
-    playSound('quest');
-
-    state.charWeight = parseFloat(document.getElementById('modal-settings-weight').value) || state.charWeight;
-    state.targetWeight = parseFloat(document.getElementById('settings-target-weight').value) || state.targetWeight;
-    
-    if (!state.trainingDays || state.trainingDays.length === 0) {
-      state.trainingDays = ['Seg', 'Ter', 'Qui', 'Sex'];
-    }
-    state.weeklyTrainGoal = state.trainingDays.length;
-    
-    state.notificationTime = document.getElementById('modal-settings-notif-time').value || '18:00';
-    state.notificationEnabled = document.getElementById('modal-settings-notif-enable').checked;
-
-    const fontSel = document.getElementById('settings-font-size');
-    if (fontSel) {
-      const fs = parseFloat(fontSel.value) || 1;
-      state.fontScale = fs;
-      document.documentElement.style.setProperty('--font-scale', fs);
-    }
-
-    // Solicita permissão de notificação ao ativar (gesto do usuário)
-    if (state.notificationEnabled && 'Notification' in window && Notification.permission === 'default') {
-      Notification.requestPermission().catch(() => {});
-    }
-    
-    // Salvar preferências de temporizador de descanso
-    state.restTimerEnabled = document.getElementById('settings-rest-enable').checked;
-    let baseRestTimeVal = parseInt(document.getElementById('settings-rest-time').value, 10) || 90;
-    if (baseRestTimeVal > 99) baseRestTimeVal = 99;
-    state.baseRestTime = baseRestTimeVal;
-    
-    const injuryVal = document.getElementById('settings-injury').value || 'Nenhum';
-    state.injury = [injuryVal];
-
-    const savedUserStr = localStorage.getItem('freaky_quest_user');
-    if (savedUserStr) {
-      try {
-        const userObj = JSON.parse(savedUserStr);
-        userObj.profilePic = state.profilePic;
-        userObj.targetWeight = state.targetWeight;
-        userObj.trainingDays = state.trainingDays;
-        userObj.weeklyDaysGoal = state.weeklyTrainGoal;
-        userObj.notificationsEnabled = state.notificationEnabled;
-        userObj.notificationTime = state.notificationTime;
-        userObj.currentWeight = state.charWeight;
-        userObj.jointPain = state.injury;
-        userObj.restTimerEnabled = state.restTimerEnabled;
-        userObj.baseRestTime = state.baseRestTime;
-        localStorage.setItem('freaky_quest_user', JSON.stringify(userObj));
-        userProfile = userObj;
-      } catch (err) {
-        console.error("Failed to update freaky_quest_user on settings submit", err);
-      }
-    }
-
-    if (!state.waterTargetManual) updateWaterTargetFromWeight();
-    recalculateMacrosTargets();
-    saveState();
-    updateUI();
-    closeSettingsModal();
-  });
-
   const btnSkipRest = document.getElementById('btn-skip-rest');
   if (btnSkipRest) {
     btnSkipRest.addEventListener('click', () => {
@@ -8710,7 +8645,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const wrap = document.getElementById('quick-rest-time-wrap');
       if (wrap) wrap.style.display = e.target.checked ? 'flex' : 'none';
 
-      // Manter o settings-modal sincronizado
+      // Manter o campo espelho em Ajustes sincronizado
       const globEnable = document.getElementById('settings-rest-enable');
       if (globEnable) globEnable.checked = e.target.checked;
       toggleRestSettingsVisibility();
@@ -8726,7 +8661,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (val > 99) val = 99;
       state.baseRestTime = val;
 
-      // Manter o settings-modal sincronizado
+      // Manter o campo espelho em Ajustes sincronizado
       const globTime = document.getElementById('settings-rest-time');
       if (globTime) globTime.value = val;
 
