@@ -848,9 +848,9 @@ const OFFICIAL_MENTORS = [
     levelReq: 1,
     theme: 'theme-sukuna',
     avatar: 'sukuna.webp',
-    // Arte-fonte ja e escura e muito saturada (gradiente vermelho/ciano), entao
-    // esse mentor foge do preset "Anime" padrao: clareia em vez de escurecer.
-    filterCSS: 'contrast(1.3) saturate(1.4) brightness(1.28)',
+    // Arte oficial (trono de caveiras) ja vem com contraste/saturacao fortes —
+    // foge do preset "Anime" padrao pra nao estourar os tons rosa/vermelho.
+    filterCSS: 'contrast(1.15) saturate(1.15) brightness(1.0)',
     quote: '"Você acaricia o ferro com medo de machucar as mãos. Ponha peso nessa barra ou aceite ser um inseto."',
     buff: '+30% Força & +15% Agilidade (Domínio Expandido)',
     colorHex: '#c1121f',

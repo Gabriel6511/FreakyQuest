@@ -112,8 +112,8 @@ Para cada mentor novo, definir:
 ## 7. Atualizações de 2026-08-12
 
 - ✅ **11º mentor: Ryomen Sukuna** (`sukuna`, universo novo `Jujutsu Kaisen`, `beast`, FOR/AGI, tema vermelho amaldiçoado).
-  - ⚠️ **Exceção de filtro**: a arte dele é escura e já muito saturada, então ele **não usa o preset "Anime" padrão** — usa `contrast(1.3) saturate(1.4) brightness(1.28)`, que **clareia** em vez de escurecer. Lição geral: o preset é ponto de partida, não regra cega — sempre comparar lado a lado antes de fixar.
-  - 🔴 **Pendência**: a imagem atual é fan art de terceiro (assinatura `u/Someone_Else_Lurking` visível). Trocar por arte oficial ou obter autorização do artista antes de considerar isso finalizado.
+  - ⚠️ **Exceção de filtro**: a arte oficial dele (trono de caveiras) já vem com contraste/saturação fortes, então ele **não usa o preset "Anime" padrão** — usa `contrast(1.15) saturate(1.15) brightness(1.0)`, um toque bem mais leve pra não estourar os tons rosa/vermelho da própria arte. Lição geral: o preset é ponto de partida, não regra cega — sempre comparar lado a lado antes de fixar.
+  - ✅ Imagem final é arte oficial (sem assinatura de terceiro) — a primeira tentativa tinha sido fan art de `u/Someone_Else_Lurking`, trocada a pedido do usuário.
 - ✅ **Sistema de 3 tons de voz** (`MESSAGE_TONES`): `faithful` (voz de cada mentor), `brutal` (Ego Brutal) e `buddy` (Parceiro de Treino), selecionável em Ajustes. Ver seção 2, item 9.
   - **Regra do tom `brutal`**: o insulto bate no **esforço e na desculpa**, nunca no corpo ou na aparência. Iniciante é justamente quem mais precisa voltar no dia seguinte.
 - ✅ **Slots de equipamento: de 4 para 7.** Novos: `hands` (Punhos), `legs` (Pernas), `badge` (Insígnia).
