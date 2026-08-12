@@ -2,7 +2,7 @@
   Template do e-mail de PRIMEIRO ACESSO (Confirm signup) — usado na primeira
   vez que um e-mail novo pede acesso (cria a conta + confirma o e-mail).
   Colar em: Supabase → Authentication → Emails → template "Confirm signup"
-  Variável usada: {{ .Token }}  (código de 6 dígitos)
+  Variável usada: {{ .Token }}  (código enviado pelo Supabase — o tamanho é definido lá, não fixe no app)
 
   Igual ao Magic Link: só código, sem link clicável — ver explicação em
   email_magic_link.html.

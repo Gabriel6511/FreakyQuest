@@ -10,7 +10,7 @@ function escapeHtml(str) {
 }
 
 // ==========================================
-// CLOUD SYNC (SUPABASE) — login por código de 6 dígitos + sync de progresso
+// CLOUD SYNC (SUPABASE) — login por código enviado por e-mail + sync de progresso
 // Login: e-mail sem senha. 1º login = sobe o progresso local atual pra nuvem.
 // Logins seguintes (outro aparelho/navegador) = puxa o progresso da nuvem
 // e substitui o local (a nuvem vira a fonte da verdade depois do 1º login).
@@ -85,7 +85,7 @@ function onCloudLogout() {
   updateAccountUI();
 }
 
-// Login por CÓDIGO de 6 dígitos, não por link.
+// Login por CÓDIGO enviado por e-mail, não por link.
 // Motivo: um link aberto a partir do e-mail costuma cair no navegador PADRÃO
 // do celular, que pode não ser o mesmo em que a pessoa estava jogando. Como o
 // progresso não sincronizado vive no localStorage (que é por navegador), ela
@@ -101,7 +101,10 @@ async function sendLoginCode(email) {
 async function verifyLoginCode(email, token) {
   if (!isCloudEnabled()) return { error: 'Não foi possível carregar o login. Feche e abra o app de novo (ou puxe a tela pra baixo pra recarregar).' };
   const clean = (token || '').replace(/\D/g, '');
-  if (clean.length !== 6) return { error: 'O código tem 6 dígitos.' };
+  // O tamanho do código quem define é o painel do Supabase, não o app — nao
+  // fixar um numero exato aqui (ja causou bug: o Supabase manda 8 digitos,
+  // nao 6). So valida que nao esta vazio/curto demais.
+  if (clean.length < 4) return { error: 'Digite o código que chegou no seu e-mail.' };
   const { error } = await supabaseClient.auth.verifyOtp({ email, token: clean, type: 'email' });
   return { error: error ? error.message : null };
 }
@@ -741,7 +744,7 @@ const OFFICIAL_MENTORS = [
     levelReq: 1,
     theme: 'theme-bebezinho',
     avatar: 'bebezinho_tribute.webp',
-    filterCSS: 'contrast(1.3) saturate(0.15) sepia(0.5) brightness(0.95)',
+    filterCSS: 'contrast(1.25) saturate(0.7) sepia(0.2) brightness(0.95)',
     quote: '"Wake wake! Abre o olho big! Freaky Season! All Day Neguin!"',
     buff: '+15% Força & +15% Foco (Tributo Especial)',
     colorHex: '#9b5de5',
@@ -758,7 +761,7 @@ const OFFICIAL_MENTORS = [
     levelReq: 1,
     theme: 'theme-ramondino',
     avatar: 'ramondino.webp',
-    filterCSS: 'contrast(1.35) saturate(0.2) sepia(0.4) brightness(0.92)',
+    filterCSS: 'contrast(1.25) saturate(0.7) sepia(0.2) brightness(0.95)',
     quote: '"Não tem segredo, irmão. É bater o peso certinho, treinar braço pesado e comer limpo! Acorda pro treino!"',
     buff: '+12% Vigor & +8% Força',
     colorHex: '#0077b6',
@@ -775,7 +778,7 @@ const OFFICIAL_MENTORS = [
     levelReq: 1,
     theme: 'theme-arnold',
     avatar: 'arnold.webp',
-    filterCSS: 'contrast(1.3) saturate(0.1) sepia(0.55) brightness(0.9)',
+    filterCSS: 'contrast(1.25) saturate(0.7) sepia(0.25) brightness(0.92)',
     quote: '"Se você quer crescer, tem que passar pela dor. Sinta o pump e venha comigo se quiser ficar gigantesco!"',
     buff: '+20% Força e Hipertrofia Estética',
     colorHex: '#d4af37',
@@ -792,7 +795,7 @@ const OFFICIAL_MENTORS = [
     levelReq: 1,
     theme: 'theme-nickwalker',
     avatar: 'nickwalker.webp',
-    filterCSS: 'contrast(1.35) saturate(0.18) sepia(0.45) brightness(0.88)',
+    filterCSS: 'contrast(1.3) saturate(0.7) sepia(0.25) brightness(0.92)',
     quote: '"Foque em progredir a carga, treine com intensidade bizarra de verdade e seja um Mutante no ginásio!"',
     buff: '+25% Força & +10% Vigor (Hipertrofia Extrema)',
     colorHex: '#ff5e00',
@@ -810,7 +813,7 @@ const OFFICIAL_MENTORS = [
     levelReq: 1,
     theme: 'theme-jin',
     avatar: 'jin.webp',
-    filterCSS: 'contrast(1.3) saturate(0.15) sepia(0.45) brightness(0.92)',
+    filterCSS: 'contrast(1.25) saturate(0.7) sepia(0.25) brightness(0.95)',
     quote: '"Bora treinar, gente linda! Aqui quem manda é o mais bonito do mundo — e olha que ele também é o mais disciplinado!"',
     buff: '+15% Vigor & +10% Força',
     colorHex: '#ff8fa3',
@@ -827,7 +830,7 @@ const OFFICIAL_MENTORS = [
     levelReq: 1,
     theme: 'theme-namjoon',
     avatar: 'namjoon.webp',
-    filterCSS: 'contrast(1.32) saturate(0.18) sepia(0.5) brightness(0.9)',
+    filterCSS: 'contrast(1.28) saturate(0.7) sepia(0.25) brightness(0.92)',
     quote: '"Treinar o corpo é treinar a mente. Cada série de hoje é um passo pra versão melhor de você amanhã."',
     buff: '+15% Foco & +10% Vigor',
     colorHex: '#5b5f97',
@@ -1521,6 +1524,7 @@ let state = {
   },
   attrPoints: 0,
   activeMentor: 'rocklee',
+  mentorManuallyChosen: false,
   activeWorkoutDiv: 'A',
   workoutsCompleted: 0,
   waterIntake: 0, // LITRES E.g. 1, 2, 3
@@ -2415,6 +2419,11 @@ function loadState() {
         if (state.dietTrackingEnabled === undefined) state.dietTrackingEnabled = true;
         if (state.cardioMinutesToday === undefined) state.cardioMinutesToday = 0;
         if (state.cardioMinutesTotal === undefined) state.cardioMinutesTotal = 0;
+        // Migração: quem já tinha save antes dessa flag existir já vem jogando
+        // com um mentor (mesmo que nunca tenha "escolhido" formalmente) — não
+        // forçar esse jogador antigo pra aba Mentores depois de reabrir o
+        // tutorial. Só contas NOVAS (via `let state = {...}`) nascem com false.
+        if (state.mentorManuallyChosen === undefined) state.mentorManuallyChosen = true;
         if (state.baseRestTime === undefined) state.baseRestTime = 90;
         if (state.appMode === undefined) state.appMode = 'rpg';
         if (state.simpleModeSeen === undefined) state.simpleModeSeen = false;
@@ -4710,7 +4719,10 @@ function renderMentorsList() {
 window.chooseMentor = function(mentorId) {
   playSound('levelup');
   state.activeMentor = mentorId;
+  state.mentorManuallyChosen = true;
   saveState();
+  const banner = document.getElementById('pick-mentor-banner');
+  if (banner) banner.classList.add('hidden');
   updateUI();
   const m = MENTORS_LIST_FULL().find(x => x.id === mentorId);
   if (m) triggerNeuralFlash(m);
@@ -6217,7 +6229,7 @@ const TUTORIAL_STEPS = [
   {
     title: 'Salve seu Progresso na Nuvem ☁️',
     illoHTML: '<div class="tutorial-illustration-container"><div class="tutorial-rune-welcome">☁️</div></div>',
-    text: 'Em Ajustes → Conta, coloque seu e-mail e digite o código de 6 dígitos que chegar (sem senha pra decorar). Assim seu progresso fica salvo e você continua de onde parou mesmo trocando de celular. Bora treinar?'
+    text: 'Em Ajustes → Conta, coloque seu e-mail e digite o código que chegar por e-mail (sem senha pra decorar). Assim seu progresso fica salvo e você continua de onde parou mesmo trocando de celular. Bora treinar?'
   }
 ];
 
@@ -6250,7 +6262,7 @@ const SIMPLE_TUTORIAL_STEPS = [
   {
     title: 'Salve seu Progresso ☁️',
     illoHTML: '<div class="tutorial-illustration-container"><div class="tutorial-rune-welcome">☁️</div></div>',
-    text: 'Em Ajustes → Conta, coloque seu e-mail e digite o código de 6 dígitos que chegar (sem senha pra decorar). Seu progresso fica salvo e você continua de onde parou mesmo trocando de celular.'
+    text: 'Em Ajustes → Conta, coloque seu e-mail e digite o código que chegar por e-mail (sem senha pra decorar). Seu progresso fica salvo e você continua de onde parou mesmo trocando de celular.'
   },
   {
     title: 'Pronto para começar! ✅',
@@ -6274,6 +6286,16 @@ function closeTutorial() {
   if (tutorialTimeoutId) {
     clearTimeout(tutorialTimeoutId);
     tutorialTimeoutId = null;
+  }
+
+  // Conta nova nunca escolheu mentor de verdade (o app só usa Rock Lee como
+  // valor inicial padrão) — leva pra aba Mentores e destaca o convite pra
+  // escolher, em vez de deixar o jogador com um mentor que ele nunca pediu.
+  if (!state.mentorManuallyChosen) {
+    const mentorsNavBtn = document.querySelector('.bottom-nav .nav-item[data-tab="mentors"]');
+    if (mentorsNavBtn) mentorsNavBtn.click();
+    const banner = document.getElementById('pick-mentor-banner');
+    if (banner) banner.classList.remove('hidden');
   }
 }
 
@@ -7030,7 +7052,22 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       state.notificationEnabled = notifEnable;
       state.notificationTime = notifTime;
+
+      // Se a dieta foi ligada/desligada agora, as quests de hoje (geradas na
+      // virada do dia, antes dessa mudança) ainda tem a missão de proteína/
+      // volume do estado ANTIGO. Sem regenerar, o usuário via a missão de
+      // comida mesmo com "Rastrear dieta" desligado. Preserva o progresso das
+      // quests que não mudam (água, treino) ao regenerar.
+      const dietSettingChanged = dietEnable !== (state.dietTrackingEnabled !== false);
       state.dietTrackingEnabled = dietEnable;
+      if (dietSettingChanged) {
+        const oldQuests = state.dailyQuests || [];
+        generateDailyQuests();
+        state.dailyQuests.forEach(q => {
+          const old = oldQuests.find(o => o.id === q.id);
+          if (old) q.completed = old.completed;
+        });
+      }
 
       const modeChanged = selectedMode !== state.appMode;
       state.appMode = selectedMode;
@@ -7854,9 +7891,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (notifTime) notifTime.value = state.notificationTime || '18:00';
     const dietCheck = document.getElementById('settings-diet-enable');
     if (dietCheck) dietCheck.checked = state.dietTrackingEnabled !== false;
+    const soundCheck = document.getElementById('settings-sound-enable');
+    if (soundCheck) soundCheck.checked = state.soundEnabled !== false;
   }
 
-  navItems.forEach(item => {
+  // Só os itens que ainda tem data-tab entram no ciclo de troca de aba — o
+  // botão de baixo de "Amigos" foi remodelado pra abrir um modal, não uma
+  // aba, e tem o próprio listener mais abaixo.
+  const tabNavItems = document.querySelectorAll('.bottom-nav .nav-item[data-tab]');
+  tabNavItems.forEach(item => {
     item.addEventListener('click', () => {
       playSound('click');
       const targetTab = item.getAttribute('data-tab');
@@ -7875,13 +7918,22 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Vai pra aba Ajustes sem precisar de um item na barra de baixo (usado
+  // pelo atalho da engrenagem no topo e por outros botões "editar" no app).
+  function goToSettingsTab() {
+    navItems.forEach(i => { i.classList.remove('active'); i.setAttribute('aria-selected', 'false'); });
+    tabContents.forEach(t => t.classList.remove('active'));
+    const target = document.getElementById('tab-settings');
+    if (target) target.classList.add('active');
+    openSettingsTab();
+  }
+
   // Header settings shortcut
   const headerSettingsBtn = document.getElementById('header-settings-btn');
   if (headerSettingsBtn) {
     headerSettingsBtn.addEventListener('click', () => {
       playSound('click');
-      const settingsNavBtn = document.querySelector('.bottom-nav .nav-item[data-tab="settings"]');
-      if (settingsNavBtn) settingsNavBtn.click();
+      goToSettingsTab();
     });
   }
 
@@ -7890,28 +7942,52 @@ document.addEventListener('DOMContentLoaded', () => {
   if (editMeasuresBtn) {
     editMeasuresBtn.addEventListener('click', () => {
       playSound('click');
-      const settingsNavBtn = document.querySelector('.bottom-nav .nav-item[data-tab="settings"]');
-      if (settingsNavBtn) settingsNavBtn.click();
+      goToSettingsTab();
     });
   }
 
-  // Sound toggler button
+  // Botão "Amigos" na barra de baixo (era o de Ajustes)
+  const friendsShortcutBtn = document.getElementById('navtab-friends-shortcut');
+  if (friendsShortcutBtn) {
+    friendsShortcutBtn.addEventListener('click', () => {
+      playSound('click');
+      openFriendsModal();
+    });
+  }
+
+  // Sound toggler button (ícone flutuante) + checkbox em Ajustes — os dois
+  // controlam o mesmo state.soundEnabled e ficam sincronizados entre si.
   const soundBtn = document.getElementById('toggle-sound');
   const soundOnIcon = soundBtn.querySelector('.sound-on-icon');
   const soundOffIcon = soundBtn.querySelector('.sound-off-icon');
+  const soundCheckbox = document.getElementById('settings-sound-enable');
 
-  soundBtn.addEventListener('click', () => {
-    state.soundEnabled = !state.soundEnabled;
+  function applySoundEnabledUI() {
     if (state.soundEnabled) {
       soundOnIcon.classList.remove('hidden');
       soundOffIcon.classList.add('hidden');
-      playSound('click');
     } else {
       soundOnIcon.classList.add('hidden');
       soundOffIcon.classList.remove('hidden');
     }
+    if (soundCheckbox) soundCheckbox.checked = state.soundEnabled !== false;
+  }
+
+  soundBtn.addEventListener('click', () => {
+    state.soundEnabled = !state.soundEnabled;
+    applySoundEnabledUI();
+    if (state.soundEnabled) playSound('click');
     saveState();
   });
+
+  if (soundCheckbox) {
+    soundCheckbox.addEventListener('change', () => {
+      state.soundEnabled = soundCheckbox.checked;
+      applySoundEnabledUI();
+      if (state.soundEnabled) playSound('click');
+      saveState();
+    });
+  }
 
   // DOCK NUTRITION LINK TAB REDIRECT
   document.getElementById('go-to-diet-btn').addEventListener('click', () => {

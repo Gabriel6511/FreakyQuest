@@ -57,10 +57,10 @@ Para cada mentor novo, definir:
 
 > ⚠️ **Regra fixa pra mentor baseado em pessoa real viva (fisiculturista, cantor, qualquer pessoa pública)**: **nunca gerar imagem sintética/IA dela numa cena fabricada** (ex: "recriar" a pessoa fazendo exercício que ela nunca fez). Usar sempre uma **foto real** (oficial, dela mesma, de uso permitido) e aplicar o filtro CSS do preset (seção abaixo) — o mesmo tratamento já usado em Arnold/Ramon Dino/Nick Walker, que são fotos reais com filtro, não renders gerados. Decidido em 2026-07 ao adicionar os mentores do BTS. Personagens fictícios (anime) não têm essa restrição.
 
-**Problema atual**: as imagens dos 8 mentores hoje misturam estilos-fonte diferentes (personagens de anime em arte estilizada vs. fisiculturistas reais em foto/render realista), e isso é disfarçado apenas parcialmente por dois presets de filtro CSS (`filterCSS` em `OFFICIAL_MENTORS`) que já existem informalmente:
+**Problema atual**: as imagens dos 10 mentores hoje misturam estilos-fonte diferentes (personagens de anime em arte estilizada vs. fisiculturistas/pessoas reais em foto), e isso é disfarçado apenas parcialmente por dois presets de filtro CSS (`filterCSS` em `OFFICIAL_MENTORS`) que já existem informalmente:
 
 - **Preset "Anime/Vívido"** (Goku, Broly, Rock Lee, Saitama): `contrast(1.4–1.6) saturate(1.7–2.0) brightness(0.85–0.92)` — realça cor e contraste, mantém o visual de arte/anime saturado.
-- **Preset "Lenda/Sépia"** (Bebezinho, Ramon Dino, Arnold, Nick Walker): `contrast(1.3–1.35) saturate(0.1–0.2) sepia(0.4–0.55) brightness(0.88–0.95)` — dessatura quase pro monocromático, tom sépia, clima "lenda old school".
+- **Preset "Lenda/Real"** (Bebezinho, Ramon Dino, Arnold, Nick Walker, Jin, RM): `contrast(1.25–1.3) saturate(0.7) sepia(0.2–0.25) brightness(0.92–0.95)` — leve tom sépia "old school", mas sem perder a cor da foto. **Corrigido em 2026-08-12**: o valor original de `saturate(0.1–0.2)` deixava fotos com pouca cor de origem (ex.: Jin, Namjoon) praticamente em preto-e-branco — o usuário reportou. `saturate(0.7)` mantém o clima "lenda" sem apagar a cor. Testado visualmente lado a lado antes de aplicar (ver `git log -p` desse commit se precisar recalibrar de novo).
 
 **Recomendação daqui pra frente**:
 

@@ -1,7 +1,7 @@
 <!--
   Template do e-mail de LOGIN (Magic Link) — usado quando a conta já existe.
   Colar em: Supabase → Authentication → Emails → template "Magic Link"
-  Variável usada: {{ .Token }}  (código de 6 dígitos)
+  Variável usada: {{ .Token }}  (código enviado pelo Supabase — o tamanho é definido lá, não fixe no app)
 
   IMPORTANTE: este template mostra apenas o CÓDIGO, sem link clicável.
   Motivo: um link aberto pelo e-mail costuma abrir no navegador PADRÃO do
