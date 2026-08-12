@@ -158,6 +158,15 @@ body.theme-sukuna {
   --accent-light: 35%;
 }
 
+body.theme-anya {
+  --primary-hue: 330;
+  --primary-sat: 85%;
+  --primary-light: 72%;
+  --accent-hue: 45;
+  --accent-sat: 90%;
+  --accent-light: 60%;
+}
+
 
 /* BASE RESET */
 *, *::before, *::after {
@@ -5546,6 +5555,10 @@ body.screen-shake::after {
   border-color: #c1121f !important;
   animation: aura-pulse-sukuna 2s infinite alternate !important;
 }
+.player-avatar-wrapper.aura-anya {
+  border-color: #ff6fb0 !important;
+  animation: aura-pulse-anya 2s infinite alternate !important;
+}
 .player-avatar-wrapper.aura-custom {
   border-color: var(--color-primary) !important;
   animation: aura-pulse-custom 2s infinite alternate !important;
@@ -5594,6 +5607,10 @@ body.screen-shake::after {
 @keyframes aura-pulse-sukuna {
   0% { box-shadow: 0 0 5px rgba(193, 18, 31, 0.4), inset 0 0 3px rgba(193, 18, 31, 0.2); }
   100% { box-shadow: 0 0 15px rgba(193, 18, 31, 0.9), inset 0 0 8px rgba(193, 18, 31, 0.4); }
+}
+@keyframes aura-pulse-anya {
+  0% { box-shadow: 0 0 5px rgba(255, 111, 176, 0.4), inset 0 0 3px rgba(255, 111, 176, 0.2); }
+  100% { box-shadow: 0 0 15px rgba(255, 111, 176, 0.9), inset 0 0 8px rgba(255, 111, 176, 0.4); }
 }
 @keyframes aura-pulse-custom {
   0% { box-shadow: 0 0 5px var(--color-primary-glow), inset 0 0 3px var(--color-primary-glow); }

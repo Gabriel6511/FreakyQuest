@@ -119,3 +119,6 @@ Para cada mentor novo, definir:
 - ✅ **Slots de equipamento: de 4 para 7.** Novos: `hands` (Punhos), `legs` (Pernas), `badge` (Insígnia).
   - **Motivo**: 5 dos 8 itens existentes eram do slot `aura`, então o jogador só conseguia usar um por vez e o resto virava inventário morto. Ao criar item novo, **distribuir entre slots** em vez de empilhar em `aura`.
   - Saves antigos (4 slots) são migrados automaticamente em `loadState()`.
+- ✅ **12º mentor: Anya Forger** (`anya`, universo novo `Spy x Family`, `genetics`, FOC/AGI, tema rosa "Waku Waku"). Falas fiéis usam ganchos reais do anime (telepatia, Estrela Stella/Tonitrus Bolt do sistema de notas da Eden Academy, "Anya wa tensai", medo de causar "GUERRA", Chichi/Bondman) — não frases genéricas.
+  - 🔴 **Pendência de imagem**: `anya.webp` ainda não existe. `filterCSS` está no preset "Anime" padrão sem calibração — **recomparar lado a lado assim que a arte real chegar**, igual foi feito com o Sukuna (a arte real pode pedir ajuste do preset).
+  - 3 itens propostos (ainda sem ícone, ver `docs/PROMPTS_ITENS_MENTORES.md`): Estrela Stella (Nv5·Insígnia), Laços Cor-de-Rosa (Nv15·Cabeça), Aura Telepática (Nv30·Aura).

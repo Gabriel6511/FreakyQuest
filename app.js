@@ -856,6 +856,27 @@ const OFFICIAL_MENTORS = [
     colorHex: '#c1121f',
     particleType: 'curse',
     isCustom: false
+  },
+  // ══════════════ SPY X FAMILY ══════════════
+  {
+    id: 'anya',
+    name: 'Anya Forger',
+    universe: 'Spy x Family',
+    category: 'anime',
+    archetype: 'genetics',
+    primaryStat: 'foc',
+    levelReq: 1,
+    theme: 'theme-anya',
+    avatar: 'anya.webp',
+    // Preset "Anime" padrao — ainda NAO calibrado contra a arte real (arquivo
+    // pendente). Recomparar lado a lado assim que a imagem chegar, como foi
+    // feito com o Sukuna (a arte real pode pedir ajuste).
+    filterCSS: 'contrast(1.45) saturate(1.75) brightness(0.9)',
+    quote: '"Anya sabe... Anya sabe que você pode treinar mais! Waku waku!!"',
+    buff: '+15% Foco & +10% Agilidade (Telepatia)',
+    colorHex: '#ff6fb0',
+    particleType: 'sparkle',
+    isCustom: false
   }
 ];
 
@@ -936,6 +957,13 @@ const MENTOR_DASHBOARD_QUOTES = {
     "O músculo não cresce com carinho, ele é moldado quando você o esmaga.",
     "Vai falhar aqui também? Ou vai levantar esse peso e fazer mais uma repetição?",
     "Quem tem poder absoluto destrói os próprios limites. Ponha-se no seu lugar."
+  ],
+  anya: [
+    "Anya sabe... você quer pular o treino hoje. Mas Anya não vai contar pro Chichi!",
+    "Treinar deixa Anya waku waku! Vamos ganhar uma Estrela Stella juntos!",
+    "Anya wa tensai! E você também pode ser, treinando todo dia!",
+    "Se você desistir agora, isso pode causar GUERRA! Continue treinando!",
+    "Depois do treino, Anya quer amendoim. Você também merece um prêmio!"
   ]
 };
 
@@ -1044,6 +1072,13 @@ const MENTOR_VOICE_LINES = {
     newRecord: '{kg}kg no {exercise}. Finalmente parou de acariciar o ferro.',
     levelUp: 'Nível {level}. Ficou menos patético. Orgulhe-se: você é forte. Para um inseto.',
     comeback: '{days} dias. Você fugiu como o verme que é. Ajoelhe-se e recomece.'
+  },
+  anya: {
+    reminder: 'Anya sabe... Anya leu sua mente e viu que hoje é dia de treino! Waku waku!! Vai, ou pode começar a GUERRA!',
+    workoutDone: 'Anya viu tudo escondida atrás do sofá — treino completo! Isso merece uma Estrela Stella! E amendoim 🥜',
+    newRecord: '{kg}kg no {exercise}?! Anya wa tensai treinadora! Isso é papel de espiã nível S!',
+    levelUp: 'Nível {level}! Chichi ficaria orgulhoso. Anya vai contar pro Bondman hoje à noite!',
+    comeback: '{days} dias sumido... Anya quase chorou! Isso quase causou GUERRA. Volta, ou os Tonitrus Bolts vão cair!'
   }
 };
 
@@ -1405,6 +1440,19 @@ const MENTOR_REWARD_CONFIGS = {
       desc: 'Aura de Rei das Maldições em toda a UI. Badge de elite no perfil.' },
     leaderboardTitle: 'Rei das Maldições', finalTitle: 'DOMÍNIO ABSOLUTO',
     easterDesc: 'Um dedo amaldiçoado foi encontrado escondido no seu inventário... melhor nem perguntar como.'
+  },
+  anya: {
+    shortcode: 'any', shortName: 'Anya', name: 'Anya Forger', colorLabel: 'Rosa Waku Waku', particleLabel: 'Faíscas telepáticas',
+    primaryStat: 'foc', secondaryStat: 'agi',
+    tier1: { type: 'css_class', value: 'has-men-any5', icon: '⭐', name: 'Estrela Stella',
+      desc: 'Uma Estrela Stella dourada aparece ao lado do seu nome — igual às que a Anya ganha na Eden Academy!' },
+    tier2: { type: 'sound', value: 'wakuwaku', icon: '🥜', name: '"Waku Waku!" ao Completar',
+      desc: 'O grito de animação da Anya toca ao completar quests. Ela AMA ver você vencer!' },
+    mission: { name: 'Operação Strix', desc: 'Missão semanal: treine 5 dias sem faltar — segundo a Anya, isso evita a Terceira Guerra Mundial!' },
+    tier4: { type: 'css_class', value: 'has-men-any20', icon: '🕵️', name: 'Disfarce de Espiã + Badge',
+      desc: 'Tema de espionagem ativado em toda a UI. Badge de elite no perfil.' },
+    leaderboardTitle: 'Elite Operação Strix', finalTitle: 'ANYA WA TENSAI',
+    easterDesc: 'Um pacote secreto de amendoins foi encontrado escondido no seu inventário... Anya jura que não foi ela quem comeu metade.'
   },
 };
 
@@ -4784,7 +4832,7 @@ function renderWorkoutRoutine() {
 // Para adicionar um novo universo: basta incluir o 'universe'
 // no objeto do mentor em OFFICIAL_MENTORS — aparece automaticamente.
 // ─────────────────────────────────────────────────────────────
-const UNIVERSE_ORDER = ['Dragon Ball', 'Naruto', 'One Punch Man', 'Fisiculturistas', 'Coreaninhos', 'Jujutsu Kaisen', 'Personalizados'];
+const UNIVERSE_ORDER = ['Dragon Ball', 'Naruto', 'One Punch Man', 'Fisiculturistas', 'Coreaninhos', 'Jujutsu Kaisen', 'Spy x Family', 'Personalizados'];
 const UNIVERSE_META = {
   'Dragon Ball':    { icon: '🐉', color: '#f97316', desc: 'O universo dos Saiyajins e do Ki infinito' },
   'Naruto':         { icon: '🥷', color: '#22c55e', desc: 'O caminho ninja do esforço e da garra' },
@@ -4792,6 +4840,7 @@ const UNIVERSE_META = {
   'Fisiculturistas':{ icon: '💪', color: '#eab308', desc: 'Lendas reais do ferro e da disciplina' },
   'Coreaninhos':    { icon: '🎤', color: '#ff8fa3', desc: 'Ídolos coreanos com disciplina de aço' },
   'Jujutsu Kaisen': { icon: '👹', color: '#c1121f', desc: 'Feiticeiros amaldiçoados e poder absoluto' },
+  'Spy x Family':   { icon: '🥜', color: '#ff6fb0', desc: 'Espiões, assassinas e telepatas disfarçados de família comum' },
   'Personalizados': { icon: '⚙️', color: '#8b5cf6', desc: 'Seus mentores criados por você' },
 };
 
