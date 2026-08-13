@@ -1,4 +1,4 @@
-const CACHE_NAME = 'freakyquest-v38';
+const CACHE_NAME = 'freakyquest-v39';
 const ASSETS = [
   './',
   './index.html',
@@ -60,7 +60,8 @@ const ASSETS = [
   './santuario_icon.webp',
   './estrela_stella_icon.webp',
   './lacos_anya_icon.webp',
-  './minduim_anya_icon.webp'
+  './minduim_anya_icon.webp',
+  './bond_anya_icon.webp'
 ];
 
 self.addEventListener('install', (event) => {
