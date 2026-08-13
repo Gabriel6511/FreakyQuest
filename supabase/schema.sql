@@ -197,3 +197,100 @@ $fn$;
 
 revoke execute on function public.admin_overview() from public;
 grant execute on function public.admin_overview() to authenticated;
+
+-- ==========================================
+-- 7. MIGRAÇÃO 2026-08-13 — Cartão de amigo com compartilhamento opt-in
+--
+-- Antes o app não tinha NENHUMA forma de ver o perfil de um amigo — a lista
+-- só mostrava nome/nível/XP/streak (já público pro ranking). Agora dá pra
+-- abrir o card de um amigo e ver mais: recordes pessoais, mentores em
+-- destaque, troféus fixados (Modo RPG) ou treinos/dias da semana (Modo
+-- Simples) — mas SÓ o que essa pessoa marcou como "quero compartilhar".
+-- Cada categoria tem o próprio interruptor, começando todos DESLIGADOS
+-- (opt-in, nunca opt-out).
+--
+-- Os 4 booleanos abaixo ficam em public_profiles (não em profiles) porque
+-- QUALQUER amigo precisa poder ler "esse cara compartilha recordes?" antes
+-- de decidir se pede os dados — e public_profiles já é lida por todo
+-- autenticado (linha 45), diferente de profiles que é 100% privada.
+--
+-- A função get_friend_card() é quem realmente busca os dados de dentro de
+-- `profiles.state` (que continua com RLS travada, só o dono lê direto) —
+-- ela roda como SECURITY DEFINER, confere amizade de verdade no banco (não
+-- confia em nada vindo do client) e só devolve cada campo se o dono daquele
+-- perfil ligou o toggle correspondente.
+-- ==========================================
+alter table public.public_profiles
+  add column if not exists share_prs boolean not null default false,
+  add column if not exists share_mentors boolean not null default false,
+  add column if not exists share_trophies boolean not null default false,
+  add column if not exists share_schedule boolean not null default false;
+
+create or replace function public.get_friend_card(target_id uuid)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $fn$
+declare
+  is_friend boolean;
+  target_state jsonb;
+  target_pub record;
+  result jsonb;
+begin
+  if target_id = auth.uid() then
+    is_friend := true; -- ver o próprio card sempre funciona (pré-visualização)
+  else
+    select exists(
+      select 1 from public.friendships
+      where (user_id = auth.uid() and friend_id = target_id)
+         or (user_id = target_id and friend_id = auth.uid())
+    ) into is_friend;
+  end if;
+
+  if not is_friend then
+    raise exception 'Vocês precisam ser amigos pra ver esse card.';
+  end if;
+
+  select nickname, level, xp, active_mentor, current_streak,
+         share_prs, share_mentors, share_trophies, share_schedule
+  into target_pub
+  from public.public_profiles where id = target_id;
+
+  if target_pub is null then
+    raise exception 'Perfil não encontrado.';
+  end if;
+
+  select state into target_state from public.profiles where id = target_id;
+  target_state := coalesce(target_state, '{}'::jsonb);
+
+  select jsonb_build_object(
+    'nickname', target_pub.nickname,
+    'level', target_pub.level,
+    'xp', target_pub.xp,
+    'active_mentor', target_pub.active_mentor,
+    'current_streak', target_pub.current_streak,
+    'app_mode', target_state->>'appMode',
+    'char_class', target_state->>'charClass',
+    'prs', case when target_pub.share_prs
+      then target_state->'personalRecords' else null end,
+    'mentor_affinities', case when target_pub.share_mentors
+      then target_state->'mentorAffinities' else null end,
+    'showcase_trophies', case when target_pub.share_trophies
+      then target_state->'showcaseTrophies' else null end,
+    'training_days', case when target_pub.share_schedule
+      then target_state->'trainingDays' else null end,
+    'custom_workouts', case when target_pub.share_schedule
+      then target_state->'customWorkouts' else null end,
+    'shares', jsonb_build_object(
+      'prs', target_pub.share_prs, 'mentors', target_pub.share_mentors,
+      'trophies', target_pub.share_trophies, 'schedule', target_pub.share_schedule
+    )
+  ) into result;
+
+  return result;
+end;
+$fn$;
+
+revoke execute on function public.get_friend_card(uuid) from public;
+grant execute on function public.get_friend_card(uuid) to authenticated;

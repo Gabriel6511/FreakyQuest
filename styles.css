@@ -854,7 +854,10 @@ body.mode-simple #toggle-workout-cust,
 body.mode-simple #workout-category-badge,
 body.mode-simple .pcm-stat-xp,
 body.mode-simple #pcm-mentor-section,
-body.mode-simple #pcm-title-badge {
+body.mode-simple #pcm-title-badge,
+body.mode-simple #privacy-share-mentors-row,
+body.mode-simple #privacy-share-trophies-row,
+body.mode-simple #fc-rank-stat {
   display: none !important;
 }
 body.mode-simple .option-select-card.active {

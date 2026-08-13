@@ -418,10 +418,30 @@ function updateAccountUI() {
     loggedOutEl.classList.add('hidden');
     loggedInEl.classList.remove('hidden');
     if (emailEl) emailEl.innerText = cloudUser.email;
+    loadPrivacyToggles();
   } else {
     loggedOutEl.classList.remove('hidden');
     loggedInEl.classList.add('hidden');
   }
+}
+
+// Busca os 4 interruptores de compartilhamento salvos e marca os checkboxes
+// em Ajustes — chamado sempre que a tela de conta é atualizada (login,
+// reabrir Ajustes), não só uma vez, pra nunca mostrar valor desatualizado.
+async function loadPrivacyToggles() {
+  if (!cloudUser) return;
+  const { data, error } = await supabaseClient
+    .from('public_profiles')
+    .select('share_prs, share_mentors, share_trophies, share_schedule')
+    .eq('id', cloudUser.id)
+    .maybeSingle();
+  if (error || !data) return;
+  const map = { 'privacy-share-prs': data.share_prs, 'privacy-share-mentors': data.share_mentors,
+    'privacy-share-trophies': data.share_trophies, 'privacy-share-schedule': data.share_schedule };
+  Object.entries(map).forEach(([id, val]) => {
+    const el = document.getElementById(id);
+    if (el) el.checked = !!val;
+  });
 }
 
 // ==========================================
@@ -475,15 +495,120 @@ function friendRowHTML(p, extra) {
   const you = cloudUser && p.id === cloudUser.id;
   const mentorName = p.active_mentor ? (OFFICIAL_MENTORS.find(m => m.id === p.active_mentor)?.name || p.active_mentor) : '—';
   return `
-    <div class="glass-panel" style="padding: 10px 12px; display: flex; align-items: center; gap: 10px; ${you ? 'border: 1px solid var(--color-primary);' : ''}">
+    <div class="glass-panel friend-row-clickable" data-friend-id="${p.id}" style="padding: 10px 12px; display: flex; align-items: center; gap: 10px; cursor: pointer; ${you ? 'border: 1px solid var(--color-primary);' : ''}">
       ${extra || ''}
       <div style="flex: 1; min-width: 0;">
         <div style="font-weight: 800; font-size: 0.8rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(p.nickname)}${you ? ' (você)' : ''}</div>
         <div style="font-size: 0.6rem; color: var(--text-secondary);">Nv ${p.level || 1} · ${mentorName} · 🔥 ${p.current_streak || 0}</div>
       </div>
       <div style="font-weight: 800; font-size: 0.75rem; color: var(--color-primary); white-space: nowrap;">${p.xp || 0} XP</div>
+      <span style="color: var(--text-muted); font-size: 0.9rem;">›</span>
     </div>
   `;
+}
+
+// Abre o card detalhado de um amigo (ou o seu próprio, pra pré-visualizar o
+// que os outros veem). Busca via get_friend_card() no banco — a checagem de
+// amizade e os toggles de compartilhamento são conferidos DENTRO da função,
+// nunca confiando em nada calculado no client.
+async function openFriendCard(friendId) {
+  if (!cloudUser) return;
+  playSound('click');
+  const modal = document.getElementById('friend-card-modal');
+  modal.classList.remove('hidden');
+  document.getElementById('fc-title').innerText = '🪪 Carregando…';
+
+  const { data, error } = await supabaseClient.rpc('get_friend_card', { target_id: friendId });
+  if (error || !data) {
+    document.getElementById('fc-title').innerText = '🪪 Card do Amigo';
+    document.getElementById('fc-name').innerText = 'Não foi possível carregar.';
+    document.getElementById('fc-sub').innerText = error ? error.message : '';
+    document.getElementById('fc-rpg-sections').classList.add('hidden');
+    document.getElementById('fc-simple-sections').classList.add('hidden');
+    return;
+  }
+
+  document.getElementById('fc-title').innerText = '🪪 Card do Amigo';
+  document.getElementById('fc-name').innerText = data.nickname || '—';
+  const mentorName = data.active_mentor ? (OFFICIAL_MENTORS.find(m => m.id === data.active_mentor)?.name || data.active_mentor) : null;
+  document.getElementById('fc-sub').innerText = mentorName ? `Mentor ativo: ${mentorName}` : 'Sem mentor ativo';
+  document.getElementById('fc-level').innerText = data.level || 1;
+  document.getElementById('fc-streak').innerText = data.current_streak || 0;
+
+  const isSimpleFriend = data.app_mode === 'simple';
+  const rankStat = document.getElementById('fc-rank-stat');
+  if (isSimpleFriend) {
+    rankStat.classList.add('hidden');
+  } else {
+    rankStat.classList.remove('hidden');
+    document.getElementById('fc-rank').innerText = getHunterRankChar(data.level || 1);
+  }
+
+  document.getElementById('fc-rpg-sections').classList.toggle('hidden', isSimpleFriend);
+  document.getElementById('fc-simple-sections').classList.toggle('hidden', !isSimpleFriend);
+
+  const prsHTML = (prsObj) => {
+    const entries = Object.entries(prsObj || {});
+    if (!entries.length) return '<p class="pcm-mentor-mini-empty">Nenhum recorde ainda.</p>';
+    return entries.slice(0, 8).map(([ex, w]) => `
+      <div class="pcm-record-slot" style="display:flex; justify-content:space-between; padding:6px 10px; background:rgba(0,0,0,0.2); border-radius:8px; margin-bottom:4px; font-size:0.72rem;">
+        <span>${escapeHtml(ex)}</span><span style="font-weight:800; color:var(--color-primary);">${w}kg</span>
+      </div>`).join('');
+  };
+
+  if (isSimpleFriend) {
+    document.getElementById('fc-prs-simple').innerHTML = data.shares.prs
+      ? prsHTML(data.prs)
+      : '<p class="pcm-mentor-mini-empty">Essa pessoa não compartilha os recordes.</p>';
+
+    const daysWrap = document.getElementById('fc-schedule-days');
+    const workoutsWrap = document.getElementById('fc-schedule-workouts');
+    if (data.shares.schedule && data.training_days) {
+      daysWrap.innerHTML = data.training_days.map(d => `<span class="badge" style="background:var(--color-primary); color:#000; font-weight:800; padding:4px 10px; border-radius:8px; font-size:0.7rem;">${d}</span>`).join('');
+      const workouts = data.custom_workouts || {};
+      workoutsWrap.innerHTML = data.training_days.map((d, idx) => {
+        const w = workouts[idx] || workouts[String(idx)];
+        const exCount = w && Array.isArray(w.exercises) ? w.exercises.length : 0;
+        const title = w && w.title ? w.title : `Ficha de ${d}`;
+        return `<div style="padding:8px 10px; background:rgba(0,0,0,0.2); border-radius:8px; font-size:0.72rem;">
+          <strong>${d}:</strong> ${escapeHtml(title)} <span style="color:var(--text-muted);">(${exCount} exercício${exCount === 1 ? '' : 's'})</span>
+        </div>`;
+      }).join('');
+    } else {
+      daysWrap.innerHTML = '<p class="pcm-mentor-mini-empty">Essa pessoa não compartilha os dias/fichas de treino.</p>';
+      workoutsWrap.innerHTML = '';
+    }
+  } else {
+    document.getElementById('fc-prs').innerHTML = data.shares.prs
+      ? prsHTML(data.prs)
+      : '<p class="pcm-mentor-mini-empty">Essa pessoa não compartilha os recordes.</p>';
+
+    const mentorsWrap = document.getElementById('fc-mentors');
+    if (data.shares.mentors && data.mentor_affinities) {
+      const ranked = Object.entries(data.mentor_affinities)
+        .map(([id, aff]) => ({ id, level: aff.level || 1 }))
+        .sort((a, b) => b.level - a.level).slice(0, 2);
+      mentorsWrap.innerHTML = ranked.length ? ranked.map(r => {
+        const m = OFFICIAL_MENTORS.find(x => x.id === r.id);
+        return `<div class="pcm-mentor-mini"><div class="pcm-mentor-mini-name">${m ? m.name : r.id}</div><div class="pcm-mentor-mini-lvl">Nv ${r.level}</div></div>`;
+      }).join('') : '<p class="pcm-mentor-mini-empty">Nenhum mentor treinado ainda.</p>';
+    } else {
+      mentorsWrap.innerHTML = '<p class="pcm-mentor-mini-empty">Essa pessoa não compartilha os mentores.</p>';
+    }
+
+    const trophiesWrap = document.getElementById('fc-trophies');
+    if (data.shares.trophies && data.showcase_trophies) {
+      const shown = data.showcase_trophies.filter(Boolean);
+      trophiesWrap.innerHTML = shown.length
+        ? shown.map(tid => {
+            const t = TROPHIES.find(x => x.id === tid);
+            return `<span class="pcm-trophy-badge" title="${t ? escapeHtml(t.name) : tid}" style="font-size:1.4rem;">${t ? t.icon : '🏆'}</span>`;
+          }).join('')
+        : '<p class="pcm-mentor-mini-empty">Nenhum troféu fixado.</p>';
+    } else {
+      trophiesWrap.innerHTML = '<p class="pcm-mentor-mini-empty">Essa pessoa não compartilha os troféus.</p>';
+    }
+  }
 }
 
 async function renderFriendsList() {
@@ -684,7 +809,8 @@ const SUB_CLASSES = {
 // GUIA PARA ADICIONAR NOVO MENTOR (ex: mentor #9, #20, #50...):
 //   1. Copie um objeto abaixo e ajuste todos os campos
 //   2. Adicione o tema CSS em styles.css (body.theme-<id>)
-//   3. Adicione as quotes em MENTOR_DASHBOARD_QUOTES
+//   3. Adicione as 5 falas fiéis em MENTOR_VOICE_LINES (usadas no balão do
+//      Painel e nas notificações de treino/recorde/level up)
 //   4. Adicione uma entrada em MENTOR_REWARD_CONFIGS (ver linha ~405)
 //      — NÃO escreva o array de recompensas à mão. O gerador
 //      generateMentorRewards() monta as 23 etapas automaticamente
@@ -914,93 +1040,6 @@ const OFFICIAL_MENTORS = [
   }
 ];
 
-const MENTOR_DASHBOARD_QUOTES = {
-  bebezinho: [
-    "Wake wake! Abre o olho big! Freaky Season! All Day Neguin!",
-    "Tudo nosso, nada deles! O progresso não para!",
-    "Vem com o bebê! Mais um dia de pura dedicação!",
-    "Foca no pump, fecha a cara e vai!",
-    "A constância é a chave para moldar o herói!"
-  ],
-  brolyz: [
-    "O meu poder é máximo! Kakarotooooo!",
-    "Sinta o poder transbordar do seu peitoral!",
-    "Não há limites para a fúria dos seus treinos!",
-    "Destrua cada barreira hoje!",
-    "A força acumulada vai explodir nos pesos!"
-  ],
-  rocklee: [
-    "O trabalho duro vence o talento natural quando o talento natural não trabalha duro!",
-    "O fogo da juventude queima dentro de você hoje!",
-    "Se você acredita no seu sonho, eu provarei que você pode com trabalho duro!",
-    "Mais 100 repetições! Não desista antes do fim!",
-    "Um fracassado pode superar um gênio com esforço!"
-  ],
-  ramondino: [
-    "Não tem segredo, irmão. É bater o peso certinho, treinar braço pesado e comer limpo! Acorda pro treino!",
-    "Cada grama na balança conta! Foco na dieta hoje!",
-    "O Acre tem força bruta! Mostre sua garra!",
-    "Não pula o treino de antebraço, hein big!",
-    "O shape fala por si só!"
-  ],
-  goku: [
-    "Oi, eu sou o Goku! Treinar na gravidade 100x vai te deixar insano. Vamos superar nossos limites hoje?",
-    "Eu estou tão animado para treinar pesado hoje!",
-    "Sinto um grande poder vindo de você!",
-    "Coma bastante e treine ainda mais!",
-    "A dor de hoje é a força de amanhã!"
-  ],
-  arnold: [
-    "Se você quer crescer, tem que passar pela dor. Sinta o pump e venha comigo se quiser ficar gigantesco!",
-    "No pain, no gain! Sem esforço não há glória!",
-    "A última repetição é o que faz o músculo crescer!",
-    "Mantenha a mente focada no músculo e sinta a contração!",
-    "Descanse apenas o necessário e volte ao combate!"
-  ],
-  saitama: [
-    "100 flexões, 100 agachamentos, 100 abdominais e 10 km de corrida todos os dias! Isso é tudo.",
-    "Você já treinou tanto que está ficando careca?",
-    "Apenas faça o que precisa ser feito.",
-    "A força de verdade vem de dentro.",
-    "Mais um treino normal concluído sem esforço."
-  ],
-  nickwalker: [
-    "Foque em progredir a carga, treine com intensidade bizarra de verdade e seja um Mutante no ginásio!",
-    "Cresça a cada treino! O pump é indescritível!",
-    "Sem desculpas, coloque mais carga e esmague!",
-    "Intensidade bizarra é o nosso padrão!",
-    "Você quer ser comum ou quer ser um mutante?"
-  ],
-  jin: [
-    "Bora treinar, gente linda! Aqui quem manda é o mais bonito do mundo!",
-    "Disciplina é disciplina — treino não se pula, nem no serviço militar!",
-    "Um sorriso confiante e a série de hoje está no bolso!",
-    "Já treinou o suficiente pra ficar Worldwide Handsome hoje?",
-    "Constância com bom humor: essa é a receita!"
-  ],
-  namjoon: [
-    "Treinar o corpo é treinar a mente. Cada série é um passo à frente.",
-    "Reflita, respire e ataque a próxima série com propósito.",
-    "O crescimento de hoje é a sabedoria de amanhã.",
-    "Equilíbrio: corpo forte, mente tranquila.",
-    "Um bom líder também lidera o próprio treino."
-  ],
-  sukuna: [
-    "Pouco peso? Tá indo treinar ou brincar?",
-    "Você acaricia o ferro com medo de machucar as mãos.",
-    "O músculo não cresce com carinho, ele é moldado quando você o esmaga.",
-    "Vai falhar aqui também? Ou vai levantar esse peso e fazer mais uma repetição?",
-    "Quem tem poder absoluto destrói os próprios limites. Ponha-se no seu lugar."
-  ],
-  anya: [
-    "Anya sabe... você quer pular o treino hoje. Mas Anya não vai contar pro Chichi!",
-    "Treinar deixa Anya waku waku! Vamos ganhar uma Estrela Stella juntos!",
-    "Anya wa tensai! E você também pode ser, treinando todo dia!",
-    "Se você desistir agora, isso pode causar GUERRA! Continue treinando!",
-    "Depois do treino, Anya quer amendoim. Você também merece um prêmio!"
-  ]
-};
-
 // ─────────────────────────────────────────────────────────────
 // TOM DE VOZ DO APP — 3 modos escolhidos pelo usuário em Ajustes.
 //
@@ -1172,6 +1211,40 @@ const TONE_LINES = {
     ]
   }
 };
+
+// Falas ambiente pra quando o usuário toca no mentor no Painel só pra ver
+// uma frase nova (sem evento específico por trás — level up, recorde etc.
+// já são cobertos pelas situações acima). Só existe pros tons brutal/buddy;
+// o tom "fiel" reaproveita reminder/workoutDone de MENTOR_VOICE_LINES, que
+// já são fiéis ao personagem e não têm placeholder, em getMentorIdleQuote().
+TONE_LINES.brutal.idle = [
+  'Parado lendo. O ferro não levanta sozinho.',
+  'Cada segundo olhando pra tela é um segundo que você não tá progredindo.',
+  'Ainda tá aqui? Vai treinar.'
+];
+TONE_LINES.buddy.idle = [
+  'Oi! Como você tá hoje? Lembra de beber água 💛',
+  'Só passando pra desejar um ótimo treino, sem pressão ✨',
+  'Você já chegou até aqui — isso já conta muito 🌱'
+];
+
+// Fala aleatória pro balão do mentor no Painel (clique manual, sem evento
+// específico). Fiel: reaproveita reminder/workoutDone de MENTOR_VOICE_LINES
+// (já fiéis, sem placeholder). Outros tons: pool 'idle' dedicado acima.
+function getMentorIdleQuote() {
+  let tone = state.messageTone || 'faithful';
+  if (state.appMode === 'simple' && tone === 'faithful') tone = 'buddy';
+
+  if (tone === 'faithful') {
+    const lines = MENTOR_VOICE_LINES[state.activeMentor];
+    if (lines) {
+      const pool = [lines.reminder, lines.workoutDone].filter(Boolean);
+      if (pool.length) return pool[Math.floor(Math.random() * pool.length)];
+    }
+  }
+  const pool = (TONE_LINES[tone] || TONE_LINES.buddy).idle || [];
+  return pool.length ? pool[Math.floor(Math.random() * pool.length)] : '';
+}
 
 // Devolve a fala certa para a situação, já com os placeholders trocados.
 // Cai no tom "buddy" se o mentor ativo não tiver linha própria (ex.: mentor
@@ -3898,7 +3971,10 @@ function updateUI() {
   // Meta semanal de treinos
   checkWeeklyReset();
   const weeklyCurrent = state.workoutsThisWeek || 0;
-  const weeklyTarget = userProfile.weeklyDaysGoal || state.weeklyTrainGoal || 4;
+  // state.trainingDays é a fonte real (sincroniza na nuvem); userProfile.weeklyDaysGoal
+  // é uma cópia local que não participa do sync — usá-la primeiro podia mostrar a meta
+  // desatualizada depois de puxar progresso de outro aparelho.
+  const weeklyTarget = (state.trainingDays && state.trainingDays.length) || state.weeklyTrainGoal || 4;
   const weeklyPct = Math.min(100, Math.round((weeklyCurrent / weeklyTarget) * 100));
   const weeklyBadge = document.getElementById('weekly-goal-badge');
   const weeklyFill = document.getElementById('weekly-progress-fill');
@@ -5354,7 +5430,7 @@ window.showAllMentorRewards = function(mentorId) {
     const { icon, name, desc } = getRewardDisplayInfo(r);
     const isImg = icon && (icon.endsWith('.webp') || icon.endsWith('.png') || icon.endsWith('.jpg'));
     const iconHtml = isImg
-      ? `<img src="${icon}" alt="" class="mrw-icon-img" />`
+      ? `<img src="${icon}" alt="" class="mrw-icon-img" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mrw-icon-emoji',textContent:'🖼️',title:'Arte pendente'}))" />`
       : `<span class="mrw-icon-emoji">${icon}</span>`;
     return `
       <div class="mrw-row ${unlocked ? 'mrw-unlocked' : 'mrw-locked'}">
@@ -5785,16 +5861,31 @@ function unlockTrophy(trophyId) {
 function renderEvolutionChart() {
   const svg = document.getElementById('evolution-svg');
   if (!svg) return;
+
+  const container = document.getElementById('evolution-chart-container');
+  const emptyState = document.getElementById('evolution-empty-state');
+  const axisLabels = document.getElementById('evolution-axis-labels');
+
+  // Volume total (kg x reps) de cada treino finalizado — dado real, vem de
+  // calculateSessionVolume() em completeActiveWorkout(). strengthHistory
+  // nasce com só o seed [0] (sem treino ainda); menos de 2 entradas = nunca
+  // treinou de verdade. Nesse caso um gráfico "reto em zero" só parece
+  // quebrado — mostra um aviso em vez de renderizar SVG vazio.
+  const sHist = state.strengthHistory || [];
+  if (sHist.length < 2) {
+    if (container) container.classList.add('hidden');
+    if (axisLabels) axisLabels.classList.add('hidden');
+    if (emptyState) emptyState.classList.remove('hidden');
+    return;
+  }
+  if (container) container.classList.remove('hidden');
+  if (axisLabels) axisLabels.classList.remove('hidden');
+  if (emptyState) emptyState.classList.add('hidden');
+
   svg.innerHTML = '';
 
   const wHist = state.weightHistory || [];
-  // Volume total (kg x reps) de cada treino finalizado — dado real, vem de
-  // calculateSessionVolume() em completeActiveWorkout(). Sem fórmula
-  // inventada: sem treino registrado ainda, o volume é 0 mesmo.
-  const sHist = state.strengthHistory || [];
-
   if (wHist.length === 0) wHist.push(parseFloat(state.charWeight) || 80);
-  if (sHist.length === 0) sHist.push(0);
 
   const finalW = [...wHist];
   const finalS = [...sHist];
@@ -6354,7 +6445,7 @@ function renderEquipment() {
       const item = EQUIPMENT_DATABASE.find(i => i.id === equippedItemId);
       if (item) {
         const iconHtml = item.icon.endsWith('.png') || item.icon.endsWith('.jpg') || item.icon.endsWith('.webp')
-          ? `<img src="${item.icon}" alt="${item.name}" class="eq-icon-img" style="width: 28px; height: 28px; object-fit: contain; filter: drop-shadow(0 0 5px rgba(255,255,255,0.15)); flex-shrink: 0;" />`
+          ? `<img src="${item.icon}" alt="${item.name}" class="eq-icon-img" style="width: 28px; height: 28px; object-fit: contain; filter: drop-shadow(0 0 5px rgba(255,255,255,0.15)); flex-shrink: 0;" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'equip-slot-icon',textContent:'🖼️',title:'Arte pendente'}))" />`
           : `<span class="equip-slot-icon">${item.icon}</span>`;
         slotEl.innerHTML = `
           <div class="equip-slot-filled">
@@ -6421,7 +6512,7 @@ function renderEquipment() {
       }
       
       const iconHtml = item.icon.endsWith('.png') || item.icon.endsWith('.jpg') || item.icon.endsWith('.webp')
-        ? `<img src="${item.icon}" alt="${item.name}" class="eq-icon-img" style="width: 36px; height: 36px; object-fit: contain;" />`
+        ? `<img src="${item.icon}" alt="${item.name}" class="eq-icon-img" style="width: 36px; height: 36px; object-fit: contain;" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'eq-card-icon',textContent:'🖼️',title:'Arte pendente'}))" />`
         : `<span class="eq-card-icon">${item.icon}</span>`;
       card.innerHTML = `
         <div class="eq-card-header">
@@ -6613,7 +6704,7 @@ function showItemAcquiredModal(icon, name, desc, opts) {
   document.getElementById('modal-item-subtitle').innerText = subtitle;
   document.getElementById('btn-close-item-modal').innerText = btnText;
   if (icon && (icon.endsWith('.png') || icon.endsWith('.jpg') || icon.endsWith('.webp'))) {
-    iconEl.innerHTML = `<img src="${icon}" alt="${name}" style="width: 44px; height: 44px; object-fit: contain;" />`;
+    iconEl.innerHTML = `<img src="${icon}" alt="${name}" style="width: 44px; height: 44px; object-fit: contain;" onerror="this.replaceWith(document.createTextNode('🖼️'))" />`;
   } else {
     iconEl.innerText = icon;
   }
@@ -7031,6 +7122,21 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Interruptores de privacidade — salva na hora do clique (não espera o
+  // botão geral "Salvar Ajustes"), já que é um toggle único e a pessoa
+  // espera feedback imediato numa configuração de privacidade.
+  const privacyMap = { 'privacy-share-prs': 'share_prs', 'privacy-share-mentors': 'share_mentors',
+    'privacy-share-trophies': 'share_trophies', 'privacy-share-schedule': 'share_schedule' };
+  Object.entries(privacyMap).forEach(([elId, column]) => {
+    const el = document.getElementById(elId);
+    if (!el) return;
+    el.addEventListener('change', async () => {
+      if (!cloudUser) return;
+      playSound('click');
+      await supabaseClient.from('public_profiles').update({ [column]: el.checked }).eq('id', cloudUser.id);
+    });
+  });
+
   const nicknameConfirmBtn = document.getElementById('nickname-confirm-btn');
   if (nicknameConfirmBtn) {
     nicknameConfirmBtn.addEventListener('click', () => {
@@ -7089,6 +7195,28 @@ document.addEventListener('DOMContentLoaded', () => {
     closeFriendsBtn.addEventListener('click', () => {
       playSound('click');
       friendsModal.classList.add('hidden');
+    });
+  }
+
+  // Card de amigo — delegação de evento porque as linhas (amigos e ranking)
+  // são recriadas toda vez que a lista recarrega.
+  const friendCardModalEl = document.getElementById('friend-card-modal');
+  ['friends-list-container', 'ranking-list-container'].forEach(id => {
+    const list = document.getElementById(id);
+    if (!list) return;
+    list.addEventListener('click', (e) => {
+      const row = e.target.closest('.friend-row-clickable');
+      if (row) openFriendCard(row.dataset.friendId);
+    });
+  });
+  const closeFriendCardBtn = document.getElementById('btn-close-friend-card');
+  if (closeFriendCardBtn && friendCardModalEl) {
+    closeFriendCardBtn.addEventListener('click', () => {
+      playSound('click');
+      friendCardModalEl.classList.add('hidden');
+    });
+    friendCardModalEl.addEventListener('click', (e) => {
+      if (e.target === friendCardModalEl) friendCardModalEl.classList.add('hidden');
     });
   }
   const copyInviteCodeBtn = document.getElementById('btn-copy-invite-code');
@@ -9154,12 +9282,10 @@ document.addEventListener('DOMContentLoaded', () => {
   if (heroSection) {
     heroSection.addEventListener('click', () => {
       playSound('click');
-      const mId = state.activeMentor || 'rocklee';
-      const quotesList = MENTOR_DASHBOARD_QUOTES[mId] || [];
       const heroQuoteEl = document.getElementById('mentor-bubble-quote');
-      if (quotesList.length > 0 && heroQuoteEl) {
-        const randQuote = quotesList[Math.floor(Math.random() * quotesList.length)];
-        heroQuoteEl.innerText = randQuote.replace(/^"|"$/g, '');
+      const quote = getMentorIdleQuote();
+      if (quote && heroQuoteEl) {
+        heroQuoteEl.innerText = quote.replace(/^"|"$/g, '');
         heroSection.style.transform = 'scale(0.995)';
         setTimeout(() => { heroSection.style.transform = ''; }, 120);
       }

@@ -20,7 +20,7 @@ Um mentor toca 4 arquivos e ~5 estruturas de dados diferentes. Nenhuma delas ger
 | Efeito visual da aura no avatar do jogador quando ele é mentor ativo | `.aura-<id>` | `styles.css` (~linha 5459) |
 | Botão de filtro por universo (só se for universo novo) | `.muf-btn[data-filter="..."]` | `index.html` (~linha 1292) |
 | Ordem/descrição do universo na lista (só se for universo novo) | `UNIVERSE_ORDER` (array) + `UNIVERSE_META` (objeto) | `app.js` (~linha 3798) |
-| Frases rotativas do dashboard quando o mentor está ativo (opcional, tem fallback vazio) | `MENTOR_DASHBOARD_QUOTES[id]` | `app.js` (~linha 224) |
+| Frase do balão do mentor no Painel (clique = nova fala) | reaproveita `MENTOR_VOICE_LINES[id]` via `getMentorIdleQuote()` | `app.js` |
 | **Falas do tom "Fiel ao Personagem"** (5 situações) | `MENTOR_VOICE_LINES[id]` | `app.js` |
 | Imagem do mentor | `<id>.webp` na raiz + precache | `sw.js` (`ASSETS`) |
 
@@ -89,7 +89,7 @@ Para cada mentor novo, definir:
 6. [ ] Adicionar `body.theme-<id> { --primary-hue/sat/light; --accent-hue/sat/light; }` em `styles.css`.
 7. [ ] Adicionar `.aura-<id>` (efeito de borda/aura no avatar do jogador) em `styles.css`, seguindo o padrão de `.aura-rocklee`/`.aura-goku`.
 8. [ ] Se for universo novo: adicionar `<button class="muf-btn" data-filter="<Universo>">` no filtro de universo em `index.html` **e** adicionar o universo em `UNIVERSE_ORDER` + `UNIVERSE_META` em `app.js` (~linha 3798) — sem isso o mentor fica invisível na lista.
-9. [ ] (Opcional) Adicionar 5 frases em `MENTOR_DASHBOARD_QUOTES[id]` (`app.js`) — tem fallback vazio, não quebra se pular.
+9. [ ] ~~Adicionar frases em `MENTOR_DASHBOARD_QUOTES`~~ — removido em 2026-08-13. O balão do Painel já reaproveita `MENTOR_VOICE_LINES[id]` automaticamente (item 9b), nenhum passo extra necessário.
 9b. [ ] **Adicionar as 5 falas em `MENTOR_VOICE_LINES[id]`** (`app.js`) seguindo a regra de fidelidade da seção 2, item 9. Sem isso o mentor fica mudo no tom "Fiel ao Personagem".
 10. [ ] Adicionar `<id>.webp` à lista `ASSETS` do `sw.js` **e** bumpar `CACHE_NAME` (senão o app fica preso na versão de cache anterior sem a imagem nova).
 11. [ ] Rodar `python validate.py` e `python check_duplicate_ids.py`.
