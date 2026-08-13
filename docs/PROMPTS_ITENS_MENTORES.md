@@ -288,13 +288,17 @@ background, centered composition, square 1:1, no text, no human face —
 abstract glowing aura only
 ```
 
-**29. Aura Telepática** — `aura_anya_icon.webp` (Nv30 · Aura)
+**29. Bond ao seu Lado** — `bond_anya_icon.webp` (Nv30 · Aura)
+
+*(Substitui a antiga "Aura Telepática" — "aura telepática" não existe no anime;*
+*trocada pelo Bond, o cão precognitivo real da família Forger, batizado por*
+*causa do herói de TV Bondman que a Anya adora.)*
 ```
-Digital painting icon, pink and violet radiant glow, a glowing brain-wave
-psychic energy silhouette at the very center as the light source,
-telepathic wave ripples radiating outward, flat vector illustration style,
-black background, centered composition, square 1:1, no text, no human
-face — abstract glowing aura only
+Digital painting icon, soft white and pale-blue radiant glow, a glowing
+fluffy white dog silhouette shape at the very center as the light source,
+gentle foresight sparkle particles radiating outward, flat vector
+illustration style, black background, centered composition, square 1:1,
+no text, no human face — abstract glowing aura only
 ```
 
 **30. Minduim da Anya** — `minduim_anya_icon.webp` (Nv4 · Punhos — item bônus, exclusivo dela)

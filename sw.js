@@ -1,4 +1,4 @@
-const CACHE_NAME = 'freakyquest-v35';
+const CACHE_NAME = 'freakyquest-v36';
 const ASSETS = [
   './',
   './index.html',
@@ -60,7 +60,6 @@ const ASSETS = [
   './santuario_icon.webp',
   './estrela_stella_icon.webp',
   './lacos_anya_icon.webp',
-  './aura_anya_icon.webp',
   './minduim_anya_icon.webp'
 ];
 

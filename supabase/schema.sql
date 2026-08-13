@@ -76,3 +76,48 @@ create policy "profiles_owner_delete" on public.profiles
   for delete using (auth.uid() = id);
 create policy "public_profiles_owner_delete" on public.public_profiles
   for delete using (auth.uid() = id);
+
+-- ==========================================
+-- 5. MIGRAÇÃO 2026-08-13 — Chama Eterna cooperativa (contador global)
+-- Antes cada usuário tinha sua própria contagem local (eternalFlameClicks no
+-- state), então um toque só aparecia pra quem tocou. Agora é uma única linha
+-- compartilhada por todo mundo: leitura é pública (mesmo deslogado, pra
+-- qualquer um ver o total), e o incremento só acontece via função com
+-- SECURITY DEFINER — a tabela em si não aceita UPDATE direto de ninguém, só
+-- +1 atômico por vez, então nunca dá pra "setar" o contador pra um valor
+-- arbitrário nem perder toques em cliques simultâneos de pessoas diferentes.
+-- ==========================================
+create table public.eternal_flame (
+  id int primary key default 1,
+  clicks bigint not null default 0,
+  constraint eternal_flame_single_row check (id = 1)
+);
+
+insert into public.eternal_flame (id, clicks) values (1, 0);
+
+alter table public.eternal_flame enable row level security;
+
+create policy "eternal_flame_read_all" on public.eternal_flame
+  for select using (true);
+-- Sem policy de insert/update/delete de propósito — a única forma de mudar
+-- o valor é a função abaixo.
+
+create or replace function public.increment_eternal_flame()
+returns bigint
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  new_count bigint;
+begin
+  update public.eternal_flame set clicks = clicks + 1 where id = 1
+  returning clicks into new_count;
+  return new_count;
+end;
+$$;
+
+-- Só usuário logado pode incrementar (mesma exigência das outras features
+-- de nuvem do app — sem login, o toque fica só local, como já era antes).
+revoke execute on function public.increment_eternal_flame() from public;
+grant execute on function public.increment_eternal_flame() to authenticated;

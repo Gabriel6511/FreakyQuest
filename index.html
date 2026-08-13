@@ -1802,6 +1802,11 @@
           </div>
 
           <div class="settings-group" style="margin-top: 10px;">
+            <h4>Nome / Apelido</h4>
+            <input type="text" id="settings-char-name" maxlength="15" placeholder="Seu nome ou codinome" style="width: 100%; padding: 8px; border-radius: 8px;">
+          </div>
+
+          <div class="settings-group" style="margin-top: 10px;">
             <h4>Foto de Perfil</h4>
             <input type="file" id="settings-profile-pic" accept="image/*" style="font-size: 0.8rem; background: rgba(255,255,255,0.05); border: 1px dashed rgba(255,255,255,0.15); border-radius: 6px; padding: 6px; width: 100%;">
             <div id="settings-profile-pic-preview-container" style="margin-top: 5px; display: flex; align-items: center; gap: 8px;">
@@ -2399,6 +2404,18 @@
         <h2 id="modal-item-name">Faixa do Rock Lee</h2>
         <p id="modal-item-desc">Aumenta seu vigor e foco em treinos pesados!</p>
         <button id="btn-close-item-modal" class="btn btn-accent ripple">EQUIPAR NO SHAPE</button>
+      </div>
+    </div>
+
+    <!-- Lista completa de recompensas de um mentor (botão "Ver Recompensas") -->
+    <div id="mentor-rewards-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+      <div class="custom-modal-card glass-panel fade-in pcm-card" style="max-width: 420px; max-height: 82vh; overflow-y: auto;">
+        <div class="pcm-header">
+          <h3 id="mrw-title">⭐ Recompensas</h3>
+          <button type="button" id="btn-close-mentor-rewards" class="pcm-close-btn">✕</button>
+        </div>
+        <p id="mrw-subtitle" style="font-size: 0.7rem; color: var(--text-secondary); margin-bottom: 10px;"></p>
+        <div id="mentor-rewards-list" class="mrw-list"></div>
       </div>
     </div>
 

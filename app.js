@@ -30,6 +30,11 @@ let cloudSyncDirty = false;
 let cloudSyncFailures = 0;
 const CLOUD_SYNC_MAX_RETRIES = 4;
 
+// Contador global e cooperativo da Chama Eterna — null até a primeira busca
+// no Supabase completar (leitura é pública, não precisa estar logado).
+// Enquanto for null, a UI mostra o contador local antigo como fallback.
+let globalFlameCount = null;
+
 function isCloudEnabled() {
   return !!supabaseClient;
 }
@@ -49,6 +54,36 @@ async function initCloudAuth() {
       onCloudLogout();
     }
   });
+}
+
+// Busca o contador global da Chama Eterna — leitura é pública (RLS permite
+// select pra qualquer um), funciona mesmo deslogado. Só a função de
+// incrementar (increment_eternal_flame) exige login, ver triggerEternalFlameSpark.
+async function fetchGlobalFlameCount() {
+  if (!isCloudEnabled()) return;
+  try {
+    const { data, error } = await supabaseClient
+      .from('eternal_flame')
+      .select('clicks')
+      .eq('id', 1)
+      .maybeSingle();
+    if (!error && data) {
+      globalFlameCount = data.clicks;
+      renderEternalFlameCount();
+    }
+  } catch (e) {
+    console.warn('Falha ao buscar contador global da Chama Eterna', e);
+  }
+}
+
+// Único lugar que escreve o texto do contador — usado tanto pelo fetch
+// inicial quanto pelo clique, pra manter os dois em sincronia.
+function renderEternalFlameCount() {
+  const flameCountEl = document.getElementById('eternal-flame-count');
+  if (!flameCountEl) return;
+  const count = globalFlameCount !== null ? globalFlameCount : (state.eternalFlameClicks || 0);
+  const label = globalFlameCount !== null ? 'toques de respeito (todo mundo)' : 'toques de respeito';
+  flameCountEl.innerText = `${count.toLocaleString('pt-BR')} ${label}`;
 }
 
 async function onCloudLogin(user) {
@@ -1443,8 +1478,8 @@ const MENTOR_REWARD_CONFIGS = {
   anya: {
     shortcode: 'any', shortName: 'Anya', name: 'Anya Forger', colorLabel: 'Rosa Waku Waku', particleLabel: 'Faíscas telepáticas',
     primaryStat: 'foc', secondaryStat: 'agi',
-    tier1: { type: 'css_class', value: 'has-men-any5', icon: '⭐', name: 'Estrela Stella',
-      desc: 'Uma Estrela Stella dourada aparece ao lado do seu nome — igual às que a Anya ganha na Eden Academy!' },
+    tier1: { type: 'css_class', value: 'has-men-any5', icon: '🧠', name: 'Telepatia Desperta',
+      desc: 'Um brilho rosa contorna seu nome — a Anya está de olho nos seus pensamentos!' },
     tier2: { type: 'sound', value: 'wakuwaku', icon: '🥜', name: '"Waku Waku!" ao Completar',
       desc: 'O grito de animação da Anya toca ao completar quests. Ela AMA ver você vencer!' },
     mission: { name: 'Operação Strix', desc: 'Missão semanal: treine 5 dias sem faltar — segundo a Anya, isso evita a Terceira Guerra Mundial!' },
@@ -1696,10 +1731,10 @@ const EQUIPMENT_DATABASE = [
     desc: 'Os laços icônicos da Anya. Ninguém desconfia que são chifres de verdade.',
     stats: { foc: 8, agi: 4 }, unlockDesc: 'Desbloqueia no Mentor Anya Nível 19.',
     equivalentIds: ['item_lacosanya', 'has-men-any19'] },
-  { id: 'item_auraanya', name: 'Aura Telepática', slot: 'aura', icon: 'aura_anya_icon.webp',
-    desc: 'Ondas psíquicas rosa e violeta. Agora você lê a mente do peso antes de levantar.',
+  { id: 'item_bond', name: 'Bond ao seu Lado', slot: 'aura', icon: 'bond_anya_icon.webp',
+    desc: 'Bond, o cão precognitivo da família Forger (batizado por causa do Bondman), aparece guardando seu treino. Ele já viu você terminando essa série.',
     stats: { foc: 12, agi: 6 }, unlockDesc: 'Desbloqueia no Mentor Anya Nível 30.',
-    equivalentIds: ['item_auraanya', 'has-men-any30'] }
+    equivalentIds: ['item_bond', 'has-men-any30'] }
 ];
 
 function getEffectiveAttributes() {
@@ -1731,6 +1766,36 @@ function getEffectiveAttributes() {
 function isItemUnlocked(item) {
   if (!state.unlockedItems) return false;
   return item.equivalentIds.some(id => state.unlockedItems.includes(id));
+}
+
+// Acha o item de EQUIPMENT_DATABASE que uma recompensa da progressão do
+// mentor realmente desbloqueia (mesmo `value` presente em equivalentIds).
+function findEquipmentItemForReward(reward) {
+  if (!reward || reward.type !== 'css_class') return null;
+  return EQUIPMENT_DATABASE.find(i => i.equivalentIds.includes(reward.value)) || null;
+}
+
+// Ícone + texto pra mostrar numa notificação/prévia de recompensa: troca os
+// dois pelo do item real quando existe um, não só o ícone — senão a linha
+// mistura o ícone certo com uma legenda genérica de outro milestone (ex.:
+// ícone das Caneleiras do Lee do lado do texto "Animação cinemática ao
+// treinar", que é sobre outra coisa).
+//
+// Só os níveis 5/10/20 (tier1/tier2/tier4 em generateMentorRewards) têm o
+// nome escrito à mão pra já descrever o item vinculado — esses ficam como
+// estão. Os "⭐ LENDA"/"⭐ ETERNO" de 25/30 são flavor de maestria genérico
+// SEMPRE, mesmo quando o mesmo nível também libera um item de verdade
+// (ex.: Bond da Anya no Nv30) — por isso não usar "nome começa com ⭐" como
+// critério, e sim o nível exato.
+function getRewardDisplayInfo(reward) {
+  const item = findEquipmentItemForReward(reward);
+  if (!item) return { icon: reward.icon, name: reward.name, desc: reward.desc };
+  const isHandWrittenTierName = [5, 10, 20].includes(reward.lvl);
+  return {
+    icon: item.icon,
+    name: isHandWrittenTierName ? reward.name : item.name,
+    desc: isHandWrittenTierName ? reward.desc : item.desc
+  };
 }
 
 // 3. EXERCISE TEMPLATES BY CLASS
@@ -3098,7 +3163,8 @@ function checkMentorRewards(mentorId, oldLvl, newLvl) {
       // Trigger reward modal pop-up on screen
       setTimeout(() => {
         const opts = r.type === 'css_class' ? undefined : { subtitle: 'RECOMPENSA DESBLOQUEADA', btnText: 'SHOW DE BOLA!' };
-        showItemAcquiredModal(r.icon, r.name, `${r.desc} (Ganho ao subir nível do Mentor ${OFFICIAL_MENTORS.find(m => m.id === mentorId)?.name || mentorId}!)`, opts);
+        const info = getRewardDisplayInfo(r);
+        showItemAcquiredModal(info.icon, info.name, `${info.desc} (Ganho ao subir nível do Mentor ${OFFICIAL_MENTORS.find(m => m.id === mentorId)?.name || mentorId}!)`, opts);
       }, 1600);
     }
   });
@@ -3722,7 +3788,14 @@ function updateUI() {
   const ambUniv = document.getElementById('amb-universe');
   const ambLvl = document.getElementById('amb-lvl');
   const ambRank = document.getElementById('amb-rank');
-  if (ambImg) { ambImg.src = avatarSrc; if (activeMentorData.filterCSS) ambImg.style.filter = activeMentorData.filterCSS; }
+  if (ambImg) {
+    // Zera a opacity antes de trocar o src — o onerror inline do HTML
+    // (disparado no primeiro render, quando src="" ainda está vazio) deixa
+    // opacity:0 preso mesmo depois que uma imagem válida carrega com sucesso.
+    ambImg.style.opacity = '';
+    ambImg.src = avatarSrc;
+    if (activeMentorData.filterCSS) ambImg.style.filter = activeMentorData.filterCSS;
+  }
   if (ambName) ambName.innerText = activeMentorData.name;
   if (ambUniv) ambUniv.innerText = activeMentorData.universe || '';
   if (ambLvl) {
@@ -4342,11 +4415,7 @@ function updateUI() {
   renderEquipment();
 
   // Update Eternal Flame Click Counter
-  const flameCountEl = document.getElementById('eternal-flame-count');
-  if (flameCountEl) {
-    const clicks = state.eternalFlameClicks || 0;
-    flameCountEl.innerText = `${clicks.toLocaleString('pt-BR')} toques de respeito`;
-  }
+  renderEternalFlameCount();
 }
 
 // 12. CHECK META COMPLETIONS (DAILY INTEGRATION)
@@ -5143,7 +5212,7 @@ function renderMentorsList() {
               ? `<button class="mcn-btn mcn-btn-active" disabled>✓ ATIVO</button>`
               : `<button class="mcn-btn mcn-btn-choose" onclick="chooseMentor('${m.id}')">ATIVAR BASE</button>`
             }
-            <button class="mcn-btn mcn-btn-preview" onclick="previewMentorMilestone('${m.id}', ${milestoneLevels.find(ml => ml > mLvl) || 30})">VER RECOMPENSAS</button>
+            <button class="mcn-btn mcn-btn-preview" onclick="showAllMentorRewards('${m.id}')">VER RECOMPENSAS</button>
           </div>
         </div>
       `;
@@ -5233,26 +5302,71 @@ window.previewMentorMilestone = function(mentorId, targetLvl) {
     const tier = TIERS.find(t => targetLvl >= t.range[0] && targetLvl <= t.range[1]);
     const isUnlocked = currentLvl >= targetLvl;
     const prefix = isUnlocked ? '✅ DESBLOQUEADO — ' : `🔒 Nível ${targetLvl} necessário — `;
+    const info = getRewardDisplayInfo(exactReward);
     showItemAcquiredModal(
-      exactReward.icon,
-      prefix + exactReward.name,
-      exactReward.desc + (tier ? `\n\n📊 Tier: ${tier.name} (Nv ${tier.range[0]}–${tier.range[1]})` : ''),
+      info.icon,
+      prefix + info.name,
+      info.desc + (tier ? `\n\n📊 Tier: ${tier.name} (Nv ${tier.range[0]}–${tier.range[1]})` : ''),
       { subtitle: 'PRÉVIA DA RECOMPENSA', btnText: 'ENTENDI' }
     );
   } else {
     // Show closest reward above targetLvl
     const nextAbove = allRewards.filter(r => r.lvl >= targetLvl).sort((a,b) => a.lvl - b.lvl)[0];
     if (nextAbove) {
+      const info = getRewardDisplayInfo(nextAbove);
       showItemAcquiredModal(
-        nextAbove.icon,
+        info.icon,
         `Próxima recompensa: Nível ${nextAbove.lvl}`,
-        nextAbove.desc,
+        info.desc,
         { subtitle: 'PRÉVIA DA RECOMPENSA', btnText: 'ENTENDI' }
       );
     } else {
       showItemAcquiredModal('🏆', `${mentorName} Masterizado!`, 'Você desbloqueou todas as recompensas deste mentor. Lendário!', { subtitle: 'PRÉVIA DA RECOMPENSA', btnText: 'SHOW!' });
     }
   }
+};
+
+// Lista COMPLETA das 23 recompensas de um mentor de uma vez só (botão "VER
+// RECOMPENSAS") — diferente de previewMentorMilestone, que mostra uma de
+// cada vez ao clicar num nível específico do trilho.
+window.showAllMentorRewards = function(mentorId) {
+  playSound('click');
+  const fullList = MENTORS_LIST_FULL();
+  const mentor = fullList.find(m => m.id === mentorId);
+  if (!mentor) return;
+
+  const mAff = (state.mentorAffinities && state.mentorAffinities[mentorId]) || { level: 1, xp: 0 };
+  const currentLvl = mAff.level;
+  const allRewards = (MENTOR_REWARDS[mentorId] || []).slice().sort((a, b) => a.lvl - b.lvl);
+
+  const titleEl = document.getElementById('mrw-title');
+  const subtitleEl = document.getElementById('mrw-subtitle');
+  const listEl = document.getElementById('mentor-rewards-list');
+  if (!titleEl || !listEl) return;
+
+  titleEl.innerText = `⭐ Recompensas — ${mentor.name}`;
+  subtitleEl.innerText = `Nível atual: ${currentLvl}/30 · ${allRewards.filter(r => currentLvl >= r.lvl).length}/${allRewards.length} desbloqueadas`;
+
+  listEl.innerHTML = allRewards.map(r => {
+    const unlocked = currentLvl >= r.lvl;
+    const { icon, name, desc } = getRewardDisplayInfo(r);
+    const isImg = icon && (icon.endsWith('.webp') || icon.endsWith('.png') || icon.endsWith('.jpg'));
+    const iconHtml = isImg
+      ? `<img src="${icon}" alt="" class="mrw-icon-img" />`
+      : `<span class="mrw-icon-emoji">${icon}</span>`;
+    return `
+      <div class="mrw-row ${unlocked ? 'mrw-unlocked' : 'mrw-locked'}">
+        <div class="mrw-icon-wrap">${iconHtml}</div>
+        <div class="mrw-info">
+          <span class="mrw-name">${name}</span>
+          <span class="mrw-desc">${desc}</span>
+        </div>
+        <div class="mrw-lvl-badge">${unlocked ? '✅' : '🔒'} Nv${r.lvl}</div>
+      </div>
+    `;
+  }).join('');
+
+  document.getElementById('mentor-rewards-modal').classList.remove('hidden');
 };
 
 // Tributo: celebração visual da frase (sem áudio — apenas efeito visual)
@@ -5293,15 +5407,24 @@ window.showTributeMilestoneHelp = function(milestoneId) {
 
 window.triggerEternalFlameSpark = function() {
   playSound('potion');
-  
-  state.eternalFlameClicks = (state.eternalFlameClicks || 0) + 1;
-  saveState();
-  
-  const flameCountEl = document.getElementById('eternal-flame-count');
-  if (flameCountEl) {
-    flameCountEl.innerText = `${state.eternalFlameClicks.toLocaleString('pt-BR')} toques de respeito`;
+
+  // Sem login: mantém a contagem local antiga como fallback (nada muda pra
+  // quem não usa conta na nuvem). Logado: o toque soma pro contador global
+  // de verdade — increment_eternal_flame() é atômico no banco, então dois
+  // toques ao mesmo tempo de pessoas diferentes nunca se perdem.
+  if (isCloudEnabled() && cloudUser) {
+    supabaseClient.rpc('increment_eternal_flame').then(({ data, error }) => {
+      if (!error && typeof data === 'number') {
+        globalFlameCount = data;
+        renderEternalFlameCount();
+      }
+    }).catch((e) => console.warn('Falha ao somar na Chama Eterna global', e));
+  } else {
+    state.eternalFlameClicks = (state.eternalFlameClicks || 0) + 1;
+    saveState();
+    renderEternalFlameCount();
   }
-  
+
   const container = document.querySelector('.eternal-flame-container');
   if (container) {
     container.style.transform = 'scale(1.25)';
@@ -5457,7 +5580,9 @@ function renderProfileCard() {
   };
 
   const avatarEl = document.getElementById('pcm-avatar');
-  if (avatarEl) avatarEl.src = getUserAvatarSrc();
+  // Mesmo bug do amb-img: onerror inline (disparado quando src="" no primeiro
+  // render) deixa opacity presa mesmo depois de um avatar válido carregar.
+  if (avatarEl) { avatarEl.style.opacity = ''; avatarEl.src = getUserAvatarSrc(); }
 
   const nameEl = document.getElementById('pcm-name');
   if (nameEl) nameEl.innerText = state.charName || 'Hunter';
@@ -6843,6 +6968,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Conta / sincronização na nuvem (Supabase)
   capturePendingInviteFromURL();
   initCloudAuth();
+  fetchGlobalFlameCount();
 
   const sendCodeBtn = document.getElementById('account-send-magic-link');
   if (sendCodeBtn) {
@@ -7488,6 +7614,12 @@ document.addEventListener('DOMContentLoaded', () => {
   if (settingsSaveBtn) {
     settingsSaveBtn.addEventListener('click', () => {
       playSound('click');
+      const nameEl = document.getElementById('settings-char-name');
+      const newName = nameEl ? nameEl.value.trim() : '';
+      if (newName) {
+        state.charName = newName;
+        userProfile.name = newName;
+      }
       const weight = parseFloat(document.getElementById('settings-weight').value);
       const height = parseFloat(document.getElementById('settings-height').value);
       const goal = document.getElementById('settings-goal').value;
@@ -8327,6 +8459,9 @@ document.addEventListener('DOMContentLoaded', () => {
       vig: userProfile.attributes.VIG,
       foc: userProfile.attributes.FOC
     };
+    // Pontos de atributo que sobraram na alocação inicial ficam guardados
+    // pra alocar depois em Status, em vez de somem no ar.
+    state.attrPoints = wizAttrPool > 0 ? wizAttrPool : 0;
 
     recalculateMacrosTargets();
     updateWaterTargetFromWeight();
@@ -8388,6 +8523,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Settings tab preload
   function openSettingsTab() {
+    const nameInput = document.getElementById('settings-char-name');
+    if (nameInput) nameInput.value = state.charName || '';
     const modeSelect = document.getElementById('settings-app-mode');
     if (modeSelect) modeSelect.value = state.appMode || 'rpg';
     const toneSelect = document.getElementById('settings-message-tone');
@@ -8904,6 +9041,20 @@ document.addEventListener('DOMContentLoaded', () => {
     playSound('click');
     document.getElementById('item-acquired-modal').classList.add('hidden');
   });
+
+  const btnCloseMentorRewards = document.getElementById('btn-close-mentor-rewards');
+  if (btnCloseMentorRewards) {
+    btnCloseMentorRewards.addEventListener('click', () => {
+      playSound('click');
+      document.getElementById('mentor-rewards-modal').classList.add('hidden');
+    });
+  }
+  const mentorRewardsModalEl = document.getElementById('mentor-rewards-modal');
+  if (mentorRewardsModalEl) {
+    mentorRewardsModalEl.addEventListener('click', (e) => {
+      if (e.target === mentorRewardsModalEl) mentorRewardsModalEl.classList.add('hidden');
+    });
+  }
 
   // CLAIM DAILY FREAKY CHALLENGE REWARD
   const claimBtn = document.getElementById('btn-claim-challenge');
