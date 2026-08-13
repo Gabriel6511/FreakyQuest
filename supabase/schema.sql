@@ -121,3 +121,79 @@ $$;
 -- de nuvem do app — sem login, o toque fica só local, como já era antes).
 revoke execute on function public.increment_eternal_flame() from public;
 grant execute on function public.increment_eternal_flame() to authenticated;
+
+-- ==========================================
+-- 6. MIGRAÇÃO 2026-08-13 — visão de admin (painel local `admin.html`)
+--
+-- DECISÃO DE SEGURANÇA: o painel admin NÃO usa a service_role key. Essa
+-- chave ignora todo o RLS e daria acesso irrestrito a peso/dieta/lesões de
+-- todo mundo; guardá-la em texto puro num arquivo local seria um ponto
+-- único de vazamento pra sempre. Em vez disso o painel loga com o mesmo
+-- fluxo de e-mail + código do app (usando a chave publishable, que já é
+-- pública) e chama esta função. A checagem de dono acontece DENTRO do
+-- banco, comparando o e-mail do usuário autenticado — não dá pra burlar
+-- pelo client, e nenhum segredo precisa existir fora do Supabase.
+--
+-- Pra passar o painel pra outro dono no futuro, é só trocar o e-mail aqui.
+-- ==========================================
+create or replace function public.admin_overview()
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $fn$
+declare
+  caller_email text;
+  flame bigint := 0;
+  result jsonb;
+begin
+  select email into caller_email from auth.users where id = auth.uid();
+  if caller_email is distinct from 'gabrielnavarrobruno@gmail.com' then
+    raise exception 'Acesso negado: essa funcao e restrita ao dono do app.';
+  end if;
+
+  -- to_regclass evita quebrar caso a migração 5 (Chama Eterna) ainda não
+  -- tenha sido rodada neste projeto.
+  if to_regclass('public.eternal_flame') is not null then
+    execute 'select clicks from public.eternal_flame where id = 1' into flame;
+  end if;
+
+  select jsonb_build_object(
+    'gerado_em', now(),
+    'totais', jsonb_build_object(
+      'contas', (select count(*) from auth.users),
+      'com_progresso', (select count(*) from public.profiles),
+      'ativos_7d', (select count(*) from auth.users where last_sign_in_at > now() - interval '7 days'),
+      'ativos_30d', (select count(*) from auth.users where last_sign_in_at > now() - interval '30 days'),
+      'novos_7d', (select count(*) from auth.users where created_at > now() - interval '7 days'),
+      'chama_eterna', coalesce(flame, 0),
+      'amizades', (select count(*) from public.friendships)
+    ),
+    'usuarios', (select coalesce(jsonb_agg(to_jsonb(t) order by t.criada_em desc), '[]'::jsonb) from (
+      select u.email, pp.nickname as apelido, u.created_at as criada_em,
+             u.last_sign_in_at as ultimo_login, pp.level as nivel, pp.xp,
+             pp.current_streak as streak,
+             (p.state->>'workoutsCompleted')::int as treinos,
+             p.state->>'activeMentor' as mentor,
+             p.state->>'appMode' as modo,
+             p.updated_at as progresso_salvo
+      from auth.users u
+      left join public.profiles p on p.id = u.id
+      left join public.public_profiles pp on pp.id = u.id
+    ) t),
+    'mentores', (select coalesce(jsonb_object_agg(mentor, qtd), '{}'::jsonb) from (
+      select coalesce(state->>'activeMentor', '(sem dados)') as mentor, count(*) as qtd
+      from public.profiles group by 1
+    ) m),
+    'modos', (select coalesce(jsonb_object_agg(modo, qtd), '{}'::jsonb) from (
+      select coalesce(state->>'appMode', '(sem dados)') as modo, count(*) as qtd
+      from public.profiles group by 1
+    ) mo)
+  ) into result;
+
+  return result;
+end;
+$fn$;
+
+revoke execute on function public.admin_overview() from public;
+grant execute on function public.admin_overview() to authenticated;
