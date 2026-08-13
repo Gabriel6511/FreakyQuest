@@ -2907,7 +2907,9 @@ function loadState() {
         
         // Custom features fallbacks
         if (!state.weightHistory) state.weightHistory = [parseFloat(state.charWeight) || 80];
-        if (!state.strengthHistory) state.strengthHistory = [50 + (getEffectiveAttributes().for || 10) * 1.5];
+        // 0 e honesto aqui: sem treino registrado ainda, volume real e zero —
+        // nao inventa um numero baseado em atributo (era assim antes).
+        if (!state.strengthHistory) state.strengthHistory = [0];
         if (!state.dailyChallenge) {
           state.dailyChallenge = { id: 'dc_water', progress: 0, completed: false, claimed: false };
         }
@@ -5786,10 +5788,13 @@ function renderEvolutionChart() {
   svg.innerHTML = '';
 
   const wHist = state.weightHistory || [];
+  // Volume total (kg x reps) de cada treino finalizado — dado real, vem de
+  // calculateSessionVolume() em completeActiveWorkout(). Sem fórmula
+  // inventada: sem treino registrado ainda, o volume é 0 mesmo.
   const sHist = state.strengthHistory || [];
 
   if (wHist.length === 0) wHist.push(parseFloat(state.charWeight) || 80);
-  if (sHist.length === 0) sHist.push(50 + (getEffectiveAttributes().for || 10) * 1.5);
+  if (sHist.length === 0) sHist.push(0);
 
   const finalW = [...wHist];
   const finalS = [...sHist];
@@ -5908,7 +5913,7 @@ function renderEvolutionChart() {
     });
   }
 
-  drawDots(strengthPoints, '#ff9f1c', 'Força Est.', 'XP');
+  drawDots(strengthPoints, '#ff9f1c', 'Volume Total', 'kg');
   drawDots(weightPoints, '#00f2fe', 'Peso', 'kg');
 }
 
