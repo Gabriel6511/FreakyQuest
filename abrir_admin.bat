@@ -1,8 +1,10 @@
 @echo off
 REM ============================================================
 REM  Abre o Painel Admin do FreakyQuest — clique duas vezes aqui.
-REM  So funciona rodando NESTE computador (admin.html nao existe
-REM  em nenhum lugar publicado, so na sua pasta local).
+REM  Isso e so uma conveniencia para testar localmente. O painel
+REM  tambem esta publicado no Vercel (mesmo dominio do app), entao
+REM  pra acessar de qualquer lugar (inclusive do celular, com o PC
+REM  desligado) so entrar direto em <seu-dominio>/admin.html.
 REM ============================================================
 
 set PORTA=8990

@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FreakyQuest — Painel Admin</title>
+<script src="vendor_supabase.js"></script>
+<style>
+  :root {
+    --bg: #07080c;
+    --bg-2: #0c0e14;
+    --glass: rgba(255,255,255,0.035);
+    --glass-brd: rgba(255,255,255,0.08);
+    --txt: #eef2f6;
+    --txt-dim: #8b93a7;
+    --txt-mute: #5a6275;
+    --neon: #22e07a;
+    --neon-dim: rgba(34,224,122,0.14);
+    --cyan: #35d6ff;
+    --amber: #ffb703;
+    --violet: #a855f7;
+    --danger: #ff4d6d;
+    --r: 18px;
+    --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--txt);
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    min-height: 100vh;
+    padding: 28px clamp(16px, 4vw, 44px) 60px;
+    position: relative;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  /* Aurora de fundo — dá profundidade sem virar ruído visual */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: -30%;
+    background:
+      radial-gradient(38% 44% at 18% 12%, rgba(34,224,122,0.13), transparent 70%),
+      radial-gradient(34% 40% at 82% 8%, rgba(53,214,255,0.11), transparent 70%),
+      radial-gradient(40% 46% at 62% 88%, rgba(168,85,247,0.10), transparent 72%);
+    filter: blur(46px);
+    animation: drift 26s ease-in-out infinite alternate;
+    pointer-events: none;
+    z-index: 0;
+  }
+  @keyframes drift {
+    from { transform: translate3d(-2%, -1%, 0) scale(1); }
+    to   { transform: translate3d(3%, 2%, 0) scale(1.09); }
+  }
+  .wrap { position: relative; z-index: 1; max-width: 1320px; margin: 0 auto; }
+
+  /* ─── Topo ─── */
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 18px; flex-wrap: wrap; margin-bottom: 26px;
+  }
+  .brand { display: flex; align-items: center; gap: 13px; }
+  .brand-mark {
+    width: 42px; height: 42px; border-radius: 13px; flex-shrink: 0;
+    background: linear-gradient(140deg, var(--neon), #0d9c52);
+    display: grid; place-items: center;
+    font-size: 21px; font-weight: 800; color: #04120a;
+    box-shadow: 0 0 26px rgba(34,224,122,0.42);
+  }
+  .brand h1 { font-size: 1.13rem; font-weight: 750; letter-spacing: -0.022em; }
+  .brand p { font-size: 0.71rem; color: var(--txt-mute); margin-top: 2px; }
+
+  .top-actions { display: flex; align-items: center; gap: 9px; }
+  .btn {
+    background: var(--glass); border: 1px solid var(--glass-brd);
+    color: var(--txt); padding: 9px 15px; border-radius: 11px;
+    font-size: 0.78rem; font-weight: 600; cursor: pointer;
+    font-family: inherit; transition: all .18s ease;
+    display: inline-flex; align-items: center; gap: 7px;
+  }
+  .btn:hover { background: rgba(255,255,255,0.075); border-color: rgba(255,255,255,0.17); transform: translateY(-1px); }
+  .btn:active { transform: translateY(0); }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--neon), #12b866);
+    border-color: transparent; color: #04120a; font-weight: 750;
+    box-shadow: 0 3px 18px rgba(34,224,122,0.3);
+  }
+  .btn-primary:hover { background: linear-gradient(135deg, #33ef8b, #17c972); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+
+  /* ─── Login ─── */
+  #login {
+    max-width: 400px; margin: min(13vh, 110px) auto 0;
+    background: var(--glass); border: 1px solid var(--glass-brd);
+    border-radius: 24px; padding: 34px 30px;
+    backdrop-filter: blur(26px); -webkit-backdrop-filter: blur(26px);
+    box-shadow: 0 26px 70px rgba(0,0,0,0.6);
+    animation: rise .5s cubic-bezier(.2,.8,.25,1) both;
+  }
+  #login h2 { font-size: 1.24rem; margin-bottom: 6px; letter-spacing: -0.022em; }
+  #login .sub { font-size: 0.78rem; color: var(--txt-dim); margin-bottom: 22px; line-height: 1.5; }
+  .field { margin-bottom: 13px; }
+  .field label {
+    display: block; font-size: 0.67rem; text-transform: uppercase;
+    letter-spacing: 0.09em; color: var(--txt-mute); margin-bottom: 7px; font-weight: 650;
+  }
+  input {
+    width: 100%; background: rgba(0,0,0,0.42);
+    border: 1px solid var(--glass-brd); border-radius: 11px;
+    padding: 12px 14px; color: var(--txt); font-size: 0.9rem;
+    font-family: inherit; transition: border-color .18s, box-shadow .18s;
+  }
+  input:focus {
+    outline: none; border-color: var(--neon);
+    box-shadow: 0 0 0 3px var(--neon-dim);
+  }
+  input::placeholder { color: var(--txt-mute); }
+  #login .btn { width: 100%; justify-content: center; margin-top: 7px; padding: 12px; }
+  .msg { font-size: 0.76rem; margin-top: 13px; line-height: 1.5; }
+  .msg.err { color: var(--danger); }
+  .msg.ok { color: var(--neon); }
+  .hidden { display: none !important; }
+
+  /* ─── Bento ─── */
+  .bento {
+    display: grid; gap: 15px;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    margin-bottom: 15px;
+  }
+  .card {
+    background: var(--glass); border: 1px solid var(--glass-brd);
+    border-radius: var(--r); padding: 19px;
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    position: relative; overflow: hidden;
+    animation: rise .55s cubic-bezier(.2,.8,.25,1) both;
+    transition: border-color .22s, transform .22s;
+  }
+  .card:hover { border-color: rgba(255,255,255,0.15); transform: translateY(-2px); }
+  /* fio de luz no topo do card */
+  .card::after {
+    content: ''; position: absolute; inset: 0 0 auto 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent, var(--neon)), transparent);
+    opacity: .5;
+  }
+  @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+  .k-label {
+    font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--txt-mute); font-weight: 700; display: flex; align-items: center; gap: 6px;
+  }
+  .k-val {
+    font-family: var(--mono); font-size: clamp(1.9rem, 4.4vw, 2.5rem);
+    font-weight: 700; letter-spacing: -0.035em; margin-top: 9px; line-height: 1;
+    color: var(--accent, var(--txt));
+  }
+  .k-sub { font-size: 0.71rem; color: var(--txt-dim); margin-top: 7px; }
+
+  .span-2 { grid-column: span 2; }
+  @media (max-width: 620px) { .span-2 { grid-column: span 1; } }
+
+  /* ─── Barras ─── */
+  .bar-row { display: flex; align-items: center; gap: 11px; margin-top: 11px; }
+  .bar-name { font-size: 0.76rem; width: 92px; flex-shrink: 0; color: var(--txt-dim); text-transform: capitalize; }
+  .bar-track { flex: 1; height: 7px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden; }
+  .bar-fill {
+    height: 100%; border-radius: 4px;
+    background: linear-gradient(90deg, var(--accent, var(--neon)), color-mix(in srgb, var(--accent, var(--neon)) 45%, transparent));
+    animation: grow .9s cubic-bezier(.2,.8,.25,1) both;
+  }
+  @keyframes grow { from { width: 0 !important; } }
+  .bar-num { font-family: var(--mono); font-size: 0.78rem; width: 26px; text-align: right; color: var(--txt); }
+
+  /* ─── Tabela ─── */
+  .table-card { padding: 0; overflow: hidden; }
+  .table-head {
+    padding: 17px 19px 14px; display: flex; align-items: center;
+    justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  }
+  .table-head h3 { font-size: 0.93rem; font-weight: 700; letter-spacing: -0.015em; }
+  .scroll-x { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.8rem; min-width: 780px; }
+  thead th {
+    text-align: left; padding: 9px 15px;
+    font-size: 0.63rem; text-transform: uppercase; letter-spacing: 0.09em;
+    color: var(--txt-mute); font-weight: 700;
+    border-bottom: 1px solid var(--glass-brd); white-space: nowrap;
+    background: rgba(0,0,0,0.24);
+  }
+  tbody td { padding: 13px 15px; border-bottom: 1px solid rgba(255,255,255,0.045); white-space: nowrap; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr { transition: background .15s; }
+  tbody tr:hover { background: rgba(255,255,255,0.028); }
+  .mono { font-family: var(--mono); font-size: 0.77rem; }
+  .email { font-weight: 600; }
+  .nick { color: var(--cyan); font-weight: 650; }
+  .dim { color: var(--txt-mute); }
+
+  .pill {
+    display: inline-block; padding: 3px 9px; border-radius: 999px;
+    font-size: 0.64rem; font-weight: 700; letter-spacing: 0.03em;
+  }
+  .pill-on   { background: rgba(34,224,122,0.15);  color: var(--neon);  }
+  .pill-idle { background: rgba(255,183,3,0.13);   color: var(--amber); }
+  .pill-off  { background: rgba(255,255,255,0.06); color: var(--txt-mute); }
+  .pill-rpg  { background: rgba(168,85,247,0.16);  color: #c99bff; }
+  .pill-simp { background: rgba(53,214,255,0.13);  color: var(--cyan); }
+
+  .empty { padding: 40px 20px; text-align: center; color: var(--txt-mute); font-size: 0.83rem; }
+  footer { margin-top: 22px; text-align: center; font-size: 0.68rem; color: var(--txt-mute); }
+  .spin {
+    width: 15px; height: 15px; border: 2px solid rgba(255,255,255,0.15);
+    border-top-color: var(--neon); border-radius: 50%;
+    animation: sp .7s linear infinite; display: inline-block;
+  }
+  @keyframes sp { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ══ LOGIN ══ -->
+  <section id="login">
+    <h2>Painel Admin</h2>
+    <p class="sub">Acesso restrito ao dono do FreakyQuest. Entre com o e-mail cadastrado — o banco valida quem você é.</p>
+
+    <div class="field">
+      <label for="email">E-mail</label>
+      <input type="email" id="email" placeholder="seu@email.com" autocomplete="email">
+    </div>
+    <button class="btn btn-primary" id="btn-send">Enviar código</button>
+
+    <div id="code-step" class="hidden">
+      <div class="field" style="margin-top:15px">
+        <label for="code">Código recebido no e-mail</label>
+        <input type="text" id="code" placeholder="Código" inputmode="numeric" autocomplete="one-time-code">
+      </div>
+      <button class="btn btn-primary" id="btn-verify">Entrar</button>
+    </div>
+
+    <p class="msg" id="login-msg"></p>
+  </section>
+
+  <!-- ══ DASHBOARD ══ -->
+  <div id="dash" class="hidden">
+    <header>
+      <div class="brand">
+        <div class="brand-mark">FQ</div>
+        <div>
+          <h1>Painel Admin</h1>
+          <p id="hdr-sub">—</p>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button class="btn" id="btn-refresh">↻ Atualizar</button>
+        <button class="btn" id="btn-logout">Sair</button>
+      </div>
+    </header>
+
+    <div class="bento" id="kpis"></div>
+    <div class="bento" id="charts"></div>
+
+    <div class="card table-card" style="animation-delay:.14s">
+      <div class="table-head">
+        <h3>Usuários</h3>
+        <span class="dim" style="font-size:0.72rem" id="tbl-count"></span>
+      </div>
+      <div class="scroll-x"><table id="tbl">
+        <thead><tr>
+          <th>E-mail</th><th>Apelido</th><th>Status</th><th>Modo</th>
+          <th>Nível</th><th>Treinos</th><th>Sequência</th>
+          <th>Mentor</th><th>Último login</th><th>Entrou em</th>
+        </tr></thead>
+        <tbody id="tbody"></tbody>
+      </table></div>
+    </div>
+
+    <footer id="foot"></footer>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://mhzrmtxaoaipmjlpedvg.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_IF_vgdgV-aF9XOKkvE3Zng_Ym4Z4l7q';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const $ = id => document.getElementById(id);
+const msg = (t, cls) => { const el = $('login-msg'); el.textContent = t; el.className = 'msg ' + (cls || ''); };
+
+// ── Login por código (mesmo fluxo do app) ──
+$('btn-send').onclick = async () => {
+  const email = $('email').value.trim();
+  if (!email) return msg('Digite seu e-mail.', 'err');
+  $('btn-send').disabled = true;
+  msg('Enviando…');
+  const { error } = await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: false } });
+  $('btn-send').disabled = false;
+  if (error) return msg(error.message, 'err');
+  $('code-step').classList.remove('hidden');
+  msg('Código enviado. Confira seu e-mail.', 'ok');
+};
+
+$('btn-verify').onclick = async () => {
+  const email = $('email').value.trim();
+  const token = $('code').value.trim().replace(/\s/g, '');
+  if (!token) return msg('Digite o código.', 'err');
+  $('btn-verify').disabled = true;
+  msg('Verificando…');
+  const { error } = await sb.auth.verifyOtp({ email, token, type: 'email' });
+  $('btn-verify').disabled = false;
+  if (error) return msg(error.message, 'err');
+  boot();
+};
+
+$('btn-logout').onclick = async () => {
+  await sb.auth.signOut();
+  $('dash').classList.add('hidden');
+  $('login').classList.remove('hidden');
+  msg('');
+};
+$('btn-refresh').onclick = () => load(true);
+
+// ── Helpers ──
+const fmtDate = s => {
+  if (!s) return '—';
+  const d = new Date(s);
+  return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit' }) +
+         ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+};
+const daysSince = s => s ? Math.floor((Date.now() - new Date(s)) / 86400000) : null;
+
+function statusPill(ultimoLogin) {
+  const d = daysSince(ultimoLogin);
+  if (d === null) return '<span class="pill pill-off">nunca</span>';
+  if (d <= 7)  return '<span class="pill pill-on">ativo</span>';
+  if (d <= 30) return '<span class="pill pill-idle">' + d + 'd parado</span>';
+  return '<span class="pill pill-off">' + d + 'd parado</span>';
+}
+
+function kpi(label, value, sub, accent) {
+  return `<div class="card" style="--accent:${accent}">
+    <div class="k-label">${label}</div>
+    <div class="k-val">${value}</div>
+    <div class="k-sub">${sub}</div>
+  </div>`;
+}
+
+function barCard(title, obj, accent, labelMap) {
+  const entries = Object.entries(obj || {}).sort((a, b) => b[1] - a[1]);
+  if (!entries.length) return '';
+  const max = Math.max(...entries.map(e => e[1])) || 1;
+  const rows = entries.map(([k, v]) => {
+    const nome = (labelMap && labelMap[k]) || k;
+    return `<div class="bar-row">
+      <span class="bar-name">${nome}</span>
+      <span class="bar-track"><span class="bar-fill" style="width:${(v / max) * 100}%"></span></span>
+      <span class="bar-num">${v}</span>
+    </div>`;
+  }).join('');
+  return `<div class="card span-2" style="--accent:${accent}">
+    <div class="k-label">${title}</div>${rows}
+  </div>`;
+}
+
+// ── Carrega os dados via a função protegida do banco ──
+async function load(isRefresh) {
+  if (isRefresh) $('btn-refresh').innerHTML = '<span class="spin"></span> Atualizando';
+  const { data, error } = await sb.rpc('admin_overview');
+  $('btn-refresh').innerHTML = '↻ Atualizar';
+
+  if (error) {
+    $('dash').classList.add('hidden');
+    $('login').classList.remove('hidden');
+    msg('Erro: ' + error.message, 'err');
+    return;
+  }
+
+  const t = data.totais;
+  const pct = t.contas ? Math.round((t.ativos_7d / t.contas) * 100) : 0;
+
+  $('kpis').innerHTML = [
+    kpi('Contas criadas', t.contas, `+${t.novos_7d} nos últimos 7 dias`, 'var(--neon)'),
+    kpi('Ativos (7 dias)', t.ativos_7d, `${pct}% da base · ${t.ativos_30d} em 30 dias`, 'var(--cyan)'),
+    kpi('Com progresso salvo', t.com_progresso, `${t.contas - t.com_progresso} só criaram conta`, 'var(--violet)'),
+    kpi('Chama Eterna', (t.chama_eterna || 0).toLocaleString('pt-BR'), `${t.amizades} amizade(s) formada(s)`, 'var(--amber)')
+  ].join('');
+
+  $('charts').innerHTML =
+    barCard('Mentores mais usados', data.mentores, 'var(--violet)') +
+    barCard('Modo do app', data.modos, 'var(--cyan)', { rpg: 'Modo RPG', simple: 'Modo Simples' });
+
+  const users = data.usuarios || [];
+  $('tbl-count').textContent = users.length + ' no total';
+  $('tbody').innerHTML = users.length ? users.map(u => `<tr>
+      <td class="email">${u.email || '—'}</td>
+      <td class="nick">${u.apelido || '<span class="dim">—</span>'}</td>
+      <td>${statusPill(u.ultimo_login)}</td>
+      <td>${u.modo === 'simple' ? '<span class="pill pill-simp">Simples</span>'
+            : u.modo === 'rpg' ? '<span class="pill pill-rpg">RPG</span>'
+            : '<span class="dim">—</span>'}</td>
+      <td class="mono">${u.nivel ?? '—'}</td>
+      <td class="mono">${u.treinos ?? 0}</td>
+      <td class="mono">${u.streak ?? 0}</td>
+      <td class="dim" style="text-transform:capitalize">${u.mentor || '—'}</td>
+      <td class="mono dim">${fmtDate(u.ultimo_login)}</td>
+      <td class="mono dim">${fmtDate(u.criada_em)}</td>
+    </tr>`).join('')
+    : '<tr><td colspan="10" class="empty">Nenhum usuário ainda.</td></tr>';
+
+  $('hdr-sub').textContent = t.contas + ' usuário(s) · ' + t.ativos_7d + ' ativo(s) essa semana';
+  $('foot').textContent = 'Atualizado em ' + new Date(data.gerado_em).toLocaleString('pt-BR');
+}
+
+async function boot() {
+  const { data } = await sb.auth.getSession();
+  if (data && data.session) {
+    $('login').classList.add('hidden');
+    $('dash').classList.remove('hidden');
+    await load();
+  }
+}
+boot();
+</script>
+</body>
+</html>
