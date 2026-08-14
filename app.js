@@ -1018,6 +1018,27 @@ const OFFICIAL_MENTORS = [
     particleType: 'curse',
     isCustom: false
   },
+  {
+    id: 'todo',
+    name: 'Aoi Todo',
+    universe: 'Jujutsu Kaisen',
+    category: 'anime',
+    archetype: 'effort',
+    primaryStat: 'for',
+    levelReq: 1,
+    theme: 'theme-todo',
+    avatar: 'todo.webp',
+    // A cena original ja vem com dominante rosa/amarela muito forte, entao o
+    // preset "Anime" padrao (saturate 1.85) estourava tudo em magenta neon.
+    // Aqui o caminho e o inverso: DESSATURAR e subir contraste pra recuperar
+    // o rosto. Calibrado lado a lado contra 3 alternativas.
+    filterCSS: 'contrast(1.35) saturate(0.7) brightness(0.92)',
+    quote: '"Eu não odeio quem é fraco. Odeio quem é fraco e não faz nada pra mudar isso. Ah, e qual é o seu tipo? De treino, eu digo."',
+    buff: '+20% Força & +15% Resistência (Controle Absoluto)',
+    colorHex: '#7209b7',
+    particleType: 'impact',
+    isCustom: false
+  },
   // ══════════════ SPY X FAMILY ══════════════
   {
     id: 'anya',
@@ -1152,6 +1173,13 @@ const MENTOR_VOICE_LINES = {
     newRecord: '{kg}kg no {exercise}?! Anya wa tensai treinadora! Isso é papel de espiã nível S!',
     levelUp: 'Nível {level}! Chichi ficaria orgulhoso. Anya vai contar pro Bondman hoje à noite!',
     comeback: '{days} dias sumido... Anya quase chorou! Isso quase causou GUERRA. Volta, ou os Tonitrus Bolts vão cair!'
+  },
+  todo: {
+    reminder: 'Controle. É disso que se trata: bater o ponto todo dia, sem desculpa. Bora, aplauda esse treino.',
+    workoutDone: 'Aplaudo isso. De verdade — *bate palmas*. Agora me diz: qual é o seu tipo? De disciplina, eu digo.',
+    newRecord: '{kg}kg no {exercise}?! ISSO! Não é estranho comemorar assim — meu melhor amigo faria igual.',
+    levelUp: 'Nível {level}. Eu não odeio quem é fraco. Odeio quem é fraco e não tenta. Você tentou. Suba mais um degrau.',
+    comeback: '{days} dias sumido, hein? Fraco é normal. Fraco que não volta pra tentar de novo, isso eu não perdoo.'
   }
 };
 
@@ -1548,6 +1576,19 @@ const MENTOR_REWARD_CONFIGS = {
     leaderboardTitle: 'Rei das Maldições', finalTitle: 'DOMÍNIO ABSOLUTO',
     easterDesc: 'Um dedo amaldiçoado foi encontrado escondido no seu inventário... melhor nem perguntar como.'
   },
+  todo: {
+    shortcode: 'tdo', shortName: 'Todo', name: 'Aoi Todo', colorLabel: 'Violeta Boogie Woogie', particleLabel: 'Ondas de distorção espacial',
+    primaryStat: 'for', secondaryStat: 'res',
+    tier1: { type: 'css_class', value: 'has-men-tdo5', icon: '👏', name: 'Sincronia Ativada',
+      desc: 'Um brilho violeta pulsa ao redor do seu avatar — controle total sobre o próprio treino!' },
+    tier2: { type: 'sound', value: 'boogiewoogie', icon: '🔮', name: 'Eco do Boogie Woogie',
+      desc: 'Um estalo de palmas ecoa ao completar treino intenso. Aura violeta máxima no card.' },
+    mission: { name: 'Qual é o Seu Tipo', desc: 'Missão semanal: treine 5 dias seguidos sem quebrar a sincronia — controle é tudo.' },
+    tier4: { type: 'css_class', value: 'has-men-tdo20', icon: '🥊', name: 'Controle Absoluto + Badge',
+      desc: 'Aura de combatente supremo em toda a UI. Badge de elite no perfil.' },
+    leaderboardTitle: 'Elite Kyoto', finalTitle: 'CONTROLE ABSOLUTO',
+    easterDesc: 'Um pôster meio amassado da Takada Reika foi encontrado escondido no seu inventário... melhor não comentar, ele leva a sério.'
+  },
   anya: {
     shortcode: 'any', shortName: 'Anya', name: 'Anya Forger', colorLabel: 'Rosa Waku Waku', particleLabel: 'Faíscas telepáticas',
     primaryStat: 'foc', secondaryStat: 'agi',
@@ -1790,6 +1831,20 @@ const EQUIPMENT_DATABASE = [
     desc: 'Expansão de Domínio. Dentro dela, o único resultado possível é o corte.',
     stats: { for: 12, agi: 6 }, unlockDesc: 'Desbloqueia no Mentor Sukuna Nível 30.',
     equivalentIds: ['item_santuario', 'has-men-suk30'] },
+
+  // ══ AOI TODO ══
+  { id: 'item_boogiewoogie', name: 'Palmas do Boogie Woogie', slot: 'hands', icon: 'boogie_woogie_icon.webp',
+    desc: 'A técnica que troca sua posição com quem você tocou, no instante em que ambos batem palmas juntos.',
+    stats: { for: 5 }, unlockDesc: 'Desbloqueia no Mentor Aoi Todo Nível 9.',
+    equivalentIds: ['item_boogiewoogie', 'has-men-tdo9'] },
+  { id: 'item_emblemakyoto', name: 'Emblema de Kyoto Jujutsu High', slot: 'badge', icon: 'emblema_kyoto_icon.webp',
+    desc: 'O emblema do 2º ano da Escola Técnica de Kyoto. Ele não representa a escola — a escola é que tem sorte de tê-lo.',
+    stats: { for: 8, res: 4 }, unlockDesc: 'Desbloqueia no Mentor Aoi Todo Nível 19.',
+    equivalentIds: ['item_emblemakyoto', 'has-men-tdo19'] },
+  { id: 'item_postertakada', name: 'Pôster da Takada Reika', slot: 'arms', icon: 'poster_takada_icon.webp',
+    desc: 'A idol favorita do Todo, guardada com carinho. Se você entender por que isso importa, vocês dois já são melhores amigos.',
+    stats: { for: 12, res: 6 }, unlockDesc: 'Desbloqueia no Mentor Aoi Todo Nível 30.',
+    equivalentIds: ['item_postertakada', 'has-men-tdo30'] },
 
   // ══ ANYA ══ (único mentor com 4 itens — o Minduim é bônus)
   { id: 'item_minduim', name: 'Minduim da Anya', slot: 'hands', icon: 'minduim_anya_icon.webp',
@@ -2906,6 +2961,10 @@ function loadState() {
         if (state.targetWeight === undefined) state.targetWeight = state.charWeight || 75;
         if (state.tutorialCompleted === undefined) state.tutorialCompleted = false;
         if (state.unlockedItems === undefined) state.unlockedItems = [];
+        // renderDailyQuests() itera nisso sem checar; faltando, updateUI()
+        // inteiro morre com TypeError (app em branco). O caminho da nuvem já
+        // é coberto por normalizeStateShape() — aqui era o único furo.
+        if (!Array.isArray(state.dailyQuests)) state.dailyQuests = [];
         if (state.unlockedTrophies === undefined) state.unlockedTrophies = [];
         if (state.showcaseTrophies === undefined) state.showcaseTrophies = [];
         if (state.profilePic === undefined) state.profilePic = '';
@@ -3089,7 +3148,11 @@ function recalculateMacrosTargets() {
 
 // 8. PROGRESSION SYSTEM
 function getSubclassRank(charClass, lvl) {
-  const list = SUB_CLASSES[charClass];
+  // charClass vem do localStorage sem validacao (loadState lê userObj.class
+  // direto). Um valor legado/corrompido aqui derrubava updateUI() inteiro com
+  // TypeError — ou seja, app em branco. Mesmo fallback já usado em
+  // WORKOUT_TEMPLATES.
+  const list = SUB_CLASSES[charClass] || SUB_CLASSES.bodybuilder;
   let activeRank = list[0].name;
   for (let rank of list) {
     if (lvl >= rank.lvl) {

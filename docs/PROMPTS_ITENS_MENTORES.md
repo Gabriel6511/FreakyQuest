@@ -309,3 +309,38 @@ golden sparkles radiating outward, flat vector illustration style, black
 background, centered composition, square 1:1, no text, no human face —
 abstract glowing aura only
 ```
+
+## Aoi Todo
+
+**31. Palmas do Boogie Woogie** — `boogie_woogie_icon.webp` (Nv9 · Punhos)
+```
+Digital painting icon, deep violet radiant glow, two glowing open palms
+about to clap together at the very center as the light source, warped
+space-distortion ripples radiating outward, flat vector illustration
+style, black background, centered composition, square 1:1, no text, no
+human face — abstract glowing aura only
+```
+
+**32. Emblema de Kyoto Jujutsu High** — `emblema_kyoto_icon.webp` (Nv19 · Insígnia)
+```
+Digital painting icon, dark emerald green radiant glow, a glowing school
+crest/emblem badge shape at the very center as the light source, sharp
+academic-style light rays radiating outward, flat vector illustration
+style, black background, centered composition, square 1:1, no text, no
+human face — abstract glowing aura only
+```
+
+**33. Pôster da Takada Reika** — `poster_takada_icon.webp` (Nv30 · Braços)
+
+*(Takada Reika é a idol favorita do Todo dentro do universo de Jujutsu Kaisen —*
+*é a base da pergunta "qual é o seu tipo?" que ele usa como ritual de amizade,*
+*inclusive com o Itadori. Item é o pôster/foto dela que ele guarda com carinho,*
+*não a idol em si — evita gerar rosto humano, foco no objeto/moldura.)*
+```
+Digital painting icon, warm gold and soft pink radiant glow, a glowing
+framed poster/photograph shape (blank glowing rectangle, no face inside)
+at the very center as the light source, star-shaped sparkle particles
+radiating outward, flat vector illustration style, black background,
+centered composition, square 1:1, no text, no human face — abstract
+glowing aura only
+```

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'freakyquest-v39';
+const CACHE_NAME = 'freakyquest-v40';
 const ASSETS = [
   './',
   './index.html',
@@ -18,6 +18,7 @@ const ASSETS = [
   './namjoon.webp',
   './sukuna.webp',
   './anya.webp',
+  './todo.webp',
   './bebezinho_tribute.webp',
   './shape_engordar.webp',
   './shape_emagrecer.webp',
@@ -61,7 +62,11 @@ const ASSETS = [
   './estrela_stella_icon.webp',
   './lacos_anya_icon.webp',
   './minduim_anya_icon.webp',
-  './bond_anya_icon.webp'
+  './bond_anya_icon.webp',
+  // Leva 2026-08-13 — Aoi Todo (13o mentor)
+  './boogie_woogie_icon.webp',
+  './emblema_kyoto_icon.webp',
+  './poster_takada_icon.webp'
 ];
 
 self.addEventListener('install', (event) => {
