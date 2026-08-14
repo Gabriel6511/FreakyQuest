@@ -287,6 +287,14 @@ const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const $ = id => document.getElementById(id);
 const msg = (t, cls) => { const el = $('login-msg'); el.textContent = t; el.className = 'msg ' + (cls || ''); };
 
+// Apelido/e-mail sao texto livre controlado pelo USUARIO e caem numa tabela
+// montada com innerHTML. Sem escapar, um apelido como "<svg onload=...>"
+// (cabe nos 20 caracteres permitidos) executaria script aqui dentro — ou seja,
+// na sessao autenticada do dono do painel. Mesmo helper que o app usa.
+const esc = str => String(str ?? '').replace(/[&<>"']/g, c => ({
+  '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+}[c]));
+
 // ── Login por código (mesmo fluxo do app) ──
 $('btn-send').onclick = async () => {
   const email = $('email').value.trim();
@@ -352,7 +360,7 @@ function barCard(title, obj, accent, labelMap) {
   const rows = entries.map(([k, v]) => {
     const nome = (labelMap && labelMap[k]) || k;
     return `<div class="bar-row">
-      <span class="bar-name">${nome}</span>
+      <span class="bar-name">${esc(nome)}</span>
       <span class="bar-track"><span class="bar-fill" style="width:${(v / max) * 100}%"></span></span>
       <span class="bar-num">${v}</span>
     </div>`;
@@ -392,8 +400,8 @@ async function load(isRefresh) {
   const users = data.usuarios || [];
   $('tbl-count').textContent = users.length + ' no total';
   $('tbody').innerHTML = users.length ? users.map(u => `<tr>
-      <td class="email">${u.email || '—'}</td>
-      <td class="nick">${u.apelido || '<span class="dim">—</span>'}</td>
+      <td class="email">${esc(u.email) || '—'}</td>
+      <td class="nick">${u.apelido ? esc(u.apelido) : '<span class="dim">—</span>'}</td>
       <td>${statusPill(u.ultimo_login)}</td>
       <td>${u.modo === 'simple' ? '<span class="pill pill-simp">Simples</span>'
             : u.modo === 'rpg' ? '<span class="pill pill-rpg">RPG</span>'
@@ -401,7 +409,7 @@ async function load(isRefresh) {
       <td class="mono">${u.nivel ?? '—'}</td>
       <td class="mono">${u.treinos ?? 0}</td>
       <td class="mono">${u.streak ?? 0}</td>
-      <td class="dim" style="text-transform:capitalize">${u.mentor || '—'}</td>
+      <td class="dim" style="text-transform:capitalize">${esc(u.mentor) || '—'}</td>
       <td class="mono dim">${fmtDate(u.ultimo_login)}</td>
       <td class="mono dim">${fmtDate(u.criada_em)}</td>
     </tr>`).join('')
