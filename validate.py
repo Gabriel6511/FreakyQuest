@@ -10,12 +10,26 @@ print(f'CSS: braces balance={css_braces}, parens balance={css_parens}')
 if css_braces != 0: print('  !! CSS BRACE MISMATCH !!'); ok = False
 if css_parens != 0: print('  !! CSS PAREN MISMATCH !!'); ok = False
 
-# JS balance check
-js = open('app.js', 'r', encoding='utf-8').read()
+# JS balance check — app.js foi dividido em js/app-NN-*.js (ver docs/QA.md).
+# Cada parte e checada isoladamente: um desbalanceamento so num arquivo
+# apontaria o culpado, mas a soma tambem precisa fechar.
+import glob
+partes = sorted(glob.glob('js/app-*.js'))
+if not partes:
+    print('  !! NENHUM arquivo js/app-*.js encontrado !!'); ok = False
+js = ''
+for p in partes:
+    txt = open(p, 'r', encoding='utf-8').read()
+    js += txt
+    b = txt.count('{') - txt.count('}')
+    pa = txt.count('(') - txt.count(')')
+    br = txt.count('[') - txt.count(']')
+    if b or pa or br:
+        print(f'  !! {p}: braces={b}, parens={pa}, brackets={br} !!'); ok = False
 js_braces = js.count('{') - js.count('}')
 js_parens = js.count('(') - js.count(')')
 js_brackets = js.count('[') - js.count(']')
-print(f'JS: braces={js_braces}, parens={js_parens}, brackets={js_brackets}')
+print(f'JS ({len(partes)} arquivos): braces={js_braces}, parens={js_parens}, brackets={js_brackets}')
 if js_braces != 0: print('  !! JS BRACE MISMATCH !!'); ok = False
 if js_parens != 0: print('  !! JS PAREN MISMATCH !!'); ok = False
 if js_brackets != 0: print('  !! JS BRACKET MISMATCH !!'); ok = False

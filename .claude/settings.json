@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -m http.server:*)",
+      "Bash(python validate.py)",
+      "Bash(python check_duplicate_ids.py)",
+      "Bash(node --check app.js)",
+      "mcp__Claude_Browser__preview_start",
+      "mcp__Claude_Browser__preview_stop"
+    ]
+  }
+}

@@ -1,0 +1,49 @@
+# Auditoria completa — MANUAL, não roda sozinha.
+#
+# Rode isto antes de subir uma atualização grande. Não está no `on: push`
+# de propósito: leva minutos e abre um navegador em 12 telas.
+#
+# Como rodar: aba "Actions" no GitHub -> "Auditoria completa" ->
+# botão "Run workflow".
+name: Auditoria completa
+
+on:
+  workflow_dispatch:
+    inputs:
+      rapido:
+        description: 'Rodar só 3 telas em vez de 12 (mais rápido)'
+        type: boolean
+        default: false
+
+jobs:
+  auditoria:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Instalar Playwright
+        run: |
+          pip install playwright
+          playwright install --with-deps chromium
+
+      - name: Rodar auditoria completa
+        run: |
+          if [ "${{ inputs.rapido }}" = "true" ]; then
+            python scripts/audit_all.py --rapido
+          else
+            python scripts/audit_all.py
+          fi
+
+      - name: Guardar relatório
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: relatorio-auditoria
+          path: scripts/relatorio_runtime.json
+          if-no-files-found: ignore

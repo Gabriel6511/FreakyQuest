@@ -15,4 +15,6 @@ graphify-out/
 ruvector.db
 .mcp.json
 .claude/settings.local.json
+node_modules/
+scripts/relatorio_runtime.json
 
