@@ -6,6 +6,15 @@
   <meta name="theme-color" content="#0a0b10">
   <meta name="description" content="FreakyQuest - RPG de Academia. Treinos, dieta, XP e mentores fitness.">
   <link rel="manifest" href="manifest.json">
+  <!-- iOS nao usa o manifest do mesmo jeito que o Android: o icone da tela de
+       inicio vem do apple-touch-icon (PNG — o iOS nao le WebP aqui de forma
+       confiavel; sem isso ele usa um print borrado da pagina). O
+       status-bar-style black-translucent combina com o viewport-fit=cover
+       que ja esta acima. -->
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="FreakyQuest">
   <title>FreakyQuest - RPG de Academia</title>
   <!-- Google Fonts for premium gaming and body aesthetics -->
   <link rel="preconnect" href="https://fonts.googleapis.com">

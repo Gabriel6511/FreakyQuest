@@ -1,4 +1,4 @@
-const CACHE_NAME = 'freakyquest-v43';
+const CACHE_NAME = 'freakyquest-v44';
 const ASSETS = [
   './',
   './index.html',
@@ -22,6 +22,7 @@ const ASSETS = [
   './logo.webp',
   './logo-192.webp',
   './logo-512.webp',
+  './apple-touch-icon.png',
   './rocklee.webp',
   './goku.webp',
   './arnold.webp',
